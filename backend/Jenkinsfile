@@ -5,6 +5,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
+                    cd backend
                     ./gradlew clean install
                 '''
             }
@@ -13,6 +14,7 @@ pipeline {
         stage('Test') {
             steps {
                 sh '''
+                    cd backend
                     ./gradlew clean test
                 '''
             }
