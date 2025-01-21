@@ -1,11 +1,19 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Hello') {
+    stage('Build') {
             steps {
-                echo 'Hello World'
+                sh '''
+                    ./gradlew clean install
+                '''
             }
         }
-    }
+
+        stage('Test') {
+            steps {
+                sh '''
+                    ./gradlew clean test
+                '''
+            }
+        }
 }
