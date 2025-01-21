@@ -2,15 +2,15 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
-            steps {
-                sh '''
-                    cd backend
-                    chmod +x gradlew
-                    ./gradlew clean install
-                '''
-            }
-        }
+        // stage('Build') {
+        //     steps {
+        //         sh '''
+        //             cd backend
+        //             chmod +x gradlew
+        //             ./gradlew clean install
+        //         '''
+        //     }
+        // }
 
         stage('Test') {
             steps {
