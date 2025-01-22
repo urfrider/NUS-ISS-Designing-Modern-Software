@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import com.jayway.jsonpath.internal.function.numeric.Sum;
-
 public class sum {
 
     @Test
