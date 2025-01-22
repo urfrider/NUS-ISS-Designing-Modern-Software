@@ -1,24 +1,36 @@
 pipeline {
     agent any
-
+    
     stages {
-        // stage('Build') {
-        //     steps {
-        //         sh '''
-        //             cd backend
-        //             chmod +x gradlew
-        //             ./gradlew clean install
-        //         '''
-        //     }
-        // }
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/urfrider/NUS-ISS-Designing-Modern-Software.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "Building the project..."
+                // Build steps go here, for example:
+                // sh './gradlew build'
+            }
+        }
 
         stage('Test') {
             steps {
-                sh '''
-                    cd backend
+                withCredentials([
+                    string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
+                    string(credentialsId: 'DB_USERNAME', variable: 'DB_USERNAME'),
+                    string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
+                ]) {
+                    sh '''
+                    cd ./backend
                     chmod +x gradlew
+                    
                     ./gradlew clean test
-                '''
+                    '''
+                }
             }
         }
     }
