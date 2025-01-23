@@ -3,11 +3,22 @@ package com.nus_iss.spring.backend;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 @SpringBootTest
 class BackendApplicationTests {
+    static {
+		// Load environment variables from .env file
+		Dotenv dotenv = Dotenv.load();
 
-	@Test
-	void contextLoads() {
-	}
+		// Set system properties from .env variables
+		System.setProperty("DB_HOST", dotenv.get("DB_HOST"));
+		System.setProperty("DB_USERNAME", dotenv.get("DB_USERNAME"));
+		System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
+		System.setProperty("SECRET_KEY", dotenv.get("SECRET_KEY"));
+    }
 
+    @Test
+    void contextLoads() {
+    }
 }
