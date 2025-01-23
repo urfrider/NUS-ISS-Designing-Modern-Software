@@ -17,7 +17,14 @@ jobs:
       # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
-
+        
+      - name: Set environment variables
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: echo "Environment variables set"
+        
       # Step 2: Set up JDK
       - name: Set up JDK
         uses: actions/setup-java@v3
@@ -28,6 +35,10 @@ jobs:
       # Step 3: Make the Gradle wrapper executable
       - name: Make gradlew executable
         run: chmod +x backend/gradlew
+        
+      # Step 4: Print all DB_URL values
+      - name: Print all environment variables
+        run: printenv
 
       # Step 4: Run Gradle tests
       - name: Run Gradle tests
