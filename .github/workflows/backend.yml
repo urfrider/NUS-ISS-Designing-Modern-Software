@@ -20,7 +20,7 @@ jobs:
         
       - name: Set environment variables
         env:
-          DB_URL: ${{ secrets.DB_URL }}
+          DB_URL: ${{ secrets.DB_HOST }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: echo "Environment variables set"
