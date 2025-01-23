@@ -21,9 +21,13 @@ jobs:
       - name: Set environment variables
         env:
           DB_URL: ${{ secrets.DB_HOST }}
-          DB_USER: ${{ secrets.DB_USER }}
+          DB_USER: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        run: echo "Environment variables set"
+        run: |
+          echo "DB_URL is set to $DB_URL"
+          echo "DB_USER is set to $DB_USER"
+          echo "DB_PASSWORD is set (not printing for security reasons)"
+
         
       # Step 2: Set up JDK
       - name: Set up JDK
