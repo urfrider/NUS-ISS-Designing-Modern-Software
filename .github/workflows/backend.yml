@@ -9,26 +9,39 @@ on:
       - main
 
 jobs:
-  test:
+  backend:
     runs-on: ubuntu-latest
+    name: Build and Test Backend
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-    
-    - name: Test with Gradle
-      env:
-        DB_HOST: ${{ secrets.DB_HOST }}
-        DB_USERNAME: ${{ secrets.DB_USERNAME }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      run: |
-        cd ./backend
-        chmod +x gradlew
-        ./gradlew clean test
+      # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+                
+      # Step 2: Set up JDK
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17' # Adjust to match your backend's required Java version
+
+      # Step 3: Make the Gradle wrapper executable
+      - name: Make gradlew executable
+        run: chmod +x backend/gradlew
+        
+      # Step 4: Print all DB_URL values
+      - name: Print all environment variables
+        run: printenv
+
+      # Step 4: Run Gradle tests
+      - name: Run Gradle tests
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: |
+          cd backend
+          ./gradlew clean test
 
       # Step 5: Upload test results 
       - name: Upload test results
