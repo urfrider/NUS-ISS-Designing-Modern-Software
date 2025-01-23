@@ -23,15 +23,11 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '17' # Adjust to match your backend's required Java version
+          java-version: '17'
 
       # Step 3: Make the Gradle wrapper executable
       - name: Make gradlew executable
         run: chmod +x backend/gradlew
-        
-      # Step 4: Print all DB_URL values
-      - name: Print all environment variables
-        run: printenv
 
       # Step 4: Run Gradle tests
       - name: Run Gradle tests
