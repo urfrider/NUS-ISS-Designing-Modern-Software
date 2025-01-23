@@ -1,0 +1,44 @@
+name: Backend Build and Test
+
+on:
+  push:
+    paths:
+      - 'backend/**'
+  pull_request:
+    paths:
+      - 'backend/**'
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    name: Build and Test Backend
+
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up JDK
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17' # Adjust to match your backend's required Java version
+
+      # Step 3: Make the Gradle wrapper executable
+      - name: Make gradlew executable
+        run: chmod +x backend/gradlew
+
+      # Step 4: Run Gradle tests
+      - name: Run Gradle tests
+        run: |
+          cd backend
+          ./gradlew clean test
+
+      # Step 5: Upload test results 
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: backend/build/test-results/test
