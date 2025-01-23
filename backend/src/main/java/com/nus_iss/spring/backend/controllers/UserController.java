@@ -5,13 +5,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.nus_iss.spring.backend.dtos.UserDto;
 import com.nus_iss.spring.backend.entities.AuthRequest;
 import com.nus_iss.spring.backend.entities.User;
 import com.nus_iss.spring.backend.services.JwtService;
 import com.nus_iss.spring.backend.services.UserInfoService;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +27,7 @@ import org.springframework.security.core.Authentication;
 
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/auth")
 public class UserController {
 
@@ -59,12 +64,21 @@ public class UserController {
     }
 
     @PostMapping("/generateToken")
-    public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+    public UserDto authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
         );
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(authRequest.getUsername());
+            String username = authRequest.getUsername();
+            User user = userService.findUserByUsername(username);
+            String token = jwtService.generateToken(username);
+
+            UserDto userDto = new UserDto();
+            userDto.setToken(token);
+            userDto.setUsername(user.getUsername());
+            userDto.setRole(user.getRole());
+
+            return userDto;
         } else {
             throw new UsernameNotFoundException("Invalid user request!");
         }

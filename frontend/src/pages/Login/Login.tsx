@@ -1,19 +1,64 @@
 import { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import HomePage from "../Home/Home";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "../../redux/userSlice";
 
 function Login() {
-  const [email, setEmail] = useState("");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [isRegister, setIsRegister] = useState(false);
+  const [role, setRole] = useState("ROLE_BUYER");
 
-  const onButtonClick = () => {
-    setEmailError("");
+  const handleRoleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRole(event.target.value);
+  };
+
+  const onRegister = async () => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL!}/auth/addNewUser`,
+        {
+          username,
+          password,
+          role,
+        }
+      );
+      console.log(response);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const onLogin = async () => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL!}/auth/generateToken`,
+        { username, password }
+      );
+      return response.data;
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const onButtonClick = async () => {
+    setUsernameError("");
     setPasswordError("");
+    setConfirmPasswordError("");
 
-    if (email === "") {
-      setEmailError("Please enter your email");
+    if (isRegister && password != confirmPassword) {
+      setConfirmPasswordError("Passwords do not match!");
+      return;
+    }
+    if (username === "") {
+      setUsernameError("Please enter your username");
       return;
     }
 
@@ -22,63 +67,144 @@ function Login() {
       return;
     }
 
-    if (password.length < 8) {
-      setPasswordError("Password must be 8 characters or longer");
+    if (password.length < 5) {
+      setPasswordError("Password must be 5 characters or longer");
       return;
     }
 
-    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-      setEmailError("Please enter a valid email address");
+    if (username === "") {
+      setUsernameError("Please enter a username");
       return;
     }
 
-    if (email) {
-      return (
-        <>
-          <Router>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-            </Routes>
-          </Router>
-        </>
-      );
+    if (isRegister) {
+      await onRegister();
     } else {
-      return <Navigate to="/Component/Login/Login" />;
+      const user = await onLogin();
+
+      dispatch(login(user));
+      navigate("/home");
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 via-blue-900 to-gray-800">
       <div className="w-full max-w-sm p-6 bg-black bg-opacity-50 shadow-lg rounded-lg">
-        <h2 className="text-2xl font-bold text-center text-white mb-8">Login</h2>
+        <h2 className="text-2xl font-bold text-center text-[#7342DC] mb-8">
+          Welcome to Moly Market!
+        </h2>
         <form>
-          <div className="mb-6">
-            <input
-              type="text"
-              value={email}
-              placeholder="Enter email address here"
-              onChange={(ev) => setEmail(ev.target.value)}
-              className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
-            />
-            <label className="text-red-500 text-sm">{emailError}</label>
-          </div>
-          <div className="mb-6">
-            <input
-              type="password"
-              value={password}
-              placeholder="Enter password here"
-              onChange={(ev) => setPassword(ev.target.value)}
-              className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
-            />
-            <label className="text-red-500 text-sm">{passwordError}</label>
+          {isRegister ? (
+            <>
+              <div className="mb-6">
+                <input
+                  type="text"
+                  value={username}
+                  placeholder="Username"
+                  onChange={(ev) => setUsername(ev.target.value)}
+                  className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
+                />
+                <label className="text-red-500 text-sm">{usernameError}</label>
+              </div>
+              <div className="mb-6">
+                <input
+                  type="password"
+                  value={password}
+                  placeholder="Password"
+                  onChange={(ev) => setPassword(ev.target.value)}
+                  className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
+                />
+                <label className="text-red-500 text-sm">{passwordError}</label>
+              </div>
+
+              <div className="mb-6">
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  placeholder="Confirm Password"
+                  onChange={(ev) => setConfirmPassword(ev.target.value)}
+                  className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
+                />
+                <label className="text-red-500 text-sm">
+                  {confirmPasswordError}
+                </label>
+              </div>
+              <div className="mb-2 text-white">
+                <div className="mb-2">Role</div>
+                <div className="flex gap-2">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      value="ROLE_BUYER"
+                      checked={role === "ROLE_BUYER"}
+                      onChange={handleRoleChange}
+                    />
+                    Buyer
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      value="ROLE_SELLER"
+                      checked={role === "ROLE_SELLER"}
+                      onChange={handleRoleChange}
+                    />
+                    Seller
+                  </label>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="mb-6">
+                <input
+                  type="text"
+                  value={username}
+                  placeholder="Username"
+                  onChange={(ev) => setUsername(ev.target.value)}
+                  className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
+                />
+                <label className="text-red-500 text-sm">{usernameError}</label>
+              </div>
+              <div className="mb-2">
+                <input
+                  type="password"
+                  value={password}
+                  placeholder="Password"
+                  onChange={(ev) => setPassword(ev.target.value)}
+                  className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
+                />
+                <label className="text-red-500 text-sm">{passwordError}</label>
+              </div>
+            </>
+          )}
+          <div className="flex gap-2 text-white mb-4">
+            <span className="text-sm">
+              {isRegister
+                ? "Already have an account?"
+                : "Don't have an account yet?"}
+            </span>
+            <span
+              onClick={() => {
+                setUsername("");
+                setPassword("");
+                setConfirmPassword("");
+                setUsernameError("");
+                setPasswordError("");
+                setConfirmPasswordError("");
+                setIsRegister((prev) => !prev);
+              }}
+              className="text-sm text-[#7342DC] font-semibold hover:opacity-70 cursor-pointer"
+            >
+              {isRegister ? "Go to login" : "Register here"}
+            </span>
           </div>
           <div className="text-center">
             <button
               type="button"
               onClick={onButtonClick}
-              className="px-6 py-2 text-lg font-bold text-blue-500 uppercase bg-transparent border-2 border-blue-500 rounded-md hover:bg-blue-500 hover:text-white transition duration-300"
+              className="px-6 py-2 text-lg font-bold text-[#7342DC] uppercase bg-transparent border-2 border-[#7342DC] rounded-md hover:bg-[#7342DC] hover:text-white transition duration-300"
             >
-              Submit
+              {isRegister ? "Register" : "Login"}
             </button>
           </div>
         </form>

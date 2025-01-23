@@ -31,6 +31,12 @@ public class UserInfoService implements UserDetailsService {
             .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
+    public User findUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> user = userRepository.findByUsername(username);
+    
+        return user.orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+    }
+    
     public String addUser(User userInfo) {
         // Encode password before saving the user
         userInfo.setPassword(encoder.encode(userInfo.getPassword()));
