@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  @apply bg-gradient-to-b from-gray-900 via-blue-900 to-gray-800 min-h-screen;
+}

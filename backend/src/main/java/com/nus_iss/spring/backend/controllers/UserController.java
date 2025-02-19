@@ -2,6 +2,8 @@ package com.nus_iss.spring.backend.controllers;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,8 +49,12 @@ public class UserController {
     }
 
     @PostMapping("/addNewUser")
-    public String addNewUser(@RequestBody User userInfo) {
-        return userService.addUser(userInfo);
+    public ResponseEntity<String> addNewUser(@RequestBody User userInfo)  {
+        try {
+            return new ResponseEntity<>(userService.addUser(userInfo), HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        }
     }
 
     @GetMapping("/user/userProfile")
