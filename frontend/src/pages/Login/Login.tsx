@@ -1,8 +1,9 @@
 import { useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/userSlice";
+import { toast } from "react-toastify";
 
 function Login() {
   const navigate = useNavigate();
@@ -30,9 +31,14 @@ function Login() {
           role,
         }
       );
-      console.log(response);
-    } catch (e) {
-      console.log(e);
+
+      toast.success(response.data);
+    } catch (error) {
+      if (error instanceof AxiosError && error.response) {
+        toast.error(error.response.data);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     }
   };
 
@@ -88,7 +94,7 @@ function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 via-blue-900 to-gray-800">
+    <div className="flex items-center justify-center min-h-screen">
       <div className="w-full max-w-sm p-6 bg-black bg-opacity-50 shadow-lg rounded-lg">
         <h2 className="text-2xl font-bold text-center text-[#7342DC] mb-8">
           Welcome to Moly Market!

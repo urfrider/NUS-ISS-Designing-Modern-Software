@@ -22,6 +22,10 @@ const userSlice = createSlice({
     login: (state, action: PayloadAction<UserState>) => {
       const user = action.payload;
 
+      if (!user) {
+        return;
+      }
+
       localStorage.setItem("user", JSON.stringify(user));
       state.username = action.payload.username;
       state.role = action.payload.role;

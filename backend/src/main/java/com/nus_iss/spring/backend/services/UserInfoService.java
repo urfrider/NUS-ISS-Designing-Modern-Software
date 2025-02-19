@@ -37,10 +37,15 @@ public class UserInfoService implements UserDetailsService {
         return user.orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
     }
     
-    public String addUser(User userInfo) {
+    public String addUser(User userInfo) throws Exception {
+        Optional<User> existingUser = userRepository.findByUsername(userInfo.getUsername());
+        
+        if (existingUser.isPresent()){
+            throw new Exception("Username " + userInfo.getUsername() + " already exists!");
+        }
         // Encode password before saving the user
         userInfo.setPassword(encoder.encode(userInfo.getPassword()));
         userRepository.save(userInfo);
-        return "User Added Successfully";
+        return "User Added Successfully!";
     }
 }
