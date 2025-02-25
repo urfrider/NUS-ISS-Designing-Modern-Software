@@ -7,9 +7,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.nus_iss.spring.backend.constants.Roles;
+import com.nus_iss.spring.backend.dtos.BuyerSellerDto;
 import com.nus_iss.spring.backend.entities.User;
 import com.nus_iss.spring.backend.entities.UserInfoDetails;
+import com.nus_iss.spring.backend.repositories.BuyerRepository;
+import com.nus_iss.spring.backend.repositories.SellerRepository;
 import com.nus_iss.spring.backend.repositories.UserRepository;
+import com.nus_iss.spring.backend.interfaces.UserFactory;
 
 import java.util.Optional;
 
@@ -20,7 +25,7 @@ public class UserInfoService implements UserDetailsService {
     private UserRepository userRepository;
 
     @Autowired
-    private PasswordEncoder encoder;
+    private UserFactory userFactory;  
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -37,10 +42,18 @@ public class UserInfoService implements UserDetailsService {
         return user.orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
     }
     
-    public String addUser(User userInfo) {
-        // Encode password before saving the user
-        userInfo.setPassword(encoder.encode(userInfo.getPassword()));
-        userRepository.save(userInfo);
-        return "User Added Successfully";
+    public String addUser(BuyerSellerDto userInfo) {
+
+        User createdUser = userFactory.createUser(userInfo);
+        String createdUserRole = createdUser.getRole();
+
+        if (Roles.BUYER.equals(createdUserRole)) {
+            return "Buyer Added Successfully";
+        } else if (Roles.SELLER.equals(createdUserRole)) {
+            return "Seller Added Successfully";
+        } else {
+            return "Unknown Role Added Successfully";  
+        }
+    
     }
 }

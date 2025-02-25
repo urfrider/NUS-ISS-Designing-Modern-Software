@@ -2,17 +2,25 @@ package com.nus_iss.spring.backend.controllers;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nus_iss.spring.backend.dtos.UserDto;
+import com.nus_iss.spring.backend.dtos.BuyerDto;
+import com.nus_iss.spring.backend.dtos.BuyerSellerDto;
+import com.nus_iss.spring.backend.dtos.SellerDto;
 import com.nus_iss.spring.backend.entities.AuthRequest;
 import com.nus_iss.spring.backend.entities.User;
+import com.nus_iss.spring.backend.services.BuyerService;
 import com.nus_iss.spring.backend.services.JwtService;
+import com.nus_iss.spring.backend.services.SellerService;
 import com.nus_iss.spring.backend.services.UserInfoService;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -34,7 +42,12 @@ public class UserController {
     @Autowired
     private UserInfoService userService;
     @Autowired
+    private SellerService sellerService;
+    
+    @Autowired
     private JwtService jwtService;
+    @Autowired
+    private BuyerService buyerService;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
 
@@ -47,8 +60,8 @@ public class UserController {
     }
 
     @PostMapping("/addNewUser")
-    public String addNewUser(@RequestBody User userInfo) {
-        return userService.addUser(userInfo);
+    public String addNewUser(@RequestBody BuyerSellerDto user) {
+        return userService.addUser(user);
     }
 
     @GetMapping("/user/userProfile")
@@ -84,6 +97,23 @@ public class UserController {
         }
     }
     
-    
+    @GetMapping("/buyerProfile")
+    @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
+    public ResponseEntity<BuyerDto> getBuyerProfile(@RequestParam Long buyerId) {
+        BuyerDto buyer = this.buyerService.getBuyerById(buyerId);  // Handle if buyer not found
+        if (buyer == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(buyer);
+    }
 
+    @GetMapping("/sellerProfile")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
+    public ResponseEntity<SellerDto> getSellerProfile(@RequestParam Long sellerId) {
+        SellerDto seller = this.sellerService.getSellerById(sellerId);  // Handle if buyer not found
+        if (seller == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(seller);
+    }
 }
