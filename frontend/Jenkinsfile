@@ -10,6 +10,7 @@ pipeline {
                 }
             }
             steps {
+                echo "Building the frontend..."
                 sh '''
                     ls -la
                     node --version
