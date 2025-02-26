@@ -26,6 +26,7 @@ import com.nus_iss.spring.backend.services.SellerService;
 import com.nus_iss.spring.backend.services.UserInfoService;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -106,11 +107,34 @@ public class UserController {
     @GetMapping("/buyerProfile")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
     public ResponseEntity<BuyerDto> getBuyerProfile(@RequestParam Long buyerId) {
-        BuyerDto buyer = this.buyerService.getBuyerById(buyerId);  // Handle if buyer not found
+        BuyerDto buyer = this.buyerService.getBuyerById(buyerId);
+
         if (buyer == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok(buyer);
+    }
+
+    @PostMapping("/buyerProfile")
+    @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
+    public ResponseEntity<BuyerDto> editBuyerProfile(@RequestBody BuyerDto user) {
+        BuyerDto buyer = this.buyerService.editBuyerProfile(user);  
+
+        if (buyer == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(buyer);
+    }
+
+    @DeleteMapping("/buyerProfile")
+    @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
+    public ResponseEntity<String> deleteBuyerProfile(@RequestParam Long buyerId) {
+        BuyerDto buyer = this.buyerService.deleteBuyerProfile(buyerId);
+
+        if (buyer == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok("Buyer deleted successfully");
     }
 
     @GetMapping("/sellerProfile")
@@ -122,4 +146,27 @@ public class UserController {
         }
         return ResponseEntity.ok(seller);
     }
+
+    @PostMapping("/sellerProfile")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
+    public ResponseEntity<SellerDto> editSellerProfile(@RequestBody SellerDto user) {
+        SellerDto seller = this.sellerService.editSellerProfile(user);  
+
+        if (seller == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(seller);
+    }
+
+    @DeleteMapping("/sellerProfile")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
+    public ResponseEntity<String> deleteSellerProfile(@RequestParam Long sellerId) {
+        SellerDto seller = this.sellerService.deleteSellerProfile(sellerId);
+
+        if (seller == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok("Seller deleted successfully");
+    }
+
 }

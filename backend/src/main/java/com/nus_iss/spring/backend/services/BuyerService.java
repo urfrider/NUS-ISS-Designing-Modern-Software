@@ -31,6 +31,49 @@ public class BuyerService {
         }
     }
 
+    public BuyerDto getIdByUsername(String username) {
+        Optional<Buyer> buyerOptional = buyerRepository.findByUsername(username);
+        
+        if (buyerOptional.isPresent()) {
+            System.out.println("Buyer found: " + buyerOptional.get());  // Print if found
+            return BuyerMapper.toDto(buyerOptional.get());
+        } else {
+            System.out.println("Buyer not found with username: " + username);  // Print if not found
+            throw new RuntimeException("Buyer not found");
+        }
+    }
+
+    @Transactional
+    public BuyerDto editBuyerProfile(BuyerDto buyerDto) {
+        Long buyerId = buyerDto.getId();
+        Optional<Buyer> buyerOptional = buyerRepository.findById(buyerId);
+        
+        if (buyerOptional.isPresent()) {
+            Buyer buyer = buyerOptional.get();
+            buyer.setUsername(buyerDto.getUsername());
+            buyer.setAddress(buyerDto.getAddress());
+            buyerRepository.save(buyer);
+            return BuyerMapper.toDto(buyer);
+        } else {
+            System.out.println("Buyer not found with ID: " + buyerId);  // Print if not found
+            throw new RuntimeException("Buyer not found");
+        }
+    }
+
+    @Transactional
+    public BuyerDto deleteBuyerProfile(Long buyerId) {
+        Optional<Buyer> buyerOptional = buyerRepository.findById(buyerId);
+
+        if (buyerOptional.isPresent()) {
+            Buyer buyer = buyerOptional.get();
+            buyerRepository.delete(buyer);
+            return BuyerMapper.toDto(buyer);
+        } else {
+            System.out.println("Buyer not found with ID: " + buyerId);  // Print if not found
+            throw new RuntimeException("Buyer not found");
+        }
+    }
+
     // public List<OrderDTO> getOrderHistory(Long buyerId) {
     //     Buyer buyer = buyerRepository.findById(buyerId)
     //             .orElseThrow(() -> new RuntimeException("Buyer not found"));

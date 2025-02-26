@@ -11,8 +11,12 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [address, setAddress] = useState("")
+  const [uen, setUen] = useState("")
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [addressError, setAddressError] = useState("");
+  const [uenError, setUenError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [isRegister, setIsRegister] = useState(false);
   const [role, setRole] = useState("ROLE_BUYER");
@@ -25,10 +29,17 @@ function Login() {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL!}/auth/addNewUser`,
+        role === "ROLE_BUYER" ?
         {
           username,
           password,
           role,
+          address
+        } : {
+          username,
+          password,
+          role,
+          uen
         }
       );
 
@@ -58,6 +69,8 @@ function Login() {
     setUsernameError("");
     setPasswordError("");
     setConfirmPasswordError("");
+    setAddressError("");
+    setUen("")
 
     if (isRegister && password != confirmPassword) {
       setConfirmPasswordError("Passwords do not match!");
@@ -81,6 +94,15 @@ function Login() {
     if (username === "") {
       setUsernameError("Please enter a username");
       return;
+    }
+
+    if (address === "" && role === "ROLE_BUYER") {
+      setAddressError("Please enter your address");
+      return;
+    }
+
+    if (uen === "" && role === "ROLE_SELLER") {
+      setUenError("Please enter your UEN")
     }
 
     if (isRegister) {
@@ -135,6 +157,22 @@ function Login() {
                   {confirmPasswordError}
                 </label>
               </div>
+
+              <div className="mb-6">
+                  <div>
+                    <input
+                      type="text"
+                      value={role === "ROLE_BUYER" ? address : uen}
+                      placeholder= {role === "ROLE_BUYER" ? "Address" : "UEN" }
+                      onChange={(ev) => role === "ROLE_BUYER" ? setAddress(ev.target.value) : setUen(ev.target.value)}
+                      className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
+                    />
+                    <label className="text-red-500 text-sm">
+                      {role === "ROLE_BUYER" ? addressError : uenError}
+                    </label>
+                  </div>
+              </div>
+
               <div className="mb-2 text-white">
                 <div className="mb-2">Role</div>
                 <div className="flex gap-2">
