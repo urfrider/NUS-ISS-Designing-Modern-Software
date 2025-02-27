@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/userSlice";
 import { toast } from "react-toastify";
+import { BUYER, SELLER } from "../../constants/constants";
 
 function Login() {
   const navigate = useNavigate();
@@ -11,11 +12,15 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [address, setAddress] = useState("")
+  const [uen, setUen] = useState("")
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [addressError, setAddressError] = useState("");
+  const [uenError, setUenError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [isRegister, setIsRegister] = useState(false);
-  const [role, setRole] = useState("ROLE_BUYER");
+  const [role, setRole] = useState(BUYER);
 
   const handleRoleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRole(event.target.value);
@@ -25,14 +30,25 @@ function Login() {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL!}/auth/addNewUser`,
+        role === BUYER ?
         {
           username,
           password,
           role,
+          address
+        } : {
+          username,
+          password,
+          role,
+          uen
         }
       );
 
       toast.success(response.data);
+      const user = await onLogin();
+
+      dispatch(login(user));
+      navigate("/home");
     } catch (error) {
       if (error instanceof AxiosError && error.response) {
         toast.error(error.response.data);
@@ -58,6 +74,9 @@ function Login() {
     setUsernameError("");
     setPasswordError("");
     setConfirmPasswordError("");
+    setAddressError("");
+    setUen("")
+
 
     if (isRegister && password != confirmPassword) {
       setConfirmPasswordError("Passwords do not match!");
@@ -72,7 +91,6 @@ function Login() {
       setPasswordError("Please enter a password");
       return;
     }
-
     if (password.length < 5) {
       setPasswordError("Password must be 5 characters or longer");
       return;
@@ -80,6 +98,16 @@ function Login() {
 
     if (username === "") {
       setUsernameError("Please enter a username");
+      return;
+    }
+
+    if (isRegister && address === "" && role === BUYER) {
+      setAddressError("Please enter your address");
+      return;
+    }
+
+    if (isRegister && uen === "" && role === SELLER) {
+      setUenError("Please enter your UEN");
       return;
     }
 
@@ -135,14 +163,30 @@ function Login() {
                   {confirmPasswordError}
                 </label>
               </div>
+
+              <div className="mb-6">
+                  <div>
+                    <input
+                      type="text"
+                      value={role === BUYER ? address : uen}
+                      placeholder= {role === BUYER ? "Address" : "UEN" }
+                      onChange={(ev) => role === BUYER ? setAddress(ev.target.value) : setUen(ev.target.value)}
+                      className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
+                    />
+                    <label className="text-red-500 text-sm">
+                      {role === BUYER ? addressError : uenError}
+                    </label>
+                  </div>
+              </div>
+
               <div className="mb-2 text-white">
                 <div className="mb-2">Role</div>
                 <div className="flex gap-2">
                   <label className="flex items-center gap-2">
                     <input
                       type="radio"
-                      value="ROLE_BUYER"
-                      checked={role === "ROLE_BUYER"}
+                      value={BUYER}
+                      checked={role === BUYER}
                       onChange={handleRoleChange}
                     />
                     Buyer
@@ -150,8 +194,8 @@ function Login() {
                   <label className="flex items-center gap-2">
                     <input
                       type="radio"
-                      value="ROLE_SELLER"
-                      checked={role === "ROLE_SELLER"}
+                      value={SELLER}
+                      checked={role === SELLER}
                       onChange={handleRoleChange}
                     />
                     Seller
