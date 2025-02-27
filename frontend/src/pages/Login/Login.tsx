@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/userSlice";
 import { toast } from "react-toastify";
+import { BUYER, SELLER } from "../../constants/role";
 
 function Login() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ function Login() {
   const [uenError, setUenError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [isRegister, setIsRegister] = useState(false);
-  const [role, setRole] = useState("ROLE_BUYER");
+  const [role, setRole] = useState(BUYER);
 
   const handleRoleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRole(event.target.value);
@@ -29,7 +30,7 @@ function Login() {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL!}/auth/addNewUser`,
-        role === "ROLE_BUYER" ?
+        role === BUYER ?
         {
           username,
           password,
@@ -44,6 +45,10 @@ function Login() {
       );
 
       toast.success(response.data);
+      const user = await onLogin();
+
+      dispatch(login(user));
+      navigate("/home");
     } catch (error) {
       if (error instanceof AxiosError && error.response) {
         toast.error(error.response.data);
@@ -72,6 +77,7 @@ function Login() {
     setAddressError("");
     setUen("")
 
+
     if (isRegister && password != confirmPassword) {
       setConfirmPasswordError("Passwords do not match!");
       return;
@@ -85,7 +91,6 @@ function Login() {
       setPasswordError("Please enter a password");
       return;
     }
-
     if (password.length < 5) {
       setPasswordError("Password must be 5 characters or longer");
       return;
@@ -96,13 +101,14 @@ function Login() {
       return;
     }
 
-    if (address === "" && role === "ROLE_BUYER") {
+    if (isRegister && address === "" && role === BUYER) {
       setAddressError("Please enter your address");
       return;
     }
 
-    if (uen === "" && role === "ROLE_SELLER") {
-      setUenError("Please enter your UEN")
+    if (isRegister && uen === "" && role === SELLER) {
+      setUenError("Please enter your UEN");
+      return;
     }
 
     if (isRegister) {
@@ -162,13 +168,13 @@ function Login() {
                   <div>
                     <input
                       type="text"
-                      value={role === "ROLE_BUYER" ? address : uen}
-                      placeholder= {role === "ROLE_BUYER" ? "Address" : "UEN" }
-                      onChange={(ev) => role === "ROLE_BUYER" ? setAddress(ev.target.value) : setUen(ev.target.value)}
+                      value={role === BUYER ? address : uen}
+                      placeholder= {role === BUYER ? "Address" : "UEN" }
+                      onChange={(ev) => role === BUYER ? setAddress(ev.target.value) : setUen(ev.target.value)}
                       className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
                     />
                     <label className="text-red-500 text-sm">
-                      {role === "ROLE_BUYER" ? addressError : uenError}
+                      {role === BUYER ? addressError : uenError}
                     </label>
                   </div>
               </div>
@@ -179,8 +185,8 @@ function Login() {
                   <label className="flex items-center gap-2">
                     <input
                       type="radio"
-                      value="ROLE_BUYER"
-                      checked={role === "ROLE_BUYER"}
+                      value={BUYER}
+                      checked={role === BUYER}
                       onChange={handleRoleChange}
                     />
                     Buyer
@@ -188,8 +194,8 @@ function Login() {
                   <label className="flex items-center gap-2">
                     <input
                       type="radio"
-                      value="ROLE_SELLER"
-                      checked={role === "ROLE_SELLER"}
+                      value={SELLER}
+                      checked={role === SELLER}
                       onChange={handleRoleChange}
                     />
                     Seller
