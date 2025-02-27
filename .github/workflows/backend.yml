@@ -18,7 +18,7 @@ jobs:
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      
+
     steps:
       # Step 1: Checkout code
       - name: Checkout code
@@ -37,10 +37,6 @@ jobs:
 
       # Step 4: Run Gradle tests
       - name: Run Gradle tests
-        env:
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           cd backend
           ./gradlew clean test
@@ -52,3 +48,16 @@ jobs:
         with:
           name: test-results
           path: backend/build/test-results/test
+
+      # Step 6: Upload XML test results
+      - name: Convert JUnit XML to HTML
+        run: |
+          npm install -g htmlize-junit
+          htmlize-junit -i '**/target/surefire-reports/TEST-*.xml' -o test-report.html
+            
+      # Step 7: Upload HTML test reports
+      - name: Upload HTML Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-test-report
+          path: test-report.html
