@@ -50,14 +50,16 @@ jobs:
           path: backend/build/test-results/test
 
       # Step 6: Upload XML test results
-      - name: Convert JUnit XML to HTML
+      - name: Generate HTML test reports
+        if: always()
         run: |
-          npm install -g htmlize-junit
-          htmlize-junit -i '**/target/surefire-reports/TEST-*.xml' -o test-report.html
+          cd backend
+          ./gradlew testReport || true
             
       # Step 7: Upload HTML test reports
-      - name: Upload HTML Report
+      - name: Upload HTML test reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: html-test-report
-          path: test-report.html
+          name: test-reports-html
+          path: backend/build/reports/tests/test
