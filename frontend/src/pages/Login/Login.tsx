@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/userSlice";
 import { toast } from "react-toastify";
-import { BUYER, SELLER } from "../../constants/role";
+import { BUYER, SELLER } from "../../constants/constants";
 
 function Login() {
   const navigate = useNavigate();
