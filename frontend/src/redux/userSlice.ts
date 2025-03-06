@@ -12,7 +12,7 @@ const initialState: UserState = {
   token: "",
 };
 
-const savedUser = localStorage.getItem("user");
+const savedUser = localStorage.getItem("users");
 const parsedUser = savedUser ? JSON.parse(savedUser) : initialState;
 
 const userSlice = createSlice({
