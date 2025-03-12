@@ -1,25 +1,23 @@
 package com.nus_iss.spring.backend.controllers;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.nus_iss.spring.backend.dtos.UserDto;
+import com.nus_iss.spring.backend.constants.Roles;
 import com.nus_iss.spring.backend.dtos.BuyerDto;
 import com.nus_iss.spring.backend.dtos.BuyerSellerDto;
 import com.nus_iss.spring.backend.dtos.SellerDto;
 import com.nus_iss.spring.backend.entities.AuthRequest;
 import com.nus_iss.spring.backend.entities.User;
+import com.nus_iss.spring.backend.entities.Buyer;
+import com.nus_iss.spring.backend.entities.Seller;
 import com.nus_iss.spring.backend.services.BuyerService;
 import com.nus_iss.spring.backend.services.JwtService;
 import com.nus_iss.spring.backend.services.SellerService;
@@ -36,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 
-
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/auth")
@@ -46,13 +43,12 @@ public class UserController {
     private UserInfoService userService;
     @Autowired
     private SellerService sellerService;
-    
+
     @Autowired
     private JwtService jwtService;
     @Autowired
     private BuyerService buyerService;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -63,10 +59,10 @@ public class UserController {
     }
 
     @PostMapping("/addNewUser")
-    public ResponseEntity<String> addNewUser(@RequestBody BuyerSellerDto userInfo)  {
+    public ResponseEntity<String> addNewUser(@RequestBody BuyerSellerDto userInfo) {
         try {
             return new ResponseEntity<>(userService.addUser(userInfo), HttpStatus.OK);
-        } catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
@@ -84,26 +80,40 @@ public class UserController {
     }
 
     @PostMapping("/generateToken")
-    public UserDto authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+    public BuyerSellerDto authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
-        );
+                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         if (authentication.isAuthenticated()) {
             String username = authRequest.getUsername();
             User user = userService.findUserByUsername(username);
             String token = jwtService.generateToken(username);
 
-            UserDto userDto = new UserDto();
-            userDto.setToken(token);
-            userDto.setUsername(user.getUsername());
-            userDto.setRole(user.getRole());
+            BuyerSellerDto buyerSellerDto = new BuyerSellerDto();
+            buyerSellerDto.setToken(token);
+            buyerSellerDto.setUsername(user.getUsername());
+            buyerSellerDto.setRole(user.getRole());
 
-            return userDto;
+            switch (user.getRole()) {
+                case Roles.BUYER:
+                    Buyer buyer = buyerService.getBuyerByUsername(username);
+                    buyerSellerDto.setAddress(buyer.getAddress());
+                    break;
+
+                case Roles.SELLER:
+                    Seller seller = sellerService.getSellerByUsername(username);
+                    buyerSellerDto.setUen(seller.getUen());
+                    break;
+
+                default:
+                    throw new IllegalArgumentException("Unsupported role: " + user.getRole());
+            }
+
+            return buyerSellerDto;
         } else {
             throw new UsernameNotFoundException("Invalid user request!");
         }
     }
-    
+
     @GetMapping("/buyerProfile")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
     public ResponseEntity<BuyerDto> getBuyerProfile(@RequestParam Long buyerId) {
@@ -118,7 +128,7 @@ public class UserController {
     @PostMapping("/buyerProfile")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
     public ResponseEntity<BuyerDto> editBuyerProfile(@RequestBody BuyerDto user) {
-        BuyerDto buyer = this.buyerService.editBuyerProfile(user);  
+        BuyerDto buyer = this.buyerService.editBuyerProfile(user);
 
         if (buyer == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -140,7 +150,7 @@ public class UserController {
     @GetMapping("/sellerProfile")
     @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
     public ResponseEntity<SellerDto> getSellerProfile(@RequestParam Long sellerId) {
-        SellerDto seller = this.sellerService.getSellerById(sellerId);  // Handle if buyer not found
+        SellerDto seller = this.sellerService.getSellerById(sellerId); // Handle if buyer not found
         if (seller == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -150,7 +160,7 @@ public class UserController {
     @PostMapping("/sellerProfile")
     @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
     public ResponseEntity<SellerDto> editSellerProfile(@RequestBody SellerDto user) {
-        SellerDto seller = this.sellerService.editSellerProfile(user);  
+        SellerDto seller = this.sellerService.editSellerProfile(user);
 
         if (seller == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

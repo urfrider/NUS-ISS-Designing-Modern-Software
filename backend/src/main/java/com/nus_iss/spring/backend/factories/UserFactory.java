@@ -1,4 +1,4 @@
-package com.nus_iss.spring.backend.interfaces;
+package com.nus_iss.spring.backend.factories;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;

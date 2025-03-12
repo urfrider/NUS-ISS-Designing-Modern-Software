@@ -31,12 +31,12 @@ public class BuyerService {
         }
     }
 
-    public BuyerDto getIdByUsername(String username) {
+    public Buyer getBuyerByUsername(String username) {
         Optional<Buyer> buyerOptional = buyerRepository.findByUsername(username);
         
         if (buyerOptional.isPresent()) {
             System.out.println("Buyer found: " + buyerOptional.get());  // Print if found
-            return BuyerMapper.toDto(buyerOptional.get());
+            return buyerOptional.get();
         } else {
             System.out.println("Buyer not found with username: " + username);  // Print if not found
             throw new RuntimeException("Buyer not found");

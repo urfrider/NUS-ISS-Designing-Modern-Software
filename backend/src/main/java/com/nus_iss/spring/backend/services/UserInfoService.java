@@ -10,8 +10,8 @@ import com.nus_iss.spring.backend.constants.Roles;
 import com.nus_iss.spring.backend.dtos.BuyerSellerDto;
 import com.nus_iss.spring.backend.entities.User;
 import com.nus_iss.spring.backend.entities.UserInfoDetails;
+import com.nus_iss.spring.backend.factories.UserFactory;
 import com.nus_iss.spring.backend.repositories.UserRepository;
-import com.nus_iss.spring.backend.interfaces.UserFactory;
 
 import java.util.Optional;
 

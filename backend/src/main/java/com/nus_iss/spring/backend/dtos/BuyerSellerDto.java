@@ -14,5 +14,5 @@ public class BuyerSellerDto {
     private String role;
     private String address;
     private String uen;  
-
+    private String token;
 }
