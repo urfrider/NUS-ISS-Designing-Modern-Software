@@ -2,8 +2,10 @@ package com.nus_iss.spring.backend.entities;
 
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
@@ -22,22 +24,10 @@ public class Seller extends User {
 
     private String uen;
 
-    // @OneToMany(mappedBy = "seller")
-    // private List<Product> productList;
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Product> productList;
 
-    // @OneToMany(mappedBy = "seller")
-    // private List<Order> orderList;
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<OrderItem> OrderItems;
 
-    // // Seller specific methods here
-    // public void listProduct(Product product) {
-    //     // List product logic
-    // }
-
-    // public void updateInventory(Product product) {
-    //     // Update inventory logic
-    // }
-
-    public void viewOrders() {
-        // View orders logic
-    }
 }

@@ -43,6 +43,7 @@ public class SecurityConfig {
                 .requestMatchers("/auth/welcome", "/auth/addNewUser", "/auth/generateToken").permitAll()
                 .requestMatchers("/auth/user/**").hasAnyAuthority("ROLE_BUYER", "ROLE_SELLER")                
                 .requestMatchers("/auth/admin/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers("/api/products/**").hasAnyAuthority("ROLE_BUYER", "ROLE_SELLER")
                 .anyRequest().authenticated() // Protect all other endpoints
             )
             .sessionManagement(sess -> sess
