@@ -29,12 +29,12 @@ public class SellerService {
         }
     }
 
-    public SellerDto getIdByUsername(String username) {
+    public Seller getSellerByUsername(String username) {
         Optional<Seller> sellerOptional = sellerRepository.findByUsername(username);
         
         if (sellerOptional.isPresent()) {
             System.out.println("Seller found: " + sellerOptional.get());  // Print if found
-            return SellerMapper.toDto(sellerOptional.get());
+            return sellerOptional.get();
         } else {
             System.out.println("Seller not found with username: " + username);  // Print if not found
             throw new RuntimeException("Seller not found");

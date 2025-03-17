@@ -64,9 +64,10 @@ function Login() {
         `${import.meta.env.VITE_API_URL!}/auth/generateToken`,
         { username, password }
       );
+      console.log("response", response)
       return response.data;
     } catch (e) {
-      console.log(e);
+      console.log("Login error", e);
     }
   };
 
@@ -115,6 +116,8 @@ function Login() {
       await onRegister();
     } else {
       const user = await onLogin();
+
+      console.log(user)
 
       dispatch(login(user));
       navigate("/home");

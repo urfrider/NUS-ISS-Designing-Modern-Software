@@ -1,5 +1,7 @@
 package com.nus_iss.spring.backend.dtos;
 
+import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,13 +9,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BuyerSellerDto {
+public class NotificationDto {
 
     private Long id;
-    private String username;
-    private String password;
-    private String role;
-    private String address;
-    private String uen;  
-    private String token;
+    private BuyerSellerDto user;
+    private String message;
+    private String type;
+    private Date createdAt;
+    private Boolean isRead;
+
 }
