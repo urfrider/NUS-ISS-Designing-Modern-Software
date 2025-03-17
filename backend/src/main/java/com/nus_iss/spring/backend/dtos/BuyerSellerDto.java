@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BuyerSellerDto {
 
+    private Long id;
     private String username;
     private String password;
     private String role;

@@ -26,6 +26,7 @@ public class UserFactory {
 
     public User createUser(BuyerSellerDto user) {
 
+        Long id = user.getId();
         String username = user.getUsername();
         String password = user.getPassword();
         String role = user.getRole();
@@ -35,6 +36,7 @@ public class UserFactory {
 
         if (role.equals("ROLE_BUYER")) {
             Buyer buyer = new Buyer();
+            buyer.setId(id);
             buyer.setUsername(username);
             buyer.setPassword(encodedPassword);
             buyer.setRole("ROLE_BUYER");
@@ -42,6 +44,7 @@ public class UserFactory {
             return buyerRepository.save(buyer);
         } else if (role.equals("ROLE_SELLER")) {
             Seller seller = new Seller();
+            seller.setId(id);
             seller.setUsername(username);
             seller.setPassword(encodedPassword);
             seller.setRole("ROLE_SELLER");

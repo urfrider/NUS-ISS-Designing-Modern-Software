@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequestMapping("/auth")
 public class UserController {
 
@@ -87,8 +87,10 @@ public class UserController {
             String username = authRequest.getUsername();
             User user = userService.findUserByUsername(username);
             String token = jwtService.generateToken(username);
+            Long id = user.getId();
 
             BuyerSellerDto buyerSellerDto = new BuyerSellerDto();
+            buyerSellerDto.setId(id);
             buyerSellerDto.setToken(token);
             buyerSellerDto.setUsername(user.getUsername());
             buyerSellerDto.setRole(user.getRole());
