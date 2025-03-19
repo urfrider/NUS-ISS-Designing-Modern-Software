@@ -12,20 +12,21 @@ function EditProfile() {
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.user);
   const [id] = useState(user.id);
-  const [username, setUsername] = useState(user.username);
+  const [username] = useState(user.username);
   const [address, setAddress] = useState(user.address || "");
   const [uen, setUen] = useState(user.uen || "");
   const [role] = useState(user.role || "");
 
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user.token}`,
+      "Content-Type": "application/json",
+    },
+  };
+
   const onSave = async () => {
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-          "Content-Type": "application/json",
-        },
-      };
-
+      
       const response =
         role == BUYER
           ? await axios.post(
@@ -34,7 +35,8 @@ function EditProfile() {
                 id,
                 username,
                 address,
-              },config
+              },
+              config
             )
           : await axios.post(
               `${import.meta.env.VITE_API_URL!}/auth/sellerProfile`,
@@ -42,15 +44,14 @@ function EditProfile() {
                 id,
                 username,
                 uen,
-              },config
+              },
+              config
             );
-      toast.success("Profile updated successfully!")
-      
+      toast.success("Profile updated successfully!");
+
       const updatedUserData =
-      role == BUYER
-        ? { username, address }
-        : { username, uen };
-      
+        role == BUYER ? { address } : { uen };
+
       dispatch(updateUser(updatedUserData));
       navigate("/profile");
     } catch (error) {
@@ -70,23 +71,27 @@ function EditProfile() {
 
   return (
     <div>
-      <div className="flex flex-col justify-center items-center min-h-screen gap-4">
-        <h1 className="text-2xl font-bold">Edit Profile</h1>
-        <div className="flex flex-col gap-2 w-full max-w-md">
+      <div className="flex flex-col items-center min-h-screen mt-32 gap-4">
+        <h1 className="text-2xl font-bold mb-4">Edit Profile</h1>
+        <div className="flex flex-col gap-4 w-full max-w-md">
           <label className="text-lg">Username:</label>
           <input
             type="text"
-            className="p-2 border border-purple-300 rounded-full"
+            className="p-2 rounded-md border"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            disabled
+            style={{ pointerEvents: 'none' }}
           />
+
+          <label className="text-lg">Role:</label>
+          <input type="text" className="p-2 rounded-md border" disabled value={role} style={{ pointerEvents: 'none' }}/>
 
           {user.role === "ROLE_SELLER" && (
             <>
               <label className="text-lg">UEN:</label>
               <input
                 type="text"
-                className="p-2 border border-purple-300 rounded-full"
+                className="p-2 rounded-md border"
                 value={uen}
                 onChange={(e) => setUen(e.target.value)}
               />
@@ -98,19 +103,28 @@ function EditProfile() {
               <label className="text-lg">Address:</label>
               <input
                 type="text"
-                className="p-2 border border-purple-300 rounded-full"
+                className="p-2 rounded-md border"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
               />
             </>
           )}
 
-          <button
-            className="w-48 border bg-white border-purple-300 rounded-full p-2 hover:bg-purple-300 duration-300"
-            onClick={handleSave}
-          >
-            Save Changes
-          </button>
+          <div className="flex flex-row justify-between">
+            <button
+              className="w-48 mt-8 border bg-red-500 rounded-md p-2 hover:bg-purple-300 duration-300"
+              onClick={() => {navigate("/profile")}}
+            >
+              Back
+            </button>
+
+            <button
+              className="w-48 mt-8 border bg-green-500 rounded-md p-2 hover:bg-purple-300 duration-300"
+              onClick={handleSave}
+            >
+              Save Changes
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -18,9 +18,9 @@ import com.nus_iss.spring.backend.entities.AuthRequest;
 import com.nus_iss.spring.backend.entities.User;
 import com.nus_iss.spring.backend.entities.Buyer;
 import com.nus_iss.spring.backend.entities.Seller;
-import com.nus_iss.spring.backend.services.BuyerService;
+import com.nus_iss.spring.backend.services.BuyerServiceImpl;
 import com.nus_iss.spring.backend.services.JwtService;
-import com.nus_iss.spring.backend.services.SellerService;
+import com.nus_iss.spring.backend.services.SellerServiceImpl;
 import com.nus_iss.spring.backend.services.UserInfoService;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -40,12 +40,11 @@ public class UserController {
     @Autowired
     private UserInfoService userService;
     @Autowired
-    private SellerService sellerService;
-
+    private SellerServiceImpl sellerService;
     @Autowired
     private JwtService jwtService;
     @Autowired
-    private BuyerService buyerService;
+    private BuyerServiceImpl buyerService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -91,6 +90,7 @@ public class UserController {
             buyerSellerDto.setToken(token);
             buyerSellerDto.setUsername(user.getUsername());
             buyerSellerDto.setRole(user.getRole());
+            buyerSellerDto.setBalance(user.getBalance());
 
             switch (user.getRole()) {
                 case Roles.BUYER:

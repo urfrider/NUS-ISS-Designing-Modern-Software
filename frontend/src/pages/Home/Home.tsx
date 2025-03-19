@@ -1,20 +1,44 @@
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import axios from "axios";
+import ProductCard from "../Product/ProductCard";
 
 function HomePage() {
-  const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.user);
+
+  const [products, setProducts] = useState([]);
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user.token}`,
+      "Content-Type": "application/json",
+    },
+  };
+
+  useEffect(() => {
+    const fetchSellerProfile = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/products`,
+          config
+        );
+        console.log(response);
+        setProducts(response.data)
+      } catch (error) {}
+    };
+
+    fetchSellerProfile();
+  }, []);
 
   return (
     <div>
       <div className="flex justify-center items-center min-h-screen">
         <div className="flex items-center flex-col gap-2 text-white border-white border p-4 rounded-md">
-          <h1 className="">Home Page</h1>
-          <div className="my-4">
-            <button
-              onClick={() => navigate("/product/add")}
-              className="border border-purple-300 rounded-xl p-2 hover:bg-purple-300 duration-300"
-            >
-              Create Product
-            </button>
+          <div className="flex flex-wrap justify-center gap-4 p-8">
+            {products.map((product) => (
+              <ProductCard product={product} />
+            ))}
           </div>
         </div>
       </div>

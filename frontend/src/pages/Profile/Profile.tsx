@@ -20,24 +20,25 @@ function Profile() {
 
   return (
     <div>
-      <div className="flex flex-col justify-center items-center min-h-screen gap-4">
+      <div className="flex flex-col mt-32 items-center min-h-screen gap-4">
         <h1 className="text-2xl font-bold">Profile</h1>
-        <h2 className="text-xl">Username: {user.username}</h2>
-        <h2 className="text-xl">Role: {user.role}</h2>
-        {user.role === SELLER && (
-          <h2 className="text-xl">UEN: {user.uen}</h2>
-        )}
-        {user.role === BUYER && (
-          <h2 className="text-xl">Address: {user.address}</h2>
-        )}
+        <div className="flex flex-col text-left gap-4">
+          <h2 className="text-xl mt-4">Username: {user.username}</h2>
+          <h2 className="text-xl">Balance: {user.balance}</h2>
+          <h2 className="text-xl">Role: {user.role}</h2>
+          {user.role === SELLER && <h2 className="text-xl">UEN: {user.uen}</h2>}
+          {user.role === BUYER && (
+            <h2 className="text-xl">Address: {user.address}</h2>
+          )}
+        </div>
         <button
-          className="w-48 border bg-white border-purple-300 rounded-full p-2 hover:bg-purple-300 duration-300"
+          className="mt-8 w-48 border bg-white border-purple-300 rounded-md p-2 hover:bg-purple-300 duration-300"
           onClick={onEditProfile}
         >
           Edit Profile
         </button>
         <button
-          className="w-48 border bg-white border-purple-300 rounded-full p-2 hover:bg-purple-300 duration-300"
+          className="w-48 border bg-white border-purple-300 rounded-md p-2 hover:bg-purple-300 duration-300"
           onClick={onLogout}
         >
           Logout
