@@ -11,14 +11,16 @@ import com.nus_iss.spring.backend.dtos.BuyerDto;
 import com.nus_iss.spring.backend.entities.Buyer;
 import com.nus_iss.spring.backend.mappers.BuyerMapper;
 import com.nus_iss.spring.backend.repositories.BuyerRepository;
+import com.nus_iss.spring.backend.services.interfaces.BuyerService;
 
 @Service
 @RequiredArgsConstructor
-public class BuyerService {
+public class BuyerServiceImpl implements BuyerService {
     private final BuyerRepository buyerRepository;
     // private final OrderRepository orderRepository;
     // private final ProductRepository productRepository;
-
+    
+    @Override
     public BuyerDto getBuyerById(Long id) {
         Optional<Buyer> buyerOptional = buyerRepository.findById(id);
         
@@ -31,6 +33,7 @@ public class BuyerService {
         }
     }
 
+    @Override
     public Buyer getBuyerByUsername(String username) {
         Optional<Buyer> buyerOptional = buyerRepository.findByUsername(username);
         
@@ -43,6 +46,7 @@ public class BuyerService {
         }
     }
 
+    @Override
     @Transactional
     public BuyerDto editBuyerProfile(BuyerDto buyerDto) {
         Long buyerId = buyerDto.getId();
@@ -52,6 +56,7 @@ public class BuyerService {
             Buyer buyer = buyerOptional.get();
             buyer.setUsername(buyerDto.getUsername());
             buyer.setAddress(buyerDto.getAddress());
+            buyer.setBalance(buyerDto.getBalance());
             buyerRepository.save(buyer);
             return BuyerMapper.toDto(buyer);
         } else {
@@ -60,6 +65,7 @@ public class BuyerService {
         }
     }
 
+    @Override
     @Transactional
     public BuyerDto deleteBuyerProfile(Long buyerId) {
         Optional<Buyer> buyerOptional = buyerRepository.findById(buyerId);
@@ -98,6 +104,7 @@ public class BuyerService {
     //     orderRepository.save(newOrder);
     // }
 
+    @Override
     @Transactional
     public void checkout(Long buyerId) {
         System.out.println("Checkout complete for buyer " + buyerId);

@@ -7,7 +7,7 @@ export interface UserState {
   token: string;
   uen: string;
   address: string;
-
+  balance: number;
 }
 
 const initialState: UserState = {
@@ -16,7 +16,8 @@ const initialState: UserState = {
   role: "",
   token: "",
   uen: "",
-  address: ""
+  address: "",
+  balance: -1,
 };
 
 const savedUser = localStorage.getItem("users");
@@ -40,7 +41,7 @@ const userSlice = createSlice({
       state.uen = action.payload.uen;
       state.address = action.payload.address;
       state.token = action.payload.token;
-      
+      state.balance = action.payload.balance;
     },
     updateUser: (state, action: PayloadAction<Partial<UserState>>) => {
       const updatedUser = action.payload;
@@ -58,6 +59,9 @@ const userSlice = createSlice({
       state.username = "";
       state.role = "";
       state.token = "";
+      state.uen = "";
+      state.address = "";
+      state.balance = -1;
     },
   },
 });

@@ -1,4 +1,4 @@
-package com.nus_iss.spring.backend.services;
+package com.nus_iss.spring.backend.services.interfaces;
 
 import com.nus_iss.spring.backend.dtos.NotificationDto;
 

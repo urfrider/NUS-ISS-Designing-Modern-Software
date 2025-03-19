@@ -8,15 +8,17 @@ import com.nus_iss.spring.backend.dtos.SellerDto;
 import com.nus_iss.spring.backend.entities.Seller;
 import com.nus_iss.spring.backend.mappers.SellerMapper;
 import com.nus_iss.spring.backend.repositories.SellerRepository;
+import com.nus_iss.spring.backend.services.interfaces.SellerService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class SellerService {
+public class SellerServiceImpl implements SellerService{
     private final SellerRepository sellerRepository;
 
+    @Override
     public SellerDto getSellerById(Long id) {
         Optional<Seller> sellerOptional = sellerRepository.findById(id);
         
@@ -29,6 +31,7 @@ public class SellerService {
         }
     }
 
+    @Override
     public Seller getSellerByUsername(String username) {
         Optional<Seller> sellerOptional = sellerRepository.findByUsername(username);
         
@@ -41,6 +44,7 @@ public class SellerService {
         }
     }
 
+    @Override
     @Transactional
     public SellerDto editSellerProfile(SellerDto sellerDto) {
         Long sellerId = sellerDto.getId();
@@ -50,6 +54,7 @@ public class SellerService {
             Seller seller = sellerOptional.get();
             seller.setUsername(sellerDto.getUsername());
             seller.setUen(sellerDto.getUen());
+            seller.setBalance(sellerDto.getBalance());
             sellerRepository.save(seller);
             return SellerMapper.toDto(seller);
         } else {
@@ -58,6 +63,7 @@ public class SellerService {
         }
     }
 
+    @Override
     @Transactional
     public SellerDto deleteSellerProfile(Long sellerId) {
         Optional<Seller> sellerOptional = sellerRepository.findById(sellerId);

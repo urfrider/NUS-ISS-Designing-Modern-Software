@@ -18,9 +18,9 @@ import com.nus_iss.spring.backend.entities.AuthRequest;
 import com.nus_iss.spring.backend.entities.User;
 import com.nus_iss.spring.backend.entities.Buyer;
 import com.nus_iss.spring.backend.entities.Seller;
-import com.nus_iss.spring.backend.services.BuyerService;
+import com.nus_iss.spring.backend.services.BuyerServiceImpl;
 import com.nus_iss.spring.backend.services.JwtService;
-import com.nus_iss.spring.backend.services.SellerService;
+import com.nus_iss.spring.backend.services.SellerServiceImpl;
 import com.nus_iss.spring.backend.services.UserInfoService;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -29,9 +29,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 
 @RestController
@@ -42,13 +39,11 @@ public class UserController {
     @Autowired
     private UserInfoService userService;
     @Autowired
-    private SellerService sellerService;
-
+    private SellerServiceImpl sellerService;
     @Autowired
     private JwtService jwtService;
     @Autowired
-    private BuyerService buyerService;
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private BuyerServiceImpl buyerService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -94,6 +89,7 @@ public class UserController {
             buyerSellerDto.setToken(token);
             buyerSellerDto.setUsername(user.getUsername());
             buyerSellerDto.setRole(user.getRole());
+            buyerSellerDto.setBalance(user.getBalance());
 
             switch (user.getRole()) {
                 case Roles.BUYER:

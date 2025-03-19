@@ -8,9 +8,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.nus_iss.spring.backend.dtos.BuyerSellerDto;
 import com.nus_iss.spring.backend.entities.Buyer;
 import com.nus_iss.spring.backend.entities.User;
-import com.nus_iss.spring.backend.services.BuyerService;
+import com.nus_iss.spring.backend.services.BuyerServiceImpl;
 import com.nus_iss.spring.backend.services.JwtService;
-import com.nus_iss.spring.backend.services.SellerService;
+import com.nus_iss.spring.backend.services.SellerServiceImpl;
 import com.nus_iss.spring.backend.services.UserInfoService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -36,10 +36,10 @@ class UserControllerTest {
     private JwtService jwtService;
 
     @Mock
-    private BuyerService buyerService;
+    private BuyerServiceImpl buyerService;
 
     @Mock
-    private SellerService sellerService;
+    private SellerServiceImpl sellerService;
 
     @Mock
     private AuthenticationManager authenticationManager;

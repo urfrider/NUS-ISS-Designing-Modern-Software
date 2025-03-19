@@ -17,4 +17,5 @@ public class SellerDto {
     private String uen;
     private List<ProductDto> productList;
     private List<OrderDto> orderList;
+    private Long balance;
 }
