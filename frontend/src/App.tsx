@@ -6,13 +6,12 @@ import { ToastContainer } from "react-toastify";
 import { AddProduct } from "./pages/Product/AddProduct";
 import Layout from "./Layout";
 import Profile from "./pages/Profile/Profile";
-import EditProfile from "./pages/Profile/editProfile";
-import { useSelector } from "react-redux";
-import { RootState } from "./redux/store";
+import Order from "./pages/Order/Order";
+import EditProfile from "./pages/Profile/EditProfile";
+import Cart from "./pages/Cart/Cart";
+import Checkout from "./pages/Checkout/Checkout";
 
 function App() {
-  const user = useSelector((state: RootState) => state.user);
-
   return (
     <>
       <BrowserRouter>
@@ -32,7 +31,10 @@ function App() {
               <Route path="add" element={<AddProduct />} />
             </Route>
             <Route path="/profile" element={<Profile />} />
-            <Route path="/editProfile" element={<EditProfile user={user} /> } />
+            <Route path="/editProfile" element={<EditProfile /> } />
+            <Route path="/orders" element={<Order/>}/>
+            <Route path="/cart" element={<Cart/>}/>
+            <Route path="/checkout" element={<Checkout/>}/>
           </Route>
         </Routes>
       </BrowserRouter>
