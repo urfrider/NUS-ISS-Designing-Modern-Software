@@ -26,7 +26,6 @@ function EditProfile() {
 
   const onSave = async () => {
     try {
-      
       const response =
         role == BUYER
           ? await axios.post(
@@ -49,8 +48,7 @@ function EditProfile() {
             );
       toast.success("Profile updated successfully!");
 
-      const updatedUserData =
-        role == BUYER ? { address } : { uen };
+      const updatedUserData = role == BUYER ? { address } : { uen };
 
       dispatch(updateUser(updatedUserData));
       navigate("/profile");
@@ -71,6 +69,7 @@ function EditProfile() {
 
   return (
     <div>
+      test
       <div className="flex flex-col items-center min-h-screen mt-32 gap-4">
         <h1 className="text-2xl font-bold mb-4">Edit Profile</h1>
         <div className="flex flex-col gap-4 w-full max-w-md">
@@ -80,11 +79,17 @@ function EditProfile() {
             className="p-2 rounded-md border"
             value={username}
             disabled
-            style={{ pointerEvents: 'none' }}
+            style={{ pointerEvents: "none" }}
           />
 
           <label className="text-lg">Role:</label>
-          <input type="text" className="p-2 rounded-md border" disabled value={role} style={{ pointerEvents: 'none' }}/>
+          <input
+            type="text"
+            className="p-2 rounded-md border"
+            disabled
+            value={role}
+            style={{ pointerEvents: "none" }}
+          />
 
           {user.role === "ROLE_SELLER" && (
             <>
@@ -113,7 +118,9 @@ function EditProfile() {
           <div className="flex flex-row justify-between">
             <button
               className="w-48 mt-8 border bg-red-500 rounded-md p-2 hover:bg-purple-300 duration-300"
-              onClick={() => {navigate("/profile")}}
+              onClick={() => {
+                navigate("/profile");
+              }}
             >
               Back
             </button>
