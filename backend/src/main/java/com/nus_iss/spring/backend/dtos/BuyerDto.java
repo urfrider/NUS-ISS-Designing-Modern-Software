@@ -18,4 +18,6 @@ public class BuyerDto {
     private String address;
     private List<OrderDto> orderHistory;
     private Long balance;
+    private CartDto cart;
+
 }

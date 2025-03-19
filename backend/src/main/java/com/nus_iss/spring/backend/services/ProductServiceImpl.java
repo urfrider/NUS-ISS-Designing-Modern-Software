@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.nus_iss.spring.backend.controllers.UserController;
 import com.nus_iss.spring.backend.dtos.ProductDto;
 import com.nus_iss.spring.backend.entities.Product;
 import com.nus_iss.spring.backend.entities.Seller;
@@ -53,9 +52,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product updateProduct(ProductDto productDto) {
-        Product product = productRepository.findById(productDto.getId())
-            .orElseThrow(() -> new RuntimeException("Product with ID" + productDto.getId() + " does not exist!"));
+    public Product updateProduct(ProductDto productDto, Long id) {
+        Product product = productRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Product with ID" + id + " does not exist!"));
         
         product.setName(productDto.getName());
         product.setDescription(productDto.getDescription());
