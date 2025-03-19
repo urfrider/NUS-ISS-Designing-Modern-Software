@@ -1,11 +1,14 @@
 package com.nus_iss.spring.backend.factories;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.nus_iss.spring.backend.dtos.BuyerSellerDto;
 import com.nus_iss.spring.backend.entities.Buyer;
+import com.nus_iss.spring.backend.entities.Cart;
 import com.nus_iss.spring.backend.entities.Seller;
 import com.nus_iss.spring.backend.entities.User;
 import com.nus_iss.spring.backend.repositories.BuyerRepository;
@@ -41,6 +44,11 @@ public class UserFactory {
             buyer.setPassword(encodedPassword);
             buyer.setRole("ROLE_BUYER");
             buyer.setAddress(user.getAddress());
+            
+            Cart cart = new Cart();
+            cart.setBuyer(buyer);
+            cart.setCartItems(new ArrayList<>());
+            buyer.setCart(cart);
             return buyerRepository.save(buyer);
         } else if (role.equals("ROLE_SELLER")) {
             Seller seller = new Seller();
