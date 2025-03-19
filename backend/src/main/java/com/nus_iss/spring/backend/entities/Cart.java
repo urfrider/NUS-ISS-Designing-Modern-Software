@@ -1,9 +1,6 @@
 package com.nus_iss.spring.backend.entities;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -11,36 +8,39 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "carts")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order {
-    
+public class Cart {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "buyer_id", nullable = false) // FK to Buyer table
+    @OneToOne
+    @JoinColumn(name = "buyer_id", nullable = false)
+    @ToString.Exclude
     private Buyer buyer;
 
-    private Double totalAmount;
-    private String status;
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> cartItems;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private Double totalAmount = 0.0;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> orderItems = new ArrayList<>();
+    public void updateTotalAmount(){
+        this.totalAmount = cartItems.stream()
+            .map((item) -> item.getProduct().getPrice() * item.getQuantity())
+            .reduce(0.0, Double::sum);
+    }
+
 }

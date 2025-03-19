@@ -1,6 +1,5 @@
 package com.nus_iss.spring.backend.mappers;
 
-import java.util.Date;
 
 import com.nus_iss.spring.backend.dtos.NotificationDto;
 import com.nus_iss.spring.backend.entities.Notification;

@@ -75,9 +75,8 @@ public class ProductController {
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER', 'ROLE_SELLER')")
     public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody ProductDto entity) {
         try {
-            entity.setId(id);
             logger.info("UPDATING PRODUCT: {}", entity);
-            Product updatedProduct = productService.updateProduct(entity);
+            Product updatedProduct = productService.updateProduct(entity, id);
             return new ResponseEntity<>("Product with ID: " + updatedProduct.getId() + " updated successfully!", HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);

@@ -17,5 +17,6 @@ public class BuyerDto {
     private String username;
     private String address;
     private List<OrderDto> orderHistory;
+    private CartDto cart;
 
 }

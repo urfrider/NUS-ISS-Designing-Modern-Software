@@ -3,8 +3,6 @@ package com.nus_iss.spring.backend.mappers;
 
 import com.nus_iss.spring.backend.constants.Roles;
 import com.nus_iss.spring.backend.dtos.BuyerSellerDto;
-import com.nus_iss.spring.backend.entities.Buyer;
-import com.nus_iss.spring.backend.entities.Seller;
 import com.nus_iss.spring.backend.entities.User;
 
 public class UserMapper {
