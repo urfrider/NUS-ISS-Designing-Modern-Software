@@ -20,7 +20,7 @@ const initialState: UserState = {
   balance: -1,
 };
 
-const savedUser = localStorage.getItem("users");
+const savedUser = localStorage.getItem("user");
 const parsedUser = savedUser ? JSON.parse(savedUser) : initialState;
 
 const userSlice = createSlice({
@@ -29,7 +29,7 @@ const userSlice = createSlice({
   reducers: {
     login: (state, action: PayloadAction<UserState>) => {
       const user = action.payload;
-      
+
       if (!user) {
         return;
       }
@@ -45,12 +45,14 @@ const userSlice = createSlice({
     },
     updateUser: (state, action: PayloadAction<Partial<UserState>>) => {
       const updatedUser = action.payload;
-    
+
       // Update only the fields that are provided
-      if (updatedUser.username !== undefined) state.username = updatedUser.username;
-      if (updatedUser.address !== undefined) state.address = updatedUser.address;
+      if (updatedUser.username !== undefined)
+        state.username = updatedUser.username;
+      if (updatedUser.address !== undefined)
+        state.address = updatedUser.address;
       if (updatedUser.uen !== undefined) state.uen = updatedUser.uen;
-    
+
       // Update local storage so the changes persist
       localStorage.setItem("user", JSON.stringify(state));
     },

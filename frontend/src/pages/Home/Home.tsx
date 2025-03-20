@@ -7,7 +7,7 @@ import ProductCard from "../Product/ProductCard";
 function HomePage() {
   const user = useSelector((state: RootState) => state.user);
 
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<any>([]);
 
   const config = {
     headers: {
@@ -23,8 +23,7 @@ function HomePage() {
           `${import.meta.env.VITE_API_URL}/api/products`,
           config
         );
-        console.log(response);
-        setProducts(response.data)
+        setProducts(response.data);
       } catch (error) {}
     };
 
@@ -36,7 +35,7 @@ function HomePage() {
       <div className="flex justify-center items-center min-h-screen">
         <div className="flex items-center flex-col gap-2 text-white border-white border p-4 rounded-md">
           <div className="flex flex-wrap justify-center gap-4 p-8">
-            {products.map((product) => (
+            {products.map((product: any) => (
               <ProductCard product={product} />
             ))}
           </div>

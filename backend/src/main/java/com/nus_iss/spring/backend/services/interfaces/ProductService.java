@@ -1,12 +1,13 @@
 package com.nus_iss.spring.backend.services.interfaces;
 
+import java.io.IOException;
 import java.util.List;
 
+import com.nus_iss.spring.backend.dtos.CreateProductDto;
 import com.nus_iss.spring.backend.dtos.ProductDto;
-import com.nus_iss.spring.backend.entities.Product;
 
 public interface ProductService {
-    Product createProduct(ProductDto productDto);
+    Long createProduct(CreateProductDto productDto) throws IOException;
 
     ProductDto getProductById(Long id);
 
@@ -14,7 +15,7 @@ public interface ProductService {
     
     List<ProductDto> getAllProducts();
 
-    Product updateProduct(ProductDto productDto, Long id);
+    Long updateProduct(CreateProductDto productDto, Long id) throws IOException;
 
     void deleteProduct(Long id);
 }

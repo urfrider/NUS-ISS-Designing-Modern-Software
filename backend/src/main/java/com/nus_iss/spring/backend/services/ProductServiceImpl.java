@@ -1,11 +1,13 @@
 package com.nus_iss.spring.backend.services;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.nus_iss.spring.backend.dtos.CreateProductDto;
 import com.nus_iss.spring.backend.dtos.ProductDto;
 import com.nus_iss.spring.backend.entities.Product;
 import com.nus_iss.spring.backend.entities.Seller;
@@ -26,12 +28,13 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public Product createProduct(ProductDto productDto) {
-        Seller seller = sellerRepository.findById(productDto.getSellerId())
-            .orElseThrow(() -> new RuntimeException("Seller with Id: " + productDto.getSellerId() + " not found!"));
+    public Long createProduct(CreateProductDto productDto) throws IOException {
+        Seller seller = sellerRepository.findByUsername(productDto.getUsername())
+            .orElseThrow(() -> new RuntimeException("Seller with Id: " + productDto.getUsername() + " not found!"));
         Product product = productMapper.toEntity(productDto, seller);
         
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        return savedProduct.getId();
     }
 
     @Override
@@ -52,18 +55,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product updateProduct(ProductDto productDto, Long id) {
+    public Long updateProduct(CreateProductDto productDto, Long id) throws IOException {
         Product product = productRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Product with ID" + id + " does not exist!"));
         
         product.setName(productDto.getName());
         product.setDescription(productDto.getDescription());
         product.setCategory(productDto.getCategory());
-        product.setImages(productDto.getImages());
+        product.setImages(productDto.getImageFile().getBytes());
         product.setPrice(productDto.getPrice());
         product.setStock(productDto.getStock());
         
-        return productRepository.save(product);
+        return productRepository.save(product).getId();
     }
 
     @Override
