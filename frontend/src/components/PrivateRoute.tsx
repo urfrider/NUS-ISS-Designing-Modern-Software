@@ -1,12 +1,13 @@
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
-import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 
-export const PrivateRoute = ({ children }: { children: ReactNode }) => {
+export const PrivateRoute = () => {
   const user = useSelector((state: RootState) => state.user);
 
-  if (!user || !user.token) return <Navigate to="/" />;
+  if (!user || !user.token) {
+    return <Navigate to="/" replace />;
+  }
 
-  return children;
+  return <Outlet />;
 };
