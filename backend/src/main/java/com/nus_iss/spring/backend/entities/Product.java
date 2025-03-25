@@ -28,6 +28,7 @@ public class Product {
     private Double price;
     private String category;
     @Lob
+    @ToString.Exclude
     private byte[] images;
 
     @ManyToOne

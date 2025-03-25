@@ -38,9 +38,13 @@ public class CartServiceImpl implements CartService {
     private OrderService orderService;
     @Autowired
     private CartMapper cartMapper;
+    @Autowired
+    private UserInfoService userService;
+
     private static final Logger logger = LoggerFactory.getLogger(CartServiceImpl.class);
 
 
+    @Transactional
     @Override
     public CartDto addToCart(AddToCartDto cartItemDto) {
         Buyer buyer = buyerRepository.findByUsername(cartItemDto.getUsername())
@@ -50,6 +54,10 @@ public class CartServiceImpl implements CartService {
         Product product = productRepository.findById(cartItemDto.getProductId())
             .orElseThrow(() -> new RuntimeException("Product does not exist!"));
 
+        logger.info("cartItemDto: {}", cartItemDto);
+        logger.info("product: {}", product);
+
+
         if (cartItemDto.getQuantity() > product.getStock()){
             throw new RuntimeException("Insufficient stock for product ID: " + product.getId());        }
         
@@ -57,6 +65,7 @@ public class CartServiceImpl implements CartService {
             .filter(item -> item.getProduct().getId() == cartItemDto.getProductId())
             .findFirst().orElse(null);
 
+        logger.info("existingCartItem: {}", existingCartItem);
         if (existingCartItem != null){
             existingCartItem.setQuantity(existingCartItem.getQuantity() + cartItemDto.getQuantity());
             cartItemRepository.save(existingCartItem);
@@ -65,6 +74,8 @@ public class CartServiceImpl implements CartService {
             cartItem.setCart(cart);
             cartItem.setProduct(product);
             cartItem.setQuantity(cartItemDto.getQuantity());
+
+            logger.info("cartItem: {}", cartItem);
 
             cart.getCartItems().add(cartItem);
         }
@@ -96,6 +107,7 @@ public class CartServiceImpl implements CartService {
         return cartMapper.toDto(savedCart);
     }
 
+    @Transactional
     @Override
     public CartDto emptyCart(Long id) {
         Cart cart = cartRepository.findById(id)
@@ -106,8 +118,8 @@ public class CartServiceImpl implements CartService {
         return cartMapper.toDto(savedCart);
     }
 
-    @Override
     @Transactional
+    @Override
     public CartDto checkoutCart(Long id) {
         Cart cart = cartRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Cart does not exist!"));
@@ -116,11 +128,15 @@ public class CartServiceImpl implements CartService {
             Product product = productRepository.findById(item.getProduct().getId())
                 .orElseThrow(() -> new RuntimeException("Product does not exist!"));
             
-            if (item.getQuantity() > product.getStock()){
+            if (item.getQuantity() > product.getStock() || product.getStock() - item.getQuantity() < 0){
                 throw new RuntimeException("Insufficient stock for product ID: " + product.getId());
             }
 
             product.setStock(product.getStock() - item.getQuantity());
+            // update seller balance
+            Double itemPrice = item.getQuantity() * product.getPrice();
+            userService.updateUserBalance(
+                product.getSeller().getUsername(), itemPrice, "ADD");
             productRepository.save(product);
         }
 
@@ -129,11 +145,12 @@ public class CartServiceImpl implements CartService {
         return this.emptyCart(id);
     }
 
+    @Transactional
     @Override
-    public CartDto getCart(Long id) {
-        Cart cart = cartRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Cart does not exist!"));
-        return cartMapper.toDto(cart);
+    public CartDto getCart(Long buyerId) {
+        Buyer buyer = buyerRepository.findById(buyerId)
+            .orElseThrow(() -> new RuntimeException("Wrong user Id!"));
+        return cartMapper.toDto(buyer.getCart());
     }
 
 }

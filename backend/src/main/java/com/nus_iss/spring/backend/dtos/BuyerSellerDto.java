@@ -16,5 +16,5 @@ public class BuyerSellerDto {
     private String address;
     private String uen;  
     private String token;
-    private Long balance;
+    private Double balance;
 }

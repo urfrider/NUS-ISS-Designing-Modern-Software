@@ -1,5 +1,7 @@
 package com.nus_iss.spring.backend.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,7 @@ public class CartController {
 
     @Autowired
     private CartService cartService;
+    private static final Logger logger = LoggerFactory.getLogger(CartController.class);
 
     @PostMapping("/add")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
@@ -53,6 +56,7 @@ public class CartController {
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
     public ResponseEntity<?> emptyCart(@PathVariable Long id) {
         try {
+            logger.info("CARTID: {}", id);
             CartDto cart = cartService.emptyCart(id);
             return ResponseEntity.ok(cart);
         }catch(Exception e){
@@ -74,6 +78,7 @@ public class CartController {
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
     public ResponseEntity<?> getCartById(@PathVariable Long id) {
+        logger.info("USERID: {}", id);
         CartDto cartDto = cartService.getCart(id);
         return ResponseEntity.ok(cartDto);
     }

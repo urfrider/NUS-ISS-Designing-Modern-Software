@@ -42,5 +42,6 @@ public class Cart {
             .map((item) -> item.getProduct().getPrice() * item.getQuantity())
             .reduce(0.0, Double::sum);
     }
+    
 
 }

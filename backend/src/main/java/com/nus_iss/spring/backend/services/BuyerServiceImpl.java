@@ -34,6 +34,7 @@ public class BuyerServiceImpl implements BuyerService {
     }
 
     @Override
+    @Transactional
     public Buyer getBuyerByUsername(String username) {
         Optional<Buyer> buyerOptional = buyerRepository.findByUsername(username);
         

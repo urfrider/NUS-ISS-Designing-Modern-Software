@@ -32,11 +32,18 @@ const Header: React.FC = () => {
             </Link>
           </li>
           {user.role === SELLER && (
-            <li>
-              <Link to="/products" className="hover:text-blue-600">
-                My Products
-              </Link>
-            </li>
+            <>
+              <li>
+                <Link to="/products" className="hover:text-blue-600">
+                  My Products
+                </Link>
+              </li>
+              <li>
+                <Link to="/products/add" className="hover:text-blue-600">
+                  Add Product
+                </Link>
+              </li>
+            </>
           )}
           {user.role === BUYER && (
             <li>
