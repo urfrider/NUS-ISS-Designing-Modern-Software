@@ -2,9 +2,15 @@ package com.nus_iss.spring.backend.services;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.nus_iss.spring.backend.dtos.CreateProductDto;
@@ -80,5 +86,19 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto> getAllProducts() {
         List<Product> products = productRepository.findAll();
         return products.stream().map(productMapper::toDto).toList();
+    }
+
+    @Override
+    public Page<ProductDto> searchProduct(String name, String category, int page, int size) {
+        logger.info("Searching with name: {}, category: {}, page: {}, size: {}", name, category, page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.asc("name")));
+        Page<Product> productPage = productRepository.findByNameContainingIgnoreCaseAndCategoryContainingIgnoreCase(name, category, pageable);
+        logger.info("Product Page Content: {}", productPage);
+
+        List<ProductDto> productDtos = productPage.getContent().stream()
+            .map(productMapper::toDto)
+            .collect(Collectors.toList());
+
+        return new PageImpl<>(productDtos, pageable, productPage.getTotalElements());
     }
 }

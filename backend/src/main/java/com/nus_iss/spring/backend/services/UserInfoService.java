@@ -57,4 +57,22 @@ public class UserInfoService implements UserDetailsService {
             return "Unknown Role Added Successfully";  
         }
     }
+
+    public void updateUserBalance(String username, Double amount, String operation){
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User " + username + " does not exist!"));
+        if (operation == "SUBTRACT" && user.getBalance() < amount){
+            throw new RuntimeException("Balance is low!");
+        }
+
+        if (operation == "ADD"){
+            user.setBalance(user.getBalance() + amount);
+        } else if (operation == "SUBTRACT"){
+            user.setBalance(user.getBalance() - amount);
+        } else{
+            throw new IllegalArgumentException("Wrong operation!");
+        }
+
+        userRepository.save(user);
+    }
 }

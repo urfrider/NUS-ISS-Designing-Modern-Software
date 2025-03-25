@@ -44,7 +44,7 @@ public class UserFactory {
             buyer.setPassword(encodedPassword);
             buyer.setRole("ROLE_BUYER");
             buyer.setAddress(user.getAddress());
-            buyer.setBalance(0L);
+            buyer.setBalance(0.0);
             
             Cart cart = new Cart();
             cart.setBuyer(buyer);
@@ -58,7 +58,7 @@ public class UserFactory {
             seller.setPassword(encodedPassword);
             seller.setRole("ROLE_SELLER");
             seller.setUen(user.getUen());
-            seller.setBalance(0L);
+            seller.setBalance(0.0);
             return sellerRepository.save(seller);
         }
         throw new IllegalArgumentException("Unknown role: " + role);

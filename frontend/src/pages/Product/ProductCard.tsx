@@ -1,6 +1,31 @@
-import React from "react";
+import axios from "axios";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
 
-const ProductCard = ({ product }: { product: any }) => {
+const ProductCard = ({ product, user }: any) => {
+  const [quantity, setQuantity] = useState(0);
+
+  const addToCart = async () => {
+    const data = { username: user?.username, productId: product.id, quantity };
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL!}/api/cart/add`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      );
+      console.log(response);
+      toast.success(`Added to cart!`);
+    } catch (e: any) {
+      toast.error(e.response.data);
+      console.log(e.response.data);
+    }
+  };
+
+  console.log(product);
   return (
     <div className="border rounded-lg shadow-lg p-4 max-w-xs bg-white">
       <img
@@ -14,7 +39,22 @@ const ProductCard = ({ product }: { product: any }) => {
         ${product.price.toFixed(2)}
       </p>
       <p className="text-sm text-gray-500">Category: {product.category}</p>
-      <button className="mt-4 w-full bg-purple-500 text-white py-2 rounded-md hover:bg-purple-600 transition">
+      <div className="flex justify-between">
+        <p className="text-sm text-gray-500">Stock: {product.stock}</p>
+        <div className="flex gap-2 text-gray-500 items-center">
+          <span className="text-sm">Qty: </span>
+          <input
+            className="w-[50px] border p-1 rounded-md"
+            type="number"
+            value={quantity}
+            onChange={(e) => setQuantity(Number(e.target.value))}
+          />
+        </div>
+      </div>
+      <button
+        onClick={addToCart}
+        className="mt-4 w-full bg-purple-500 text-white py-2 rounded-md hover:bg-purple-600 transition"
+      >
         Add to Cart
       </button>
     </div>

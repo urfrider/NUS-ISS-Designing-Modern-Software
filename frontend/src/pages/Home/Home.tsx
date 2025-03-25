@@ -34,11 +34,14 @@ function HomePage() {
     <div>
       <div className="flex justify-center items-center min-h-screen">
         <div className="flex items-center flex-col gap-2 text-white border-white border p-4 rounded-md">
-          <div className="flex flex-wrap justify-center gap-4 p-8">
-            {products.map((product: any) => (
-              <ProductCard product={product} />
-            ))}
-          </div>
+          {products.map((product: any, key: number) => (
+            <div
+              key={`div-${key}`}
+              className="flex flex-wrap justify-center gap-4 p-8"
+            >
+              <ProductCard product={product} user={user} />
+            </div>
+          ))}
         </div>
       </div>
     </div>

@@ -12,8 +12,8 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [address, setAddress] = useState("")
-  const [uen, setUen] = useState("")
+  const [address, setAddress] = useState("");
+  const [uen, setUen] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [addressError, setAddressError] = useState("");
@@ -30,18 +30,19 @@ function Login() {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL!}/auth/addNewUser`,
-        role === BUYER ?
-        {
-          username,
-          password,
-          role,
-          address
-        } : {
-          username,
-          password,
-          role,
-          uen
-        }
+        role === BUYER
+          ? {
+              username,
+              password,
+              role,
+              address,
+            }
+          : {
+              username,
+              password,
+              role,
+              uen,
+            }
       );
 
       toast.success(response.data);
@@ -64,7 +65,7 @@ function Login() {
         `${import.meta.env.VITE_API_URL!}/auth/generateToken`,
         { username, password }
       );
-      console.log("response", response)
+      console.log("response", response);
       return response.data;
     } catch (e) {
       console.log("Login error", e);
@@ -76,8 +77,7 @@ function Login() {
     setPasswordError("");
     setConfirmPasswordError("");
     setAddressError("");
-    setUen("")
-
+    setUen("");
 
     if (isRegister && password != confirmPassword) {
       setConfirmPasswordError("Passwords do not match!");
@@ -117,7 +117,7 @@ function Login() {
     } else {
       const user = await onLogin();
 
-      console.log(user)
+      console.log(user);
 
       dispatch(login(user));
       navigate("/home");
@@ -168,18 +168,22 @@ function Login() {
               </div>
 
               <div className="mb-6">
-                  <div>
-                    <input
-                      type="text"
-                      value={role === BUYER ? address : uen}
-                      placeholder= {role === BUYER ? "Address" : "UEN" }
-                      onChange={(ev) => role === BUYER ? setAddress(ev.target.value) : setUen(ev.target.value)}
-                      className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
-                    />
-                    <label className="text-red-500 text-sm">
-                      {role === BUYER ? addressError : uenError}
-                    </label>
-                  </div>
+                <div>
+                  <input
+                    type="text"
+                    value={role === BUYER ? address : uen}
+                    placeholder={role === BUYER ? "Address" : "UEN"}
+                    onChange={(ev) =>
+                      role === BUYER
+                        ? setAddress(ev.target.value)
+                        : setUen(ev.target.value)
+                    }
+                    className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
+                  />
+                  <label className="text-red-500 text-sm">
+                    {role === BUYER ? addressError : uenError}
+                  </label>
+                </div>
               </div>
 
               <div className="mb-2 text-white">

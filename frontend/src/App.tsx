@@ -30,7 +30,7 @@ function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/editProfile" element={<EditProfile />} />
-            <Route path="/product/add" element={<AddProduct />} />
+            <Route path="/products/add" element={<AddProduct />} />
           </Route>
 
           {/* Catch-all for unauthorized access */}

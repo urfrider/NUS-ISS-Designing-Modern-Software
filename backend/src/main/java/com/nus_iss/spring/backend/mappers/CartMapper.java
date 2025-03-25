@@ -14,6 +14,7 @@ public class CartMapper {
 
     public CartDto toDto(Cart cart){
         CartDto cartDto = new CartDto();
+        cartDto.setId(cart.getId());
         cartDto.setBuyerId(cart.getBuyer().getId());
         cartDto.setTotalAmount(cart.getTotalAmount());
         List<CartItemDto> cartItemDtos = cart.getCartItems().stream()

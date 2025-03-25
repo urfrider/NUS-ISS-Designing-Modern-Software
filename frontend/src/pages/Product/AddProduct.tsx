@@ -61,7 +61,7 @@ export const AddProduct = () => {
           },
         }
       );
-      console.log(response.data);
+      toast.success("Product successfully added!");
     } catch (e) {
       console.log(e);
     }
