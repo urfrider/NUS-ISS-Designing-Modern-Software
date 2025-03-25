@@ -25,7 +25,6 @@ const ProductCard = ({ product, user }: any) => {
     }
   };
 
-  console.log(product);
   return (
     <div className="border rounded-lg shadow-lg p-4 max-w-xs bg-white">
       <img
