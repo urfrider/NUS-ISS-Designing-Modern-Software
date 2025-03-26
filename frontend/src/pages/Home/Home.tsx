@@ -11,12 +11,25 @@ function HomePage() {
   const [products, setProducts] = useState<any>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(0);
+  const [cart, setCart] = useState<any>([]);
 
   const config = {
     headers: {
       Authorization: `Bearer ${user.token}`,
       "Content-Type": "application/json",
     },
+  };
+
+  const fetchCart = async () => {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL!}/api/cart/${user?.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+        },
+      }
+    );
+    setCart(response.data);
   };
 
   const searchProducts = async () => {
@@ -45,6 +58,7 @@ function HomePage() {
 
   useEffect(() => {
     searchProducts();
+    fetchCart();
   }, [page]);
 
   return (
@@ -89,7 +103,7 @@ function HomePage() {
               key={`div-${key}`}
               className="flex flex-wrap justify-center gap-4 p-8"
             >
-              <ProductCard product={product} user={user} />
+              <ProductCard product={product} user={user} cartId={cart?.id} />
             </div>
           ))}
         </div>

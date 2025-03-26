@@ -1,16 +1,25 @@
 package com.nus_iss.spring.backend.services.interfaces;
 
 import com.nus_iss.spring.backend.dtos.CartDto;
+import com.nus_iss.spring.backend.entities.Cart;
 import com.nus_iss.spring.backend.dtos.AddToCartDto;
 
 public interface CartService {
-    CartDto getCart(Long id);
+    CartDto getCartByUsername(String username);
+
+    Cart getCartById(Long id);
+
+    CartDto getCartDtoById(Long id);
+
+    CartDto getCartByUserId(Long userId);
     
-    CartDto addToCart(AddToCartDto cartDto);
+    void addToCart(AddToCartDto cartDto);
 
-    CartDto removeFromCart(AddToCartDto cartItemDto);
+    void removeFromCart(AddToCartDto cartItemDto);
 
-    CartDto emptyCart(Long id);
+    void emptyCart(Long id);
 
-    CartDto checkoutCart(Long id);
+    void checkoutCart(Long id);
+
+    void saveCart(Cart cart);
 }

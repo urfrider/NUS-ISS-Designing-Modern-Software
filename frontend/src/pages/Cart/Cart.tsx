@@ -9,7 +9,7 @@ function Cart() {
   const navigate = useNavigate();
   const [cart, setCart] = useState<any>([]);
 
-  const fetchItems = async () => {
+  const fetchCart = async () => {
     const response = await axios.get(
       `${import.meta.env.VITE_API_URL!}/api/cart/${user?.id}`,
       {
@@ -39,8 +39,26 @@ function Cart() {
     }
   };
 
+  const onUndo = async () => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL!}/api/cart/undo/${cart?.id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      );
+      setCart(response.data);
+      console.log(response);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
-    fetchItems();
+    fetchCart();
   }, []);
   console.log(cart);
   return (
@@ -67,6 +85,12 @@ function Cart() {
         className="mt-4 p-2 bg-red-500 text-white rounded"
       >
         Clear
+      </button>
+      <button
+        onClick={onUndo}
+        className="mt-4 p-2 bg-orange-500 text-white rounded"
+      >
+        Undo
       </button>
     </div>
   );
