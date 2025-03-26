@@ -2,11 +2,16 @@ import axios from "axios";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 
-const ProductCard = ({ product, user }: any) => {
+const ProductCard = ({ product, user, cartId }: any) => {
   const [quantity, setQuantity] = useState(0);
 
   const addToCart = async () => {
-    const data = { username: user?.username, productId: product.id, quantity };
+    const data = {
+      username: user?.username,
+      productId: product.id,
+      quantity,
+      cartId,
+    };
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL!}/api/cart/add`,

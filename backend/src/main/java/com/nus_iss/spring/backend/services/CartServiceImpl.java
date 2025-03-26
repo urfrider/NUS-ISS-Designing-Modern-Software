@@ -46,7 +46,7 @@ public class CartServiceImpl implements CartService {
 
     @Transactional
     @Override
-    public CartDto addToCart(AddToCartDto cartItemDto) {
+    public void addToCart(AddToCartDto cartItemDto) {
         Buyer buyer = buyerRepository.findByUsername(cartItemDto.getUsername())
             .orElseThrow(() -> new RuntimeException("Buyer does not exist!"));
         Cart cart = cartRepository.findByBuyer(buyer)
@@ -81,12 +81,13 @@ public class CartServiceImpl implements CartService {
         }
 
         cart.updateTotalAmount();
-        Cart savedCart = cartRepository.save(cart);
-        return cartMapper.toDto(savedCart);
+        cartRepository.save(cart);
     }
 
     @Override
-    public CartDto removeFromCart(AddToCartDto cartItemDto) {
+    @Transactional
+    public void removeFromCart(AddToCartDto cartItemDto) {
+        logger.info("UNDO COMMAND: {}", cartItemDto);
         Buyer buyer = buyerRepository.findByUsername(cartItemDto.getUsername())
             .orElseThrow(() -> new RuntimeException("Buyer does not exist!"));
         Cart cart = cartRepository.findByBuyer(buyer)
@@ -103,24 +104,23 @@ public class CartServiceImpl implements CartService {
         }
         
         cart.updateTotalAmount();
-        Cart savedCart = cartRepository.save(cart);
-        return cartMapper.toDto(savedCart);
+        cartRepository.save(cart);
     }
 
     @Transactional
     @Override
-    public CartDto emptyCart(Long id) {
+    public void emptyCart(Long id) {
+        logger.info("EMPTYCART: id {}", id);
         Cart cart = cartRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Cart does not exist!"));
         cart.getCartItems().clear();
         cart.updateTotalAmount();
-        Cart savedCart = cartRepository.save(cart);
-        return cartMapper.toDto(savedCart);
+        cartRepository.save(cart);
     }
 
     @Transactional
     @Override
-    public CartDto checkoutCart(Long id) {
+    public void checkoutCart(Long id) {
         Cart cart = cartRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Cart does not exist!"));
 
@@ -140,17 +140,48 @@ public class CartServiceImpl implements CartService {
             productRepository.save(product);
         }
 
-        Long orderId = orderService.createOrder(cart);
-        logger.info("ORDER CREATED: {}", orderId);
-        return this.emptyCart(id);
+        orderService.createOrder(cart);
     }
 
     @Transactional
     @Override
-    public CartDto getCart(Long buyerId) {
-        Buyer buyer = buyerRepository.findById(buyerId)
-            .orElseThrow(() -> new RuntimeException("Wrong user Id!"));
+    public CartDto getCartByUsername(String username) {
+        Buyer buyer = buyerRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("Wrong username!"));
         return cartMapper.toDto(buyer.getCart());
+    }
+
+    @Transactional
+    @Override
+    public Cart getCartById(Long id) {
+        Cart cart = cartRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("No Cart!"));
+        return cart;
+    }
+
+    
+
+    @Override
+    public void saveCart(Cart cart) {
+        cartRepository.save(cart);
+    }
+
+    @Override
+    @Transactional
+    public CartDto getCartByUserId(Long userId) {
+        Buyer buyer = buyerRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Wrong username!"));
+        Cart cart = cartRepository.findByBuyer(buyer)
+            .orElseThrow(() -> new RuntimeException("No Cart!"));
+        return cartMapper.toDto(cart);
+    }
+
+    @Override
+    @Transactional
+    public CartDto getCartDtoById(Long id) {
+        Cart cart = cartRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("No Cart!"));
+        return cartMapper.toDto(cart);
     }
 
 }
