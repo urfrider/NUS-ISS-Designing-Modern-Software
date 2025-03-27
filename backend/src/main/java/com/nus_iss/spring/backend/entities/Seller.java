@@ -30,6 +30,6 @@ public class Seller extends User {
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude 
-    private List<OrderItem> OrderItems;
+    private List<OrderItem> orderItems;
 
 }

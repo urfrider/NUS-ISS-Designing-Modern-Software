@@ -1,7 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import Home from "./pages/Home/Home";
-import { PrivateRoute } from "./components/PrivateRoute";
 import { ToastContainer } from "react-toastify";
 import { AddProduct } from "./pages/Product/AddProduct";
 import Profile from "./pages/Profile/Profile";
@@ -9,20 +8,26 @@ import Order from "./pages/Order/Order";
 import Cart from "./pages/Cart/Cart";
 import Checkout from "./pages/Checkout/Checkout";
 import EditProfile from "./pages/Profile/EditProfile";
-import Header from "./components/Header";
+import Layout from "./Layout";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   return (
     <>
       <BrowserRouter>
         <ToastContainer />
-        <Header />
         <Routes>
           {/* Public Route */}
           <Route path="/" element={<Login />} />
 
           {/* Protected Routes */}
-          <Route element={<PrivateRoute />}>
+          <Route
+            element={
+              <PrivateRoute>
+                <Layout />
+              </PrivateRoute>
+            }
+          >
             <Route path="/home" element={<Home />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/editProfile" element={<EditProfile />} />
