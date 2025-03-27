@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nus_iss.spring.backend.dtos.CartDto;
+import com.nus_iss.spring.backend.command.AddToCartCommand;
+import com.nus_iss.spring.backend.command.CheckoutCartCommand;
+import com.nus_iss.spring.backend.command.CommandManager;
+import com.nus_iss.spring.backend.command.EmptyCartCommand;
+import com.nus_iss.spring.backend.command.RemoveFromCartCommand;
 import com.nus_iss.spring.backend.dtos.AddToCartDto;
 import com.nus_iss.spring.backend.services.interfaces.CartService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,60 +32,61 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class CartController {
 
     @Autowired
+    private CommandManager commandManager;
+    @Autowired
     private CartService cartService;
     private static final Logger logger = LoggerFactory.getLogger(CartController.class);
 
     @PostMapping("/add")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
     public ResponseEntity<?> addToCart(@RequestBody AddToCartDto addToCartDto) {
-        try {
-            CartDto cart = cartService.addToCart(addToCartDto);
-            return ResponseEntity.ok(cart);
-        }catch(Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-        }
+        Long cartId = addToCartDto.getCartId();
+        AddToCartCommand addToCartCommand = new AddToCartCommand(cartService, addToCartDto);
+        commandManager.executeCommand(cartId, addToCartCommand);
+        return ResponseEntity.ok(cartService.getCartByUsername(addToCartDto.getUsername()));
     }
 
     @DeleteMapping("/remove")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
     public ResponseEntity<?> removeFromCart(@RequestBody AddToCartDto addToCartDto) {
-        try {
-            CartDto cart = cartService.removeFromCart(addToCartDto);
-            return ResponseEntity.ok(cart);
-        }catch(Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-        }
+        Long userId = addToCartDto.getCartId();
+        RemoveFromCartCommand removeFromCartCommand = new RemoveFromCartCommand(cartService, addToCartDto);
+        commandManager.executeCommand(userId, removeFromCartCommand);
+        return ResponseEntity.ok(cartService.getCartByUsername(addToCartDto.getUsername()));
     }
 
     @PutMapping("/empty/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
     public ResponseEntity<?> emptyCart(@PathVariable Long id) {
-        try {
-            logger.info("CARTID: {}", id);
-            CartDto cart = cartService.emptyCart(id);
-            return ResponseEntity.ok(cart);
-        }catch(Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-        }
+        EmptyCartCommand emptyCartCommand = new EmptyCartCommand(cartService, id);
+        commandManager.executeCommand(id, emptyCartCommand);
+        return ResponseEntity.ok(cartService.getCartDtoById(id));
     }
 
     @PostMapping("/checkout/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
     public ResponseEntity<?> checkoutCart(@PathVariable Long id) {
-        try {
-            CartDto cart = cartService.checkoutCart(id);
-            return ResponseEntity.ok(cart);
-        }catch(Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-        }
+        CheckoutCartCommand checkoutCartCommand = new CheckoutCartCommand(cartService, id);
+        commandManager.executeCommand(id, checkoutCartCommand);
+        return ResponseEntity.ok(cartService.getCartDtoById(id));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
-    public ResponseEntity<?> getCartById(@PathVariable Long id) {
+    public ResponseEntity<?> getCartByUserId(@PathVariable Long id) {
         logger.info("USERID: {}", id);
-        CartDto cartDto = cartService.getCart(id);
+        CartDto cartDto = cartService.getCartByUserId(id);
         return ResponseEntity.ok(cartDto);
     }
     
+    @PostMapping("/undo/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
+    public ResponseEntity<?> undoLastOperation(@PathVariable Long id) {
+        try {
+            commandManager.undoCommand(id);
+            return ResponseEntity.ok(cartService.getCartDtoById(id));
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        }
+    }
 }

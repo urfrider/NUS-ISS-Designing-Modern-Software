@@ -114,7 +114,7 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?>  searchProduct(
+    public ResponseEntity<?> searchProduct(
         @RequestParam String name,
         @RequestParam String category,
         @RequestParam(defaultValue = "0") int page,

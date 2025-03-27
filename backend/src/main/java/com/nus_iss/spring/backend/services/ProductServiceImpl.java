@@ -21,6 +21,8 @@ import com.nus_iss.spring.backend.mappers.ProductMapper;
 import com.nus_iss.spring.backend.repositories.ProductRepository;
 import com.nus_iss.spring.backend.repositories.SellerRepository;
 import com.nus_iss.spring.backend.services.interfaces.ProductService;
+
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -89,10 +91,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public Page<ProductDto> searchProduct(String name, String category, int page, int size) {
         logger.info("Searching with name: {}, category: {}, page: {}, size: {}", name, category, page, size);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.asc("name")));
-        Page<Product> productPage = productRepository.findByNameContainingIgnoreCaseAndCategoryContainingIgnoreCase(name, category, pageable);
+        Page<Product> productPage = productRepository.searchProducts(name, category, pageable);
         logger.info("Product Page Content: {}", productPage);
 
         List<ProductDto> productDtos = productPage.getContent().stream()
@@ -101,4 +104,5 @@ public class ProductServiceImpl implements ProductService {
 
         return new PageImpl<>(productDtos, pageable, productPage.getTotalElements());
     }
+
 }
