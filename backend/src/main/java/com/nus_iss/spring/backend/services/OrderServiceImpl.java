@@ -1,6 +1,5 @@
 package com.nus_iss.spring.backend.services;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,7 +12,6 @@ import com.nus_iss.spring.backend.dtos.OrderItemDto;
 import com.nus_iss.spring.backend.entities.Cart;
 import com.nus_iss.spring.backend.entities.Order;
 import com.nus_iss.spring.backend.entities.OrderItem;
-import com.nus_iss.spring.backend.entities.Seller;
 import com.nus_iss.spring.backend.mappers.OrderItemMapper;
 import com.nus_iss.spring.backend.mappers.OrderMapper;
 import com.nus_iss.spring.backend.repositories.BuyerRepository;
@@ -21,6 +19,7 @@ import com.nus_iss.spring.backend.repositories.OrderItemRepository;
 import com.nus_iss.spring.backend.repositories.OrderRepository;
 import com.nus_iss.spring.backend.repositories.SellerRepository;
 import com.nus_iss.spring.backend.services.interfaces.OrderService;
+import com.nus_iss.spring.backend.state.PendingState;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -44,16 +43,16 @@ public class OrderServiceImpl implements OrderService {
         Order savedOrder = orderRepository.save(order);
 
         List<OrderItem> orderItems = cart.getCartItems().stream()
-                .map((cartItem) -> {
-                    OrderItem orderItem = new OrderItem();
-                    orderItem.setOrder(savedOrder);
-                    orderItem.setProduct(cartItem.getProduct());
-                    orderItem.setSeller(cartItem.getProduct().getSeller());
-                    orderItem.setQuantity(cartItem.getQuantity());
-                    orderItem.setPrice(cartItem.getProduct().getPrice());
-                    orderItem.setStatus("PENDING");
-                    return orderItem;
-                }).collect(Collectors.toList());
+            .map((cartItem) -> {
+                OrderItem orderItem = new OrderItem();
+                orderItem.setOrder(savedOrder);
+                orderItem.setProduct(cartItem.getProduct());
+                orderItem.setSeller(cartItem.getProduct().getSeller());
+                orderItem.setQuantity(cartItem.getQuantity());
+                orderItem.setPrice(cartItem.getProduct().getPrice());
+                orderItem.setState(new PendingState());
+                return orderItem;
+            }).collect(Collectors.toList());
 
         orderItemRepository.saveAll(orderItems);
         savedOrder.getOrderItems().addAll(orderItems);

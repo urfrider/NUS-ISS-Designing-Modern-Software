@@ -141,6 +141,7 @@ public class CartServiceImpl implements CartService {
         }
 
         orderService.createOrder(cart);
+        this.emptyCart(id);
     }
 
     @Transactional
