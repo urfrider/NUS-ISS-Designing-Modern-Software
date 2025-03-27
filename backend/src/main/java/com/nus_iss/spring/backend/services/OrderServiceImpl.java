@@ -14,6 +14,7 @@ import com.nus_iss.spring.backend.repositories.OrderItemRepository;
 import com.nus_iss.spring.backend.repositories.OrderRepository;
 import com.nus_iss.spring.backend.repositories.SellerRepository;
 import com.nus_iss.spring.backend.services.interfaces.OrderService;
+import com.nus_iss.spring.backend.state.PendingState;
 
 import lombok.AllArgsConstructor;
 
@@ -42,7 +43,7 @@ public class OrderServiceImpl implements OrderService {
                 orderItem.setSeller(cartItem.getProduct().getSeller());
                 orderItem.setQuantity(cartItem.getQuantity());
                 orderItem.setPrice(cartItem.getProduct().getPrice());
-                orderItem.setStatus("PENDING");
+                orderItem.setState(new PendingState());
                 return orderItem;
             }).collect(Collectors.toList());
 
