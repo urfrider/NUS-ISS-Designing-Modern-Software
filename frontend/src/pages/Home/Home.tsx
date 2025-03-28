@@ -23,11 +23,7 @@ function HomePage() {
   const fetchCart = async () => {
     const response = await axios.get(
       `${import.meta.env.VITE_API_URL!}/api/cart/${user?.id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${user?.token}`,
-        },
-      }
+      config
     );
     setCart(response.data);
   };

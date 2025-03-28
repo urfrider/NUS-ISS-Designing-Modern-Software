@@ -67,7 +67,7 @@ class ProductControllerTest {
         product.setName("Test Product");
         product.setPrice(100.0);
 
-        when(productService.getProductById(1L)).thenReturn(product);
+        when(productService.getProductById(1L, false, (double) 0L, false)).thenReturn(product);
 
         mockMvc.perform(get("/api/products/1")
                 .contentType(MediaType.APPLICATION_JSON))

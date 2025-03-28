@@ -21,6 +21,9 @@ import com.nus_iss.spring.backend.mappers.ProductMapper;
 import com.nus_iss.spring.backend.repositories.ProductRepository;
 import com.nus_iss.spring.backend.repositories.SellerRepository;
 import com.nus_iss.spring.backend.services.interfaces.ProductService;
+import com.nus_iss.spring.decorators.DiscountDecorator;
+import com.nus_iss.spring.decorators.GiftWrapDecorator;
+import com.nus_iss.spring.decorators.interfaces.ProductComponent;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -46,17 +49,28 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto getProductById(Long id) {
+    public ProductDto getProductById(Long id, Boolean discount, Double discountPercentage, Boolean giftWrap) {
+
         Product product = productRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Product with Id: " + id + " not found!"));
+            .orElseThrow(() -> new RuntimeException("Product with Id: " + id + " not found!"));        
+
+        ProductComponent decoratedProduct = product;
+
+        if (giftWrap) {
+            decoratedProduct = new GiftWrapDecorator(decoratedProduct);
+        }
+        if (discount) {
+            decoratedProduct = new DiscountDecorator(decoratedProduct, discountPercentage);
+        }
         
-            return productMapper.toDto(product);
+        return productMapper.toDto(decoratedProduct);
     }
 
     @Override
+    @Transactional
     public List<ProductDto> getProductsBySellerId(Long sellerId) {
         Seller seller = sellerRepository.findById(sellerId)
-        .orElseThrow(() -> new RuntimeException("Seller with Id: " + sellerId + " not found!"));
+            .orElseThrow(() -> new RuntimeException("Seller with Id: " + sellerId + " not found!"));
         List<Product> products = productRepository.findBySeller(seller);
         
         return products.stream().map(productMapper::toDto).toList();
@@ -73,6 +87,8 @@ public class ProductServiceImpl implements ProductService {
         product.setImages(productDto.getImageFile().getBytes());
         product.setPrice(productDto.getPrice());
         product.setStock(productDto.getStock());
+        product.setHasDiscount(productDto.getHasDiscount());
+        product.setDiscountPercentage(productDto.getDiscountPercentage());
         
         return productRepository.save(product).getId();
     }

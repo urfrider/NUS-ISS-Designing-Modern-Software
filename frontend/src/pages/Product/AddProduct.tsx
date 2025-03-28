@@ -11,11 +11,14 @@ interface ProductFormData {
   category: string;
   stock: number;
   price: number;
+  hasDiscount: boolean;
+  discountPercentage: number;
 }
 
 export const AddProduct = () => {
   const user = useSelector((state: RootState) => state.user);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [hasDiscount, setHasDiscount] = useState(false);
   const {
     register,
     handleSubmit,
@@ -27,6 +30,8 @@ export const AddProduct = () => {
       category: "",
       stock: 0,
       price: 0,
+      hasDiscount: false,
+      discountPercentage: 0,
     },
   });
 
@@ -37,6 +42,7 @@ export const AddProduct = () => {
   };
 
   const onSubmit = async (data: ProductFormData) => {
+    console.log (imageFile)
     if (!imageFile) {
       toast.error("Please upload an image!");
       return;
@@ -50,9 +56,11 @@ export const AddProduct = () => {
     formData.append("price", data.price.toString());
     formData.append("username", user?.username);
     formData.append("imageFile", imageFile);
+    formData.append("hasDiscount", data.hasDiscount.toString());
+    formData.append("discountPercentage", data.discountPercentage.toString());
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `${import.meta.env.VITE_API_URL!}/api/products`,
         formData,
         {
@@ -120,6 +128,30 @@ export const AddProduct = () => {
           {errors.stock && <p className="text-red-500">Stock is required.</p>}
         </div>
 
+        <div className="flex gap-2 items-center">
+          <span className="">Has Discount</span>
+          <input
+            type="checkbox"
+            {...register("hasDiscount")}
+            onChange={(e) => setHasDiscount(e.target.checked)}
+          />
+        </div>
+
+        {hasDiscount && (
+          <div className="flex gap-2 items-center">
+            <span className="">Discount Percentage</span>
+            <input
+              type="number"
+              {...register("discountPercentage", { required: hasDiscount })}
+              min="0"
+              max="100"
+            />
+            {errors.discountPercentage && (
+              <p className="text-red-500">Enter a valid discount percentage.</p>
+            )}
+          </div>
+        )}
+        
         <button>Submit</button>
       </form>
     </div>

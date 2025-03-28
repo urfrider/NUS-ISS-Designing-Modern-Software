@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nus_iss.spring.backend.entities.Review;
 import com.nus_iss.spring.backend.services.ReviewServiceImpl;
-import com.nus_iss.spring.backend.services.interfaces.OrderService;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")

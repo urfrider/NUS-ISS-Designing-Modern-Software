@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,7 +45,9 @@ public class ProductController {
         @RequestParam("stock") Integer stock,
         @RequestParam("price") Double price,
         @RequestParam("username") String username,
-        @RequestParam("imageFile") MultipartFile imageFile
+        @RequestParam("imageFile") MultipartFile imageFile,
+        @RequestParam("hasDiscount") Boolean hasDiscount,
+        @RequestParam("discountPercentage") Double discountPercentage
     ) {
         try {
             CreateProductDto createProductDto = new CreateProductDto();
@@ -55,6 +58,8 @@ public class ProductController {
             createProductDto.setPrice(price);
             createProductDto.setUsername(username);
             createProductDto.setStock(stock);
+            createProductDto.setHasDiscount(hasDiscount);
+            createProductDto.setDiscountPercentage(discountPercentage);
             logger.info("CREATEPRODUCT: {}", createProductDto);
             Long productId = productService.createProduct(createProductDto);
             return new ResponseEntity<>("Product ID: " + productId, HttpStatus.OK);
@@ -65,9 +70,14 @@ public class ProductController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER', 'ROLE_SELLER')")
-    public ResponseEntity<?> getProductById(@PathVariable("id") Long productId) {
+    public ResponseEntity<?> getProductById(@PathVariable("id") Long productId,
+        @RequestParam(defaultValue = "false") boolean discount,
+        @RequestParam(defaultValue = "0") double discountPercentage,
+        @RequestParam(defaultValue = "false") boolean giftWrap) {
         try {
-            ProductDto product  = productService.getProductById(productId);
+            
+            ProductDto product  = productService.getProductById(productId, discount, discountPercentage, giftWrap);
+
             return new ResponseEntity<>(product, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
@@ -91,16 +101,41 @@ public class ProductController {
     }
     
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_BUYER', 'ROLE_SELLER')")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody CreateProductDto entity) {
-        try {
-            logger.info("UPDATING PRODUCT: {}", entity);
-            Long productId = productService.updateProduct(entity, id);
-            return new ResponseEntity<>("Product with ID: " + productId + " updated successfully!", HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-        }
+@PreAuthorize("hasAnyAuthority('ROLE_BUYER', 'ROLE_SELLER')")
+public ResponseEntity<?> updateProduct(
+        @PathVariable Long id,
+        @RequestParam("name") String name,
+        @RequestParam("description") String description,
+        @RequestParam("category") String category,
+        @RequestParam("stock") int stock,
+        @RequestParam("price") double price,
+        @RequestParam("username") String username,
+        @RequestParam(value = "hasDiscount", required = false, defaultValue = "false") boolean hasDiscount,
+        @RequestParam(value = "discountPercentage", required = false, defaultValue = "0") double discountPercentage,
+        @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
+
+    try {
+        logger.info("UPDATING PRODUCT: {}", name);
+
+        CreateProductDto createProductDto = new CreateProductDto();
+        createProductDto.setCategory(category);
+        createProductDto.setDescription(description);
+        createProductDto.setImageFile(imageFile);
+        createProductDto.setName(name);
+        createProductDto.setPrice(price);
+        createProductDto.setUsername(username);
+        createProductDto.setStock(stock);
+        createProductDto.setHasDiscount(hasDiscount);
+        createProductDto.setDiscountPercentage(discountPercentage);
+        
+        // Call service layer to update product
+        Long productId = productService.updateProduct(createProductDto, id);
+
+        return ResponseEntity.ok("Product with ID: " + productId + " updated successfully!");
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
+}
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER', 'ROLE_SELLER')")

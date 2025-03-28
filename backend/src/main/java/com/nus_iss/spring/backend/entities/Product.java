@@ -1,5 +1,7 @@
 package com.nus_iss.spring.backend.entities;
 
+import com.nus_iss.spring.decorators.interfaces.ProductComponent;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,7 +20,7 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Product {
+public class Product implements ProductComponent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,5 +38,6 @@ public class Product {
     @ToString.Exclude  // Prevents infinite recursion
     private Seller seller;
     private Integer stock;
-
+    private Boolean hasDiscount;
+    private Double discountPercentage;
 }
