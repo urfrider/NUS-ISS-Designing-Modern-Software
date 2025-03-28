@@ -10,19 +10,23 @@ function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [paypalEmail, setPaypalEmail] = useState("");
   const [creditCardNumber, setCreditCardNumber] = useState("");
+  const [creditCardHolder, setcreditCardHolder] = useState("");
   const [creditCardExpiry, setCreditCardExpiry] = useState("");
   const [creditCardCVC, setCreditCardCVC] = useState("");
   const [cart, setCart] = useState<any>([]);
   const navigate = useNavigate();
 
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user.token}`,
+      "Content-Type": "application/json",
+    },
+  };
+
   const fetchCart = async () => {
     const response = await axios.get(
       `${import.meta.env.VITE_API_URL!}/api/cart/${user?.id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${user?.token}`,
-        },
-      }
+      config
     );
     setCart(response.data);
   };
@@ -35,6 +39,7 @@ function Checkout() {
 
     if (paymentMethod == "creditCard") {
       data["cardNumber"] = creditCardNumber;
+      data["cardHolder"] = creditCardHolder;
       data["cardExpiry"] = creditCardExpiry;
       data["cardCvc"] = creditCardCVC;
     } else if (paymentMethod == "paypal") {
@@ -42,21 +47,16 @@ function Checkout() {
     }
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `${import.meta.env.VITE_API_URL!}/api/payment`,
         {
           paymentType: paymentMethod,
           amount: cart?.totalAmount,
           details: data,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${user?.token}`,
-          },
-        }
+        config
       );
       toast.success(`Payment successful with ${paymentMethod}`);
-      console.log(response);
     } catch (e) {
       console.log(e);
     }
@@ -97,7 +97,7 @@ function Checkout() {
               />
               Cash Balance
             </label>
-            <div>${cart?.totalAmount}</div>
+            <div>${user.balance}</div>
           </div>
 
           <label className="flex items-center gap-2">
@@ -137,6 +137,13 @@ function Checkout() {
                 placeholder="Card Number"
                 value={creditCardNumber}
                 onChange={(e) => setCreditCardNumber(e.target.value)}
+                className="border p-2 rounded w-full"
+              />
+              <input
+                type="text"
+                placeholder="Card Holder Name"
+                value={creditCardHolder}
+                onChange={(e) => setcreditCardHolder(e.target.value)}
                 className="border p-2 rounded w-full"
               />
               <input

@@ -19,4 +19,6 @@ public class ProductDto {
     private byte[] images;
     private String username;
     private Integer stock;
+    private Boolean hasDiscount;
+    private Double discountPercentage;
 }

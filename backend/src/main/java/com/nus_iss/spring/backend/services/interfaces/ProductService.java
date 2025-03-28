@@ -11,7 +11,7 @@ import com.nus_iss.spring.backend.dtos.ProductDto;
 public interface ProductService {
     Long createProduct(CreateProductDto productDto) throws IOException;
 
-    ProductDto getProductById(Long id);
+    ProductDto getProductById(Long id, Boolean discount, Double discountPercentage, Boolean giftWrap);
 
     List<ProductDto> getProductsBySellerId(Long sellerId);
     
