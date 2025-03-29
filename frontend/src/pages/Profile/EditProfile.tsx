@@ -6,6 +6,9 @@ import { BUYER } from "../../constants/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { updateUser } from "../../redux/userSlice";
+import { Button, Flex, Form, Input, Layout, Typography } from "antd";
+import { Content } from "antd/es/layout/layout";
+import { RegisterType } from "../Login/Login";
 
 function EditProfile() {
   const dispatch = useDispatch();
@@ -13,8 +16,8 @@ function EditProfile() {
   const user = useSelector((state: RootState) => state.user);
   const [id] = useState(user.id);
   const [username] = useState(user.username);
-  const [address, setAddress] = useState(user.address || "");
-  const [uen, setUen] = useState(user.uen || "");
+  const [address] = useState(user.address || "");
+  const [uen] = useState(user.uen || "");
   const [role] = useState(user.role || "");
 
   const config = {
@@ -24,9 +27,17 @@ function EditProfile() {
     },
   };
 
-  const onSave = async () => {
+  const [form] = Form.useForm();
+
+  const onFinish = (values: RegisterType) => {
+    onSave(values);
+    form.resetFields();
+  };
+
+  const onSave = async (values: RegisterType) => {
     try {
-      
+      const updatedAddress = values.address;
+      const updatedUen = values.uen;
       const response =
         role == BUYER
           ? await axios.post(
@@ -34,7 +45,7 @@ function EditProfile() {
               {
                 id,
                 username,
-                address,
+                updatedAddress,
               },
               config
             )
@@ -43,14 +54,16 @@ function EditProfile() {
               {
                 id,
                 username,
-                uen,
+                updatedUen,
               },
               config
             );
+      console.log("post", response);
       toast.success("Profile updated successfully!");
 
       const updatedUserData =
-        role == BUYER ? { address } : { uen };
+        role == BUYER ? { address: updatedAddress } : { uen: updatedUen };
+      console.log("updated", updatedUserData);
 
       dispatch(updateUser(updatedUserData));
       navigate("/profile");
@@ -63,71 +76,82 @@ function EditProfile() {
     }
   };
 
-  const handleSave = () => {
-    onSave();
-  };
-
-  console.log(user);
+  const handleCancel = ()  => {
+    form.resetFields();
+    navigate("/profile")
+  }
 
   return (
-    <div>
-      <div className="flex flex-col items-center min-h-screen mt-32 gap-4">
-        <h1 className="text-2xl font-bold mb-4">Edit Profile</h1>
-        <div className="flex flex-col gap-4 w-full max-w-md">
-          <label className="text-lg">Username:</label>
-          <input
-            type="text"
-            className="p-2 rounded-md border"
-            value={username}
-            disabled
-            style={{ pointerEvents: 'none' }}
-          />
+    <Layout style={{ minHeight: "100vh" }}>
+      <Content
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#EDF0FF",
+        }}
+      >
+        <Flex
+          vertical
+          style={{
+            backgroundColor: "white",
+            borderRadius: "10px",
+            paddingLeft: 30,
+            paddingRight: 30,
+            width: "30%",
+          }}
+        >
+          <Typography.Title
+            level={3}
+            style={{ textAlign: "center", marginTop: 20, marginBottom: 20 }}
+          >
+            Welcome to Moly Market!
+          </Typography.Title>
+          <Flex vertical>
+            <Form layout="vertical" form={form} onFinish={onFinish}>
+              <Flex vertical>
+                <Form.Item label="Username" name="username">
+                  <Input placeholder={username} disabled />
+                </Form.Item>
 
-          <label className="text-lg">Role:</label>
-          <input type="text" className="p-2 rounded-md border" disabled value={role} style={{ pointerEvents: 'none' }}/>
+                <Form.Item
+                  label="Role"
+                  name="role"
+                  initialValue={role === BUYER ? "Buyer" : "Seller"}
+                >
+                  <Input disabled />
+                </Form.Item>
 
-          {user.role === "ROLE_SELLER" && (
-            <>
-              <label className="text-lg">UEN:</label>
-              <input
-                type="text"
-                className="p-2 rounded-md border"
-                value={uen}
-                onChange={(e) => setUen(e.target.value)}
-              />
-            </>
-          )}
+                {role === BUYER ? (
+                  <Form.Item
+                    label="Address"
+                    name="address"
+                    initialValue={address}
+                  >
+                    <Input />
+                  </Form.Item>
+                ) : (
+                  <Form.Item label="UEN" name="uen" initialValue={uen}>
+                    <Input />
+                  </Form.Item>
+                )}
 
-          {user.role === "ROLE_BUYER" && (
-            <>
-              <label className="text-lg">Address:</label>
-              <input
-                type="text"
-                className="p-2 rounded-md border"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-              />
-            </>
-          )}
-
-          <div className="flex flex-row justify-between">
-            <button
-              className="w-48 mt-8 border bg-red-500 rounded-md p-2 hover:bg-purple-300 duration-300"
-              onClick={() => {navigate("/profile")}}
-            >
-              Back
-            </button>
-
-            <button
-              className="w-48 mt-8 border bg-green-500 rounded-md p-2 hover:bg-purple-300 duration-300"
-              onClick={handleSave}
-            >
-              Save Changes
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+                <Flex justify="center" gap={80} style={{ paddingTop: 10 }}>
+                  <Form.Item>
+                    <Button onClick={handleCancel}>Cancel</Button>
+                  </Form.Item>
+                  <Form.Item>
+                    <Button type="primary" htmlType="submit">
+                      Save Changes
+                    </Button>
+                  </Form.Item>
+                </Flex>
+              </Flex>
+            </Form>
+          </Flex>
+        </Flex>
+      </Content>
+    </Layout>
   );
 }
 
