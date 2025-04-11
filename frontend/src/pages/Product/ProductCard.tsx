@@ -106,6 +106,15 @@ const ProductCard = ({ product, user, cartId }: any) => {
           </Flex>
         )}
 
+        {user.role == BUYER && (
+          <button
+            onClick={navigateToReviews}
+            className="mt-4 w-full bg-purple-500 text-white py-2 rounded-md hover:bg-purple-600 transition"
+          >
+            Reviews
+          </button>
+        )}
+
         {user.role === SELLER && (
           <Button
             type="primary"
