@@ -74,13 +74,19 @@ const ProductCard = ({ product, user, cartId }: any) => {
         {/* <Typography>{product.stock}</Typography> */}
 
         {user.role == BUYER && (
-          <Flex>
+          <Flex style={{gap: 10}}>
             <Button
               type="primary"
               style={{ marginTop: 10, width: "100%" }}
               onClick={showModal}
             >
               Add to Cart
+            </Button>
+            <Button
+              onClick={navigateToReviews}
+              style={{ marginTop: 10, width: "100%" }}
+            >
+              Reviews
             </Button>
             <Modal
               title={`Item: ${product.name}`}
@@ -106,14 +112,14 @@ const ProductCard = ({ product, user, cartId }: any) => {
           </Flex>
         )}
 
-        {user.role == BUYER && (
+        {/* {user.role == BUYER && (
           <button
             onClick={navigateToReviews}
             className="mt-4 w-full bg-purple-500 text-white py-2 rounded-md hover:bg-purple-600 transition"
           >
             Reviews
           </button>
-        )}
+        )} */}
 
         {user.role === SELLER && (
           <Button
