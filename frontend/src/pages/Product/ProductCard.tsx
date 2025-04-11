@@ -30,7 +30,14 @@ const ProductCard = ({ product, user, cartId }: any) => {
   const editProduct = () => {
     navigate(`/editProduct/${product.id}`);
   };
-  
+
+  function navigateToReviews(
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ): void {
+    navigate(`/product/${product.id}/reviews`, {
+      state: { user: user, product: product, cartId: cartId },
+    });
+  }
   return (
     <div className="border rounded-lg shadow-lg p-4 max-w-xs bg-white">
       <img
@@ -73,6 +80,14 @@ const ProductCard = ({ product, user, cartId }: any) => {
           className="mt-4 w-full bg-purple-500 text-white py-2 rounded-md hover:bg-purple-600 transition"
         >
           Add to Cart
+        </button>
+      )}
+      {user.role == BUYER && (
+        <button
+          onClick={navigateToReviews}
+          className="mt-4 w-full bg-purple-500 text-white py-2 rounded-md hover:bg-purple-600 transition"
+        >
+          Reviews
         </button>
       )}
     </div>
