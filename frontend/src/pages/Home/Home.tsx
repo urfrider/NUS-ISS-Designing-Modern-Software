@@ -3,25 +3,34 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import axios from "axios";
 import ProductCard from "../Product/ProductCard";
-import {
-  Button,
-  Col,
-  Flex,
-  Form,
-  Input,
-  Layout,
-  Row,
-  Select,
-} from "antd";
+import { Button, Col, Flex, Form, Input, Layout, Row, Select } from "antd";
 import { Content } from "antd/es/layout/layout";
+
+export interface SearchType {
+  query: string;
+  category: string | undefined;
+}
+
+export interface ProductType {
+  category: string;
+  description: string;
+  discountPercentage: number;
+  hasDiscount: boolean;
+  id: number;
+  images: string;
+  name: string;
+  price: number;
+  stock: number;
+  username: string;
+}
 
 function HomePage() {
   const user = useSelector((state: RootState) => state.user);
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("");
-  const [products, setProducts] = useState<any>([]);
-  const [totalPages, setTotalPages] = useState(0);
-  const [page, setPage] = useState(0);
+  const [query, setQuery] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
+  const [products, setProducts] = useState<ProductType[]>([]);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [page, setPage] = useState<number>(0);
   const [cart, setCart] = useState<any>([]);
 
   const config = {
@@ -79,8 +88,7 @@ function HomePage() {
     { label: "Others", value: "Others" },
   ];
 
-  const onFinish = (values: any) => {
-    console.log(values);
+  const onFinish = (values: SearchType) => {
     setQuery(values.query);
     setCategory(values.category || "");
   };
