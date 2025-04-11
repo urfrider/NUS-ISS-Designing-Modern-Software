@@ -27,6 +27,23 @@ function EditProfile() {
     },
   };
 
+  async function addReview() {
+    console.log("Add Review");
+    const review = {
+      buyer: 5,
+      product: 3,
+      rating: 5,
+      content: "This is a test review",
+    };
+    console.log(review);
+    await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/reviews/write`,
+      review,
+      config
+    );
+    toast.success("Review written successfully!");
+  }
+
   const [form] = Form.useForm();
 
   const onFinish = (values: RegisterType) => {
@@ -61,8 +78,7 @@ function EditProfile() {
       console.log("post", response);
       toast.success("Profile updated successfully!");
 
-      const updatedUserData =
-        role == BUYER ? { address: updatedAddress } : { uen: updatedUen };
+      const updatedUserData = role == BUYER ? { address: updatedAddress } : { uen: updatedUen };
       console.log("updated", updatedUserData);
 
       dispatch(updateUser(updatedUserData));

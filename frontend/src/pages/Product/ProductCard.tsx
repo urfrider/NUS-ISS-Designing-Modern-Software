@@ -38,6 +38,13 @@ const ProductCard = ({ product, user, cartId }: any) => {
     navigate(`/editProduct/${product.id}`);
   };
 
+  function navigateToReviews(
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ): void {
+    navigate(`/product/${product.id}/reviews`, {
+      state: { user: user, product: product, cartId: cartId },
+    });
+  }
   return (
     <Flex>
       <Card
