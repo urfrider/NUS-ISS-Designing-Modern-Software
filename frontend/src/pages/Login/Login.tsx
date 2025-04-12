@@ -39,7 +39,6 @@ function LandingPage() {
   const [isRegister, setIsRegister] = useState(false);
   const [role, setRole] = useState(BUYER);
 
-  // Use custom theme token
   const token = useDesignToken();
 
   const handleRoleChange = (event: RadioChangeEvent) => {
