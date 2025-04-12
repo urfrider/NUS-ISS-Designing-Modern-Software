@@ -1,19 +1,45 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { toast } from "react-toastify";
 import { RootState } from "../../redux/store";
+import {
+  Card,
+  Radio,
+  Input,
+  Button,
+  List,
+  Space,
+  Divider,
+  Badge,
+  Form,
+} from "antd";
+import {
+  CreditCardOutlined,
+  DollarOutlined,
+  PayCircleOutlined,
+  UserOutlined,
+  CalendarOutlined,
+  SafetyOutlined,
+  ArrowLeftOutlined,
+} from "@ant-design/icons";
+import { useDesignToken } from "../../DesignToken";
+import CustomTypography from "../../components/custom/CustomTypography/CustomTypography";
+
+const { Title, Text } = CustomTypography;
 
 function Checkout() {
+  const theme = useDesignToken();
   const user = useSelector((state: RootState) => state.user);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [paypalEmail, setPaypalEmail] = useState("");
   const [creditCardNumber, setCreditCardNumber] = useState("");
-  const [creditCardHolder, setcreditCardHolder] = useState("");
+  const [creditCardHolder, setCreditCardHolder] = useState("");
   const [creditCardExpiry, setCreditCardExpiry] = useState("");
   const [creditCardCVC, setCreditCardCVC] = useState("");
   const [cart, setCart] = useState<any>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const config = {
@@ -24,29 +50,36 @@ function Checkout() {
   };
 
   const fetchCart = async () => {
-    const response = await axios.get(
-      `${import.meta.env.VITE_API_URL!}/api/cart/${user?.id}`,
-      config
-    );
-    setCart(response.data);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL!}/api/cart/${user?.id}`,
+        config
+      );
+      setCart(response.data);
+    } catch (error) {
+      toast.error("Failed to fetch cart items");
+      console.error(error);
+    }
   };
 
   const handlePlaceOrder = async () => {
-    var data: any = {
-      username: user?.username,
-      cartId: cart?.id,
-    };
-
-    if (paymentMethod == "creditCard") {
-      data["cardNumber"] = creditCardNumber;
-      data["cardHolder"] = creditCardHolder;
-      data["cardExpiry"] = creditCardExpiry;
-      data["cardCvc"] = creditCardCVC;
-    } else if (paymentMethod == "paypal") {
-      data["paypalEmail"] = paypalEmail;
-    }
+    setIsLoading(true);
 
     try {
+      let data: any = {
+        username: user?.username,
+        cartId: cart?.id,
+      };
+
+      if (paymentMethod === "creditCard") {
+        data["cardNumber"] = creditCardNumber;
+        data["cardHolder"] = creditCardHolder;
+        data["cardExpiry"] = creditCardExpiry;
+        data["cardCvc"] = creditCardCVC;
+      } else if (paymentMethod === "paypal") {
+        data["paypalEmail"] = paypalEmail;
+      }
+
       await axios.post(
         `${import.meta.env.VITE_API_URL!}/api/payment`,
         {
@@ -56,121 +89,215 @@ function Checkout() {
         },
         config
       );
-      toast.success(`Payment successful with ${paymentMethod}`);
-    } catch (e) {
-      console.log(e);
-    }
 
-    // navigate("/cart");
+      toast.success(
+        `Payment successful with ${getPaymentMethodName(paymentMethod)}`
+      );
+      navigate("/orders");
+    } catch (e) {
+      toast.error("Payment failed. Please try again.");
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getPaymentMethodName = (method: string) => {
+    switch (method) {
+      case "cash":
+        return "Cash Balance";
+      case "paypal":
+        return "PayPal";
+      case "creditCard":
+        return "Credit Card";
+      default:
+        return method;
+    }
   };
 
   useEffect(() => {
     fetchCart();
   }, []);
 
-  console.log(cart);
-
   return (
-    <div className="flex flex-col justify-center items-center gap-4 mt-16">
-      <h1 className="text-2xl font-bold">Checkout</h1>
-      <div className="flex flex-col text-left gap-4">
-        <h2 className="text-lg font-semibold">Items</h2>
-        {cart?.items?.map((item: any, idx: number) => (
-          <div
-            key={`checkout-${idx}`}
-            className="flex flex-row justify-between w-96"
-          >
-            {item?.name}
-            <div>x{item?.quantity}</div>
-          </div>
-        ))}
-
-        <div className="flex flex-col gap-2 ">
-          <h2 className="text-lg font-semibold">Select Payment Method</h2>
-          <div className="flex flex-row justify-between w-96">
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                value="cash"
-                checked={paymentMethod === "cash"}
-                onChange={() => setPaymentMethod("cash")}
-              />
-              Cash Balance
-            </label>
-            <div>${user.balance}</div>
-          </div>
-
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              value="paypal"
-              checked={paymentMethod === "paypal"}
-              onChange={() => setPaymentMethod("paypal")}
-            />
-            PayPal
-          </label>
-
-          {paymentMethod === "paypal" && (
-            <input
-              type="email"
-              placeholder="Enter PayPal Email"
-              value={paypalEmail}
-              onChange={(e) => setPaypalEmail(e.target.value)}
-              className="border p-2 rounded w-full"
-            />
-          )}
-
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              value="credit"
-              checked={paymentMethod === "creditCard"}
-              onChange={() => setPaymentMethod("creditCard")}
-            />
-            Credit Card
-          </label>
-
-          {paymentMethod === "creditCard" && (
-            <div className="flex flex-col gap-2">
-              <input
-                type="text"
-                placeholder="Card Number"
-                value={creditCardNumber}
-                onChange={(e) => setCreditCardNumber(e.target.value)}
-                className="border p-2 rounded w-full"
-              />
-              <input
-                type="text"
-                placeholder="Card Holder Name"
-                value={creditCardHolder}
-                onChange={(e) => setcreditCardHolder(e.target.value)}
-                className="border p-2 rounded w-full"
-              />
-              <input
-                type="text"
-                placeholder="Expiry Date (MM/YY)"
-                value={creditCardExpiry}
-                onChange={(e) => setCreditCardExpiry(e.target.value)}
-                className="border p-2 rounded w-full"
-              />
-              <input
-                type="text"
-                placeholder="CVC"
-                value={creditCardCVC}
-                onChange={(e) => setCreditCardCVC(e.target.value)}
-                className="border p-2 rounded w-full"
-              />
-            </div>
-          )}
-        </div>
-      </div>
-
-      <button
-        onClick={handlePlaceOrder}
-        className="mt-4 p-2 bg-blue-500 text-white rounded"
+    <div className="container mx-auto px-4 py-8">
+      <Button
+        type="link"
+        onClick={() => navigate("/cart")}
+        icon={<ArrowLeftOutlined />}
+        style={{ marginBottom: 16, position: "absolute", left: 10 }}
       >
-        Place Order
-      </button>
+        Back to Cart
+      </Button>
+      <Title level={2} style={{ textAlign: "center" }}>
+        {/* <ShoppingCartOutlined /> */}
+        Checkout
+      </Title>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <Card
+          title={<Title level={4}>Order Summary</Title>}
+          bordered={false}
+          style={{ background: "white", borderRadius: 8 }}
+        >
+          <List
+            itemLayout="horizontal"
+            dataSource={cart?.items || []}
+            renderItem={(item: any) => (
+              <List.Item actions={[<Text strong>x{item?.quantity}</Text>]}>
+                <List.Item.Meta
+                  title={item?.name}
+                  description={
+                    <Text type="secondary">
+                      ${item?.price?.toFixed(2)} each
+                    </Text>
+                  }
+                />
+                <div>${(item?.price * item?.quantity).toFixed(2)}</div>
+              </List.Item>
+            )}
+            footer={
+              <div>
+                <Divider style={{ margin: "12px 0" }} />
+                <div className="flex justify-between">
+                  <Text strong>Subtotal:</Text>
+                  <Text strong>${cart?.totalAmount?.toFixed(2) || "0.00"}</Text>
+                </div>
+              </div>
+            }
+            locale={{ emptyText: "Your cart is empty" }}
+          />
+        </Card>
+
+        <Card
+          title={<Title level={4}>Payment Method</Title>}
+          bordered={false}
+          style={{ background: "white", borderRadius: 8 }}
+        >
+          <Form layout="vertical">
+            <Radio.Group
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+              style={{ width: "100%" }}
+            >
+              <Space direction="vertical" style={{ width: "100%" }}>
+                <Radio value="cash">
+                  <Space>
+                    <DollarOutlined style={{ color: theme.colorSuccess }} />
+                    <span>Cash Balance</span>
+                    <Badge
+                      count={`$${user.balance?.toFixed(2)}`}
+                      style={{
+                        backgroundColor: theme.colorPrimary,
+                        fontWeight: "normal",
+                      }}
+                    />
+                  </Space>
+                </Radio>
+
+                <Radio value="paypal">
+                  <Space>
+                    <PayCircleOutlined style={{ color: "#0070BA" }} />
+                    <span>PayPal</span>
+                  </Space>
+                </Radio>
+
+                {paymentMethod === "paypal" && (
+                  <Form.Item style={{ margin: "0 0 16px 24px" }}>
+                    <Input
+                      placeholder="Email address"
+                      value={paypalEmail}
+                      onChange={(e) => setPaypalEmail(e.target.value)}
+                      style={{ width: "100%" }}
+                      prefix={<UserOutlined />}
+                    />
+                  </Form.Item>
+                )}
+
+                <Radio value="creditCard">
+                  <Space>
+                    <CreditCardOutlined style={{ color: theme.colorOrange }} />
+                    <span>Credit Card</span>
+                  </Space>
+                </Radio>
+
+                {paymentMethod === "creditCard" && (
+                  <div style={{ margin: "0 0 16px 24px" }}>
+                    <Space direction="vertical" style={{ width: "100%" }}>
+                      <Form.Item style={{ marginBottom: 12 }}>
+                        <Input
+                          placeholder="Card Number"
+                          value={creditCardNumber}
+                          onChange={(e) => setCreditCardNumber(e.target.value)}
+                          prefix={<CreditCardOutlined />}
+                          maxLength={19}
+                        />
+                      </Form.Item>
+                      <Form.Item style={{ marginBottom: 12 }}>
+                        <Input
+                          placeholder="Cardholder Name"
+                          value={creditCardHolder}
+                          onChange={(e) => setCreditCardHolder(e.target.value)}
+                          prefix={<UserOutlined />}
+                        />
+                      </Form.Item>
+                      <div className="grid grid-cols-2 gap-4">
+                        <Form.Item style={{ marginBottom: 12 }}>
+                          <Input
+                            placeholder="MM/YY"
+                            value={creditCardExpiry}
+                            onChange={(e) =>
+                              setCreditCardExpiry(e.target.value)
+                            }
+                            prefix={<CalendarOutlined />}
+                            maxLength={5}
+                          />
+                        </Form.Item>
+                        <Form.Item style={{ marginBottom: 0 }}>
+                          <Input
+                            placeholder="CVC"
+                            value={creditCardCVC}
+                            onChange={(e) => setCreditCardCVC(e.target.value)}
+                            prefix={<SafetyOutlined />}
+                            maxLength={4}
+                          />
+                        </Form.Item>
+                      </div>
+                    </Space>
+                  </div>
+                )}
+              </Space>
+            </Radio.Group>
+
+            <Divider />
+
+            <Button
+              type="primary"
+              size="large"
+              block
+              onClick={handlePlaceOrder}
+              loading={isLoading}
+              disabled={
+                (paymentMethod === "paypal" && !paypalEmail) ||
+                (paymentMethod === "creditCard" &&
+                  (!creditCardNumber ||
+                    !creditCardHolder ||
+                    !creditCardExpiry ||
+                    !creditCardCVC)) ||
+                !cart?.items?.length
+              }
+              style={{
+                backgroundColor: theme.colorPrimary,
+                height: 50,
+                fontSize: 16,
+                fontWeight: 600,
+              }}
+            >
+              Pay ${cart?.totalAmount?.toFixed(2) || "0.00"}
+            </Button>
+          </Form>
+        </Card>
+      </div>
     </div>
   );
 }
