@@ -125,7 +125,7 @@ function Checkout() {
         type="link"
         onClick={() => navigate("/cart")}
         icon={<ArrowLeftOutlined />}
-        style={{ marginBottom: 16, position: "absolute", left: 10 }}
+        style={{ marginBottom: 16, position: "absolute", left: 85.5 }}
       >
         Back to Cart
       </Button>

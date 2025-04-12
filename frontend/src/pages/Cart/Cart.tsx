@@ -172,7 +172,7 @@ function Cart() {
     })) || [];
 
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "20px" }}>
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "2rem" }}>
       <Title level={2} style={{ textAlign: "center", marginBottom: 40 }}>
         Your Cart
       </Title>
