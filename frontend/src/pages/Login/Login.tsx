@@ -5,29 +5,50 @@ import { useDispatch } from "react-redux";
 import { login } from "../../redux/userSlice";
 import { toast } from "react-toastify";
 import { BUYER, SELLER } from "../../constants/constants";
+import {
+  Button,
+  Flex,
+  Form,
+  Input,
+  Layout,
+  Radio,
+  RadioChangeEvent,
+  Typography,
+} from "antd";
+import { Content } from "antd/es/layout/layout";
+
+export interface LoginType {
+  username: string;
+  password: string;
+}
+
+export interface RegisterType {
+  role: string;
+  username: string;
+  password: string;
+  address?: string;
+  uen?: string;
+}
 
 function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [address, setAddress] = useState("");
-  const [uen, setUen] = useState("");
-  const [usernameError, setUsernameError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [addressError, setAddressError] = useState("");
-  const [uenError, setUenError] = useState("");
-  const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [isRegister, setIsRegister] = useState(false);
   const [role, setRole] = useState(BUYER);
 
-  const handleRoleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRoleChange = (event: RadioChangeEvent) => {
     setRole(event.target.value);
   };
 
-  const onRegister = async () => {
+  const [form] = Form.useForm();
+
+  const onRegister = async (values: RegisterType) => {
     try {
+      const username = values.username;
+      const password = values.password;
+      const role = values.role;
+      const uen = values.uen;
+      const address = values.address;
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL!}/auth/addNewUser`,
         role === BUYER
@@ -44,10 +65,8 @@ function Login() {
               uen,
             }
       );
-
       toast.success(response.data);
-      const user = await onLogin();
-
+      const user = await onLogin(values); //backend must return values ? eh but if it works it works ah
       dispatch(login(user));
       navigate("/home");
     } catch (error) {
@@ -59,8 +78,10 @@ function Login() {
     }
   };
 
-  const onLogin = async () => {
+  const onLogin = async (values: LoginType) => {
     try {
+      const username = values.username;
+      const password = values.password;
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL!}/auth/generateToken`,
         { username, password }
@@ -69,204 +90,224 @@ function Login() {
       return response.data;
     } catch (e) {
       console.log("Login error", e);
+      toast.error("Login Unsuccessful")
     }
   };
 
-  const onButtonClick = async () => {
-    setUsernameError("");
-    setPasswordError("");
-    setConfirmPasswordError("");
-    setAddressError("");
-    setUen("");
+  
 
-    if (isRegister && password != confirmPassword) {
-      setConfirmPasswordError("Passwords do not match!");
-      return;
-    }
-    if (username === "") {
-      setUsernameError("Please enter your username");
-      return;
-    }
+  const onFinish = (values: LoginType | RegisterType) => {
+    onSubmit(isRegister, values);
+    form.resetFields();
+  };
 
-    if (password === "") {
-      setPasswordError("Please enter a password");
-      return;
-    }
-    if (password.length < 5) {
-      setPasswordError("Password must be 5 characters or longer");
-      return;
-    }
-
-    if (username === "") {
-      setUsernameError("Please enter a username");
-      return;
-    }
-
-    if (isRegister && address === "" && role === BUYER) {
-      setAddressError("Please enter your address");
-      return;
-    }
-
-    if (isRegister && uen === "" && role === SELLER) {
-      setUenError("Please enter your UEN");
-      return;
-    }
-
+  const onSubmit = async (
+    isRegister: boolean,
+    values: LoginType | RegisterType
+  ) => {
     if (isRegister) {
-      await onRegister();
+      await onRegister(values as RegisterType);
     } else {
-      const user = await onLogin();
-
+      const user = await onLogin(values);
       console.log(user);
-
       dispatch(login(user));
       navigate("/home");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="w-full max-w-sm p-6 bg-black bg-opacity-50 shadow-lg rounded-lg">
-        <h2 className="text-2xl font-bold text-center text-[#7342DC] mb-8">
-          Welcome to Moly Market!
-        </h2>
-        <form>
-          {isRegister ? (
-            <>
-              <div className="mb-6">
-                <input
-                  type="text"
-                  value={username}
-                  placeholder="Username"
-                  onChange={(ev) => setUsername(ev.target.value)}
-                  className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
-                />
-                <label className="text-red-500 text-sm">{usernameError}</label>
-              </div>
-              <div className="mb-6">
-                <input
-                  type="password"
-                  value={password}
-                  placeholder="Password"
-                  onChange={(ev) => setPassword(ev.target.value)}
-                  className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
-                />
-                <label className="text-red-500 text-sm">{passwordError}</label>
-              </div>
-
-              <div className="mb-6">
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  placeholder="Confirm Password"
-                  onChange={(ev) => setConfirmPassword(ev.target.value)}
-                  className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
-                />
-                <label className="text-red-500 text-sm">
-                  {confirmPasswordError}
-                </label>
-              </div>
-
-              <div className="mb-6">
-                <div>
-                  <input
-                    type="text"
-                    value={role === BUYER ? address : uen}
-                    placeholder={role === BUYER ? "Address" : "UEN"}
-                    onChange={(ev) =>
-                      role === BUYER
-                        ? setAddress(ev.target.value)
-                        : setUen(ev.target.value)
-                    }
-                    className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
-                  />
-                  <label className="text-red-500 text-sm">
-                    {role === BUYER ? addressError : uenError}
-                  </label>
-                </div>
-              </div>
-
-              <div className="mb-2 text-white">
-                <div className="mb-2">Role</div>
-                <div className="flex gap-2">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      value={BUYER}
-                      checked={role === BUYER}
-                      onChange={handleRoleChange}
-                    />
-                    Buyer
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      value={SELLER}
-                      checked={role === SELLER}
-                      onChange={handleRoleChange}
-                    />
-                    Seller
-                  </label>
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="mb-6">
-                <input
-                  type="text"
-                  value={username}
-                  placeholder="Username"
-                  onChange={(ev) => setUsername(ev.target.value)}
-                  className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
-                />
-                <label className="text-red-500 text-sm">{usernameError}</label>
-              </div>
-              <div className="mb-2">
-                <input
-                  type="password"
-                  value={password}
-                  placeholder="Password"
-                  onChange={(ev) => setPassword(ev.target.value)}
-                  className="w-full p-2 text-lg text-white bg-transparent border-b border-gray-300 outline-none focus:border-blue-500"
-                />
-                <label className="text-red-500 text-sm">{passwordError}</label>
-              </div>
-            </>
-          )}
-          <div className="flex gap-2 text-white mb-4">
-            <span className="text-sm">
-              {isRegister
-                ? "Already have an account?"
-                : "Don't have an account yet?"}
-            </span>
-            <span
-              onClick={() => {
-                setUsername("");
-                setPassword("");
-                setConfirmPassword("");
-                setUsernameError("");
-                setPasswordError("");
-                setConfirmPasswordError("");
-                setIsRegister((prev) => !prev);
-              }}
-              className="text-sm text-[#7342DC] font-semibold hover:opacity-70 cursor-pointer"
+    <Layout style={{ minHeight: "100vh" }}>
+      <Content
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#EDF0FF",
+        }}
+      >
+        <Flex
+          vertical
+          style={{
+            backgroundColor: "white",
+            borderRadius: "10px",
+            paddingLeft: 30,
+            paddingRight: 30,
+            width: "30%",
+          }}
+        >
+          <Typography.Title
+            level={3}
+            style={{ textAlign: "center", marginTop: 20, marginBottom: 20 }}
+          >
+            Welcome to Moly Market!
+          </Typography.Title>
+          <Flex vertical>
+            <Form
+              layout="vertical"
+              initialValues={{ role: BUYER }}
+              form={form}
+              onFinish={onFinish}
             >
-              {isRegister ? "Go to login" : "Register here"}
-            </span>
-          </div>
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={onButtonClick}
-              className="px-6 py-2 text-lg font-bold text-[#7342DC] uppercase bg-transparent border-2 border-[#7342DC] rounded-md hover:bg-[#7342DC] hover:text-white transition duration-300"
-            >
-              {isRegister ? "Register" : "Login"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+              {isRegister ? (
+                <Flex vertical>
+                  <Form.Item label="Role" name="role" required>
+                    <Radio.Group onChange={handleRoleChange}>
+                      <Radio value={BUYER}>Buyer</Radio>
+                      <Radio value={SELLER}>Seller</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Username"
+                    name="username"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input your username!",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="Username" />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Password"
+                    name="password"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input your password!",
+                      },
+                    ]}
+                    hasFeedback
+                  >
+                    <Input.Password placeholder="Password" />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Confirm Password"
+                    name="confirm"
+                    dependencies={["password"]}
+                    hasFeedback
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please confirm your password!",
+                      },
+                      ({ getFieldValue }) => ({
+                        validator(_, value) {
+                          if (!value || getFieldValue("password") === value) {
+                            return Promise.resolve();
+                          }
+                          return Promise.reject(
+                            new Error(
+                              "The new password that you entered do not match!"
+                            )
+                          );
+                        },
+                      }),
+                    ]}
+                  >
+                    <Input.Password placeholder="Confirm Password" />
+                  </Form.Item>
+
+                  <Form.Item
+                    label={role === BUYER ? "Address" : "UEN"}
+                    name={role === BUYER ? "address" : "uen"}
+                    rules={[
+                      {
+                        required: true,
+                        message:
+                          role === BUYER
+                            ? "Please enter your address!"
+                            : "Please enter your UEN!",
+                      },
+                    ]}
+                    style={{ marginBottom: 10 }}
+                  >
+                    <Input
+                      value={role === BUYER ? "address" : "uen"}
+                      placeholder={role === BUYER ? "Address" : "UEN"}
+                    />
+                  </Form.Item>
+
+                  <Flex gap={4} style={{ marginBottom: 20 }}>
+                    <Typography>Already have an account?</Typography>
+                    <Typography.Link
+                      onClick={() => {
+                        setIsRegister((prev) => !prev);
+                      }}
+                    >
+                      Login here
+                    </Typography.Link>
+                  </Flex>
+
+                  <Flex justify="center">
+                    <Form.Item label={null}>
+                      <Button type="primary" htmlType="submit">
+                        Register
+                      </Button>
+                    </Form.Item>
+                  </Flex>
+                </Flex>
+              ) : (
+                <Flex vertical>
+                  <Form.Item
+                    label="Username"
+                    name="username"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input your username!",
+                      },
+                    ]}
+                  >
+                    <Input
+                      placeholder="Username"
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Password"
+                    name="password"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input your password!",
+                      },
+                    ]}
+                    style={{ marginBottom: 10 }}
+                  >
+                    <Input.Password
+                      placeholder="Password"
+                    />
+                  </Form.Item>
+
+                  <Flex gap={4} style={{ marginBottom: 20 }}>
+                    <Typography>Don't have an account yet?</Typography>
+                    <Typography.Link
+                      onClick={() => {
+                        setIsRegister((prev) => !prev);
+                      }}
+                    >
+                      Register here
+                    </Typography.Link>
+                  </Flex>
+
+                  <Flex justify="center">
+                    <Form.Item label={null}>
+                      <Button type="primary" htmlType="submit">
+                        Log in
+                      </Button>
+                    </Form.Item>
+                  </Flex>
+                </Flex>
+              )}
+            </Form>
+          </Flex>
+        </Flex>
+      </Content>
+    </Layout>
   );
 }
 
