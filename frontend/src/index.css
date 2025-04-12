@@ -4,4 +4,8 @@
 
 body {
   /* @apply bg-gradient-to-b from-gray-900 via-blue-900 to-gray-800 min-h-screen; */
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
+  font-feature-settings: "liga" 1, "kern" 1;
 }

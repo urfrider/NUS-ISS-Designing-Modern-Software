@@ -16,6 +16,9 @@ import {
   Typography,
 } from "antd";
 import { Content } from "antd/es/layout/layout";
+import { useDesignToken } from "../../DesignToken";
+import CustomTypography from "../../components/custom/CustomTypography/CustomTypography";
+import { validation } from "./validation";
 
 export interface LoginType {
   username: string;
@@ -30,11 +33,14 @@ export interface RegisterType {
   uen?: string;
 }
 
-function Login() {
+function LandingPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isRegister, setIsRegister] = useState(false);
   const [role, setRole] = useState(BUYER);
+
+  // Use custom theme token
+  const token = useDesignToken();
 
   const handleRoleChange = (event: RadioChangeEvent) => {
     setRole(event.target.value);
@@ -66,7 +72,7 @@ function Login() {
             }
       );
       toast.success(response.data);
-      const user = await onLogin(values); //backend must return values ? eh but if it works it works ah
+      const user = await onLogin(values);
       dispatch(login(user));
       navigate("/home");
     } catch (error) {
@@ -90,11 +96,10 @@ function Login() {
       return response.data;
     } catch (e) {
       console.log("Login error", e);
-      toast.error("Login Unsuccessful")
+      toast.error("Login Unsuccessful");
+      return null;
     }
   };
-
-  
 
   const onFinish = (values: LoginType | RegisterType) => {
     onSubmit(isRegister, values);
@@ -109,39 +114,118 @@ function Login() {
       await onRegister(values as RegisterType);
     } else {
       const user = await onLogin(values);
-      console.log(user);
-      dispatch(login(user));
-      navigate("/home");
+      if (user) {
+        dispatch(login(user));
+        navigate("/home");
+      }
     }
   };
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
+    <Layout
+      style={{
+        minHeight: "100vh",
+        overflow: "hidden",
+        background: `linear-gradient(135deg, ${token.colorOrange} 0%, ${token.colorPrimary} 100%)`,
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: "10%",
+          left: "10%",
+          width: "300px",
+          height: "300px",
+          borderRadius: "50%",
+          background: "rgba(255, 255, 255, 0.1)",
+          zIndex: 1,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          bottom: "15%",
+          right: "5%",
+          width: "200px",
+          height: "200px",
+          borderRadius: "50%",
+          background: "rgba(255, 255, 255, 0.1)",
+          zIndex: 1,
+        }}
+      />
+
       <Content
         style={{
           display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#EDF0FF",
+          height: "100vh",
+          position: "relative",
+          zIndex: 2,
         }}
       >
-        <Flex
-          vertical
+        <div
           style={{
-            backgroundColor: "white",
-            borderRadius: "10px",
-            paddingLeft: 30,
-            paddingRight: 30,
-            width: "30%",
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            padding: "0 10rem",
           }}
         >
-          <Typography.Title
-            level={3}
-            style={{ textAlign: "center", marginTop: 20, marginBottom: 20 }}
+          <CustomTypography.Title
+            style={{
+              color: token.colorTextWhite,
+              fontSize: 64,
+              margin: 0,
+            }}
           >
-            Welcome to Moly Market!
-          </Typography.Title>
-          <Flex vertical>
+            Moly Market
+          </CustomTypography.Title>
+
+          <CustomTypography.Title
+            level={3}
+            style={{
+              color: token.colorTextWhite,
+              fontWeight: "normal",
+              // maxWidth: 600,
+              margin: 0,
+            }}
+          >
+            Your one-stop marketplace to buy and sell with confidence
+          </CustomTypography.Title>
+        </div>
+
+        <div
+          style={{
+            width: "33.33%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Flex
+            vertical
+            style={{
+              backgroundColor: "white",
+              borderRadius: "10px",
+              padding: "40px 30px",
+              width: "80%",
+              maxWidth: 400,
+              boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+            }}
+          >
+            <Typography.Title
+              level={3}
+              style={{
+                textAlign: "center",
+                marginTop: 0,
+                marginBottom: 30,
+                color: token.colorTextBase,
+              }}
+            >
+              {isRegister ? "Create an Account" : "Welcome Back!"}
+            </Typography.Title>
+
             <Form
               layout="vertical"
               initialValues={{ role: BUYER }}
@@ -160,28 +244,18 @@ function Login() {
                   <Form.Item
                     label="Username"
                     name="username"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input your username!",
-                      },
-                    ]}
+                    rules={validation.username}
                   >
-                    <Input placeholder="Username" />
+                    <Input placeholder="Username" size="large" />
                   </Form.Item>
 
                   <Form.Item
                     label="Password"
                     name="password"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input your password!",
-                      },
-                    ]}
+                    rules={validation.password}
                     hasFeedback
                   >
-                    <Input.Password placeholder="Password" />
+                    <Input.Password placeholder="Password" size="large" />
                   </Form.Item>
 
                   <Form.Item
@@ -189,65 +263,53 @@ function Login() {
                     name="confirm"
                     dependencies={["password"]}
                     hasFeedback
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please confirm your password!",
-                      },
-                      ({ getFieldValue }) => ({
-                        validator(_, value) {
-                          if (!value || getFieldValue("password") === value) {
-                            return Promise.resolve();
-                          }
-                          return Promise.reject(
-                            new Error(
-                              "The new password that you entered do not match!"
-                            )
-                          );
-                        },
-                      }),
-                    ]}
+                    rules={validation.confirmPassword}
                   >
-                    <Input.Password placeholder="Confirm Password" />
+                    <Input.Password
+                      placeholder="Confirm Password"
+                      size="large"
+                    />
                   </Form.Item>
 
                   <Form.Item
                     label={role === BUYER ? "Address" : "UEN"}
                     name={role === BUYER ? "address" : "uen"}
-                    rules={[
-                      {
-                        required: true,
-                        message:
-                          role === BUYER
-                            ? "Please enter your address!"
-                            : "Please enter your UEN!",
-                      },
-                    ]}
-                    style={{ marginBottom: 10 }}
+                    rules={role === BUYER ? validation.address : validation.uen}
+                    style={{ marginBottom: 24 }}
                   >
                     <Input
-                      value={role === BUYER ? "address" : "uen"}
                       placeholder={role === BUYER ? "Address" : "UEN"}
+                      size="large"
                     />
                   </Form.Item>
 
-                  <Flex gap={4} style={{ marginBottom: 20 }}>
-                    <Typography>Already have an account?</Typography>
+                  <Flex gap={4} style={{ marginBottom: 24 }}>
+                    <Typography style={{ color: token.colorTextBase }}>
+                      Already have an account?
+                    </Typography>
                     <Typography.Link
                       onClick={() => {
                         setIsRegister((prev) => !prev);
+                        form.resetFields();
                       }}
+                      style={{ color: token.colorPrimary }}
                     >
                       Login here
                     </Typography.Link>
                   </Flex>
 
                   <Flex justify="center">
-                    <Form.Item label={null}>
-                      <Button type="primary" htmlType="submit">
-                        Register
-                      </Button>
-                    </Form.Item>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      size="large"
+                      style={{
+                        backgroundColor: token.colorPrimary,
+                        width: "100%",
+                      }}
+                    >
+                      Register
+                    </Button>
                   </Flex>
                 </Flex>
               ) : (
@@ -255,60 +317,56 @@ function Login() {
                   <Form.Item
                     label="Username"
                     name="username"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input your username!",
-                      },
-                    ]}
+                    rules={validation.username}
                   >
-                    <Input
-                      placeholder="Username"
-                    />
+                    <Input placeholder="Username" size="large" />
                   </Form.Item>
 
                   <Form.Item
                     label="Password"
                     name="password"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input your password!",
-                      },
-                    ]}
-                    style={{ marginBottom: 10 }}
+                    rules={validation.password}
+                    style={{ marginBottom: 24 }}
                   >
-                    <Input.Password
-                      placeholder="Password"
-                    />
+                    <Input.Password placeholder="Password" size="large" />
                   </Form.Item>
 
-                  <Flex gap={4} style={{ marginBottom: 20 }}>
-                    <Typography>Don't have an account yet?</Typography>
+                  <Flex gap={4} style={{ marginBottom: 24 }}>
+                    <Typography style={{ color: token.colorTextBase }}>
+                      Don't have an account yet?
+                    </Typography>
                     <Typography.Link
                       onClick={() => {
                         setIsRegister((prev) => !prev);
+                        form.resetFields();
                       }}
+                      style={{ color: token.colorPrimary }}
                     >
                       Register here
                     </Typography.Link>
                   </Flex>
 
                   <Flex justify="center">
-                    <Form.Item label={null}>
-                      <Button type="primary" htmlType="submit">
-                        Log in
-                      </Button>
-                    </Form.Item>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      size="large"
+                      style={{
+                        backgroundColor: token.colorPrimary,
+                        width: "100%",
+                      }}
+                    >
+                      Log in
+                    </Button>
                   </Flex>
                 </Flex>
               )}
             </Form>
           </Flex>
-        </Flex>
+        </div>
       </Content>
     </Layout>
   );
 }
 
-export default Login;
+export default LandingPage;
