@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -120,6 +120,42 @@ function LandingPage() {
     }
   };
 
+  useEffect(() => {
+    const styleEl = document.createElement("style");
+
+    const keyframes = `
+      @keyframes floatCircle1 {
+        0% { transform: translate(0, 0) scale(1); }
+        25% { transform: translate(10px, 15px) scale(1.05); }
+        50% { transform: translate(0, 25px) scale(1); }
+        75% { transform: translate(-10px, 10px) scale(0.95); }
+        100% { transform: translate(0, 0) scale(1); }
+      }
+      
+      @keyframes floatCircle2 {
+        0% { transform: translate(0, 0) scale(1); }
+        30% { transform: translate(-15px, -10px) scale(1.05); }
+        60% { transform: translate(-7px, -20px) scale(0.95); }
+        100% { transform: translate(0, 0) scale(1); }
+      }
+      
+      .floating-circle-1 {
+        animation: floatCircle1 20s ease-in-out infinite;
+      }
+      
+      .floating-circle-2 {
+        animation: floatCircle2 15s ease-in-out infinite;
+      }
+    `;
+
+    styleEl.innerHTML = keyframes;
+    document.head.appendChild(styleEl);
+
+    return () => {
+      document.head.removeChild(styleEl);
+    };
+  }, []);
+
   return (
     <Layout
       style={{
@@ -130,6 +166,7 @@ function LandingPage() {
       }}
     >
       <div
+        className="floating-circle-1"
         style={{
           position: "absolute",
           top: "10%",
@@ -142,6 +179,7 @@ function LandingPage() {
         }}
       />
       <div
+        className="floating-circle-2"
         style={{
           position: "absolute",
           bottom: "15%",
