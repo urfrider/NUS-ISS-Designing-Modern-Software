@@ -31,15 +31,19 @@ function Profile() {
       icon: <RobotOutlined />,
       sublist: [{ title: "Username", description: user.username }],
     },
-    {
-      icon: <DollarOutlined />,
-      sublist: [
-        {
-          title: "Balance",
-          description: user.balance,
-        },
-      ],
-    },
+    ...(user.role === BUYER
+      ? [
+          {
+            icon: <DollarOutlined />,
+            sublist: [
+              {
+                title: "Balance",
+                description: user.balance,
+              },
+            ],
+          },
+        ]
+      : []),
     {
       icon: <ContactsOutlined />,
       sublist: [
@@ -58,7 +62,7 @@ function Profile() {
         },
       ],
     },
-  ];
+  ].filter(Boolean);
 
   const { Text } = Typography;
 

@@ -22,7 +22,7 @@ import { Content } from "antd/es/layout/layout";
 import { UploadOutlined } from "@ant-design/icons";
 import type { CheckboxProps, UploadProps } from "antd";
 
-interface ProductFormData {
+export interface ProductFormData {
   name: string;
   description: string;
   category: string;
