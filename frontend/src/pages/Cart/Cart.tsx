@@ -1,14 +1,29 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../../redux/store";
 import axios from "axios";
+import {
+  Table,
+  Card,
+  Button,
+  Typography,
+  Row,
+  Col,
+  InputNumber,
+  Divider,
+  Space,
+} from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
+import { useDesignToken } from "../../DesignToken";
+
+const { Title, Text } = Typography;
 
 function Cart() {
   const user = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
   const [cart, setCart] = useState<any>([]);
-
+  const token = useDesignToken();
   const fetchCart = async () => {
     const response = await axios.get(
       `${import.meta.env.VITE_API_URL!}/api/cart/${user?.id}`,
@@ -33,7 +48,6 @@ function Cart() {
         }
       );
       setCart(response.data);
-      console.log(response);
     } catch (e) {
       console.log(e);
     }
@@ -51,7 +65,22 @@ function Cart() {
         }
       );
       setCart(response.data);
-      console.log(response);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const updateQuantity = async (itemId: number, quantity: number) => {
+    try {
+      console.log(`Update item ${itemId} to quantity ${quantity}`);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const removeItem = async (itemId: number) => {
+    try {
+      console.log(`Remove item ${itemId}`);
     } catch (e) {
       console.log(e);
     }
@@ -60,38 +89,165 @@ function Cart() {
   useEffect(() => {
     fetchCart();
   }, []);
-  console.log(cart);
-  return (
-    <div className="flex flex-col justify-center items-center">
-      <h1>Shopping Cart</h1>
-      {cart?.items?.map((item: any, idx: number) => {
-        return (
-          <div key={`cart-${idx}`} className="my-5">
-            <div>Name: {item.name}</div>
-            <div>Price: ${item.price * item.quantity}</div>
-            <div></div>
+
+  const columns = [
+    {
+      title: "PRODUCT",
+      dataIndex: "name",
+      key: "name",
+      render: (text: string, record: any) => (
+        <Space>
+          <div
+            style={{
+              width: 60,
+              height: 60,
+              backgroundColor: "#f0f0f0",
+              display: "inline-block",
+            }}
+          >
+            {record.image && (
+              <img
+                src={record.image}
+                alt={text}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            )}
           </div>
-        );
-      })}
-      <span>Total Price: ${cart.totalAmount}</span>
-      <button
-        onClick={() => navigate("/checkout")}
-        className="mt-4 p-2 bg-blue-500 text-white rounded"
-      >
-        Checkout
-      </button>
-      <button
-        onClick={onClearCart}
-        className="mt-4 p-2 bg-red-500 text-white rounded"
-      >
-        Clear
-      </button>
-      <button
-        onClick={onUndo}
-        className="mt-4 p-2 bg-orange-500 text-white rounded"
-      >
-        Undo
-      </button>
+          <div>
+            <div>{text}</div>
+            <div style={{ color: "#888" }}>{record.variant}</div>
+          </div>
+        </Space>
+      ),
+    },
+    {
+      title: "PRICE",
+      dataIndex: "price",
+      key: "price",
+      render: (price: number) => `$${price.toFixed(2)}`,
+    },
+    {
+      title: "QUANTITY",
+      dataIndex: "quantity",
+      key: "quantity",
+      render: (quantity: number, record: any) => (
+        <InputNumber
+          min={1}
+          max={10}
+          defaultValue={quantity}
+          onChange={(value) => updateQuantity(record.id, value as number)}
+          style={{ width: 60 }}
+        />
+      ),
+    },
+    {
+      title: "TOTAL",
+      dataIndex: "total",
+      key: "total",
+      render: (text: string, record: any) =>
+        `$${(record.price * record.quantity).toFixed(2)}`,
+    },
+    {
+      title: "",
+      key: "action",
+      render: (_: any, record: any) => (
+        <Button
+          type="text"
+          icon={<DeleteOutlined />}
+          onClick={() => removeItem(record.id)}
+        />
+      ),
+    },
+  ];
+
+  const tableData =
+    cart?.items?.map((item: any, index: number) => ({
+      key: index,
+      id: item.id,
+      name: item.name,
+      variant: item.variant || "",
+      price: item.price,
+      quantity: item.quantity,
+      image: item.image,
+    })) || [];
+
+  return (
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "2rem" }}>
+      <Title level={2} style={{ textAlign: "center", marginBottom: 40 }}>
+        Your Cart
+      </Title>
+
+      <Row gutter={24}>
+        <Col xs={24} lg={16}>
+          <Table
+            columns={columns}
+            dataSource={tableData}
+            pagination={false}
+            locale={{ emptyText: "Your cart is empty" }}
+          />
+        </Col>
+
+        <Col xs={24} lg={8}>
+          <Card title="Order Summary" style={{ marginBottom: 20 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: 10,
+              }}
+            >
+              <Text>Subtotal</Text>
+              <Text>${cart.totalAmount?.toFixed(2) || "0.00"}</Text>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: 10,
+              }}
+            >
+              <Text>Shipping</Text>
+              <Text>Free</Text>
+            </div>
+
+            <Button type="link" style={{ padding: 0, marginBottom: 10 }}>
+              Add coupon code
+            </Button>
+
+            <Divider style={{ margin: "10px 0" }} />
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: 10,
+              }}
+            >
+              <Text strong>Total</Text>
+              <Text strong>${cart.totalAmount?.toFixed(2) || "0.00"}</Text>
+            </div>
+
+            <Button
+              type="primary"
+              block
+              style={{
+                marginTop: 10,
+                backgroundColor: token.colorPrimary,
+              }}
+              onClick={() => navigate("/checkout")}
+            >
+              CHECKOUT
+            </Button>
+          </Card>
+
+          <Space>
+            <Button danger onClick={onClearCart}>
+              Clear Cart
+            </Button>
+            <Button onClick={onUndo}>Undo</Button>
+          </Space>
+        </Col>
+      </Row>
     </div>
   );
 }
