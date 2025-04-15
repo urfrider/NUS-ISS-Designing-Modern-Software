@@ -65,23 +65,32 @@ export const AddProduct = () => {
       return;
     }
 
-    // const formData = new FormData();
-    // formData.append("name", data.name);
-    // formData.append("description", data.description);
-    // formData.append("category", data.category);
-    // formData.append("stock", data.stock.toString());
-    // formData.append("price", data.price.toString());
-    // formData.append("username", user?.username);
-    // formData.append("imageFile", imageFile);
-    // formData.append("hasDiscount", data.hasDiscount.toString());
-    // formData.append("discountPercentage", data.discountPercentage.toString());
+    // need to convert to formdata for key/value pair at backend
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("category", data.category);
+    formData.append("stock", data.stock.toString());
+    formData.append("price", data.price.toString());
+    formData.append("username", user?.username);
+    formData.append("imageFile", imageFile);
+    formData.append("hasDiscount", hasDiscount.toString());
+    if (hasDiscount) {
+      formData.append("discountPercentage", data.discountPercentage.toString());
+    } else {
+      formData.append("discountPercentage", "0");
+    }
 
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL!}/api/products`, data, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
+      await axios.post(
+        `${import.meta.env.VITE_API_URL!}/api/products`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
       toast.success("Product successfully added!");
       form.resetFields();
     } catch (e) {
