@@ -3,6 +3,7 @@ import { RootState } from "../../redux/store";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
+import { Col, Flex, Row, Typography } from "antd";
 
 export const ViewProduct = () => {
   const user = useSelector((state: RootState) => state.user);
@@ -32,12 +33,25 @@ export const ViewProduct = () => {
   }, []);
 
   return (
-    <div className="flex justify-center">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-8 max-w-6xl w-full">
+    <Flex vertical style={{ justifyContent: "space-around" }}>
+      <Typography.Title
+        level={4}
+        style={{
+          padding: "40px 40px 40px 40px",
+          width: "100%",
+          display: "flex",
+          justifyContent: "flex-start",
+        }}
+      >
+        My Product Listings
+      </Typography.Title>
+      <Row gutter={[16, 16]} justify="start" style={{ width: "100%", paddingBottom: 60 }}>
         {products.map((product: any, key: number) => (
-          <ProductCard key={key} product={product} user={user} />
+          <Col key={key} xs={24} sm={12} md={8} lg={6}>
+            <ProductCard product={product} user={user} />
+          </Col>
         ))}
-      </div>
-    </div>
+      </Row>
+    </Flex>
   );
 };

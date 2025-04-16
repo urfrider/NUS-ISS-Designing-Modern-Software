@@ -46,7 +46,7 @@ const ProductCard = ({ product, user, cartId }: any) => {
     });
   }
   return (
-    <Flex>
+    <Flex style={{justifyContent: "space-around"}}>
       <Card
         title={
           <img
@@ -117,6 +117,7 @@ const ProductCard = ({ product, user, cartId }: any) => {
             type="primary"
             style={{ marginTop: 10, width: "100%" }}
             onClick={editProduct}
+            disabled={product.username!==user.username}
           >
             Edit Product
           </Button>

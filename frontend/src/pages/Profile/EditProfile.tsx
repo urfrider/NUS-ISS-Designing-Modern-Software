@@ -45,7 +45,7 @@ function EditProfile() {
               {
                 id,
                 username,
-                updatedAddress,
+                address: updatedAddress,
               },
               config
             )
@@ -54,7 +54,7 @@ function EditProfile() {
               {
                 id,
                 username,
-                updatedUen,
+                uen: updatedUen,
               },
               config
             );

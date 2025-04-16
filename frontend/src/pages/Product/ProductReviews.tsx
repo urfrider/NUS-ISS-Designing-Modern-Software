@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import ProductCard from "./ProductCard";
 import axios from "axios";
-import { config } from "process";
 import { toast } from "react-toastify";
+
+interface ReviewType {
+  id: string;
+  rating: number;
+  content: string;
+}
 
 const ProductReviews = () => {
   const location = useLocation();
   const { user, product } = location.state || {};
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState<ReviewType[]>([]);
 
   const config = {
     headers: {

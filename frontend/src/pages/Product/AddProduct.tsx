@@ -124,14 +124,9 @@ export const AddProduct = () => {
     },
   };
 
-  const onChange: CheckboxProps["onChange"] = () => {
-    setHasDiscount((prev) => !prev);
-  };
-
   const onFinish = (values: ProductFormData) => {
     onSubmit(values);
     form.resetFields();
-    setHasDiscount(false);
   };
 
   return (
@@ -254,7 +249,7 @@ export const AddProduct = () => {
                   <InputNumber placeholder="Stock" style={{ width: "100%" }} />
                 </Form.Item>
 
-                <Row gutter={16} align="middle">
+                {/* <Row gutter={16} align="middle">
                   <Col span={12}>
                     <Form.Item label="Has Discount" name="hasDiscount">
                       <Checkbox onChange={onChange}></Checkbox>
@@ -274,6 +269,50 @@ export const AddProduct = () => {
                         ]}
                       >
                         <InputNumber suffix="%" style={{ width: "100%" }} />
+                      </Form.Item>
+                    )}
+                  </Col>
+                </Row> */}
+
+                <Row gutter={16} align="middle">
+                  <Col span={12}>
+                    <Form.Item
+                      label="Has Discount"
+                      name="hasDiscount"
+                      valuePropName="checked" // Required for checkboxes
+                    >
+                      <Checkbox
+                        onChange={(e) => {
+                          setHasDiscount(e.target.checked);
+                          // Reset discount when unchecked
+                          if (!e.target.checked) {
+                            form.setFieldsValue({
+                              discountPercentage: undefined,
+                            });
+                          }
+                        }}
+                      />
+                    </Form.Item>
+                  </Col>
+
+                  <Col span={12}>
+                    {hasDiscount && (
+                      <Form.Item
+                        label="Discount Percentage"
+                        name="discountPercentage"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input discount percentage!",
+                          },
+                        ]}
+                      >
+                        <InputNumber
+                          suffix="%"
+                          style={{ width: "100%" }}
+                          min={0}
+                          max={100}
+                        />
                       </Form.Item>
                     )}
                   </Col>
