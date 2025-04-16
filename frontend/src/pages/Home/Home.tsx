@@ -58,7 +58,6 @@ function HomePage() {
       );
       setProducts(response.data.content);
       setTotalPages(response.data.totalPages);
-      setPage(0);
     } catch (error) {
       console.log(error);
     }
@@ -76,7 +75,9 @@ function HomePage() {
 
   useEffect(() => {
     searchProducts();
-    fetchCart();
+    if (user.role === "ROLE_BUYER") {
+      fetchCart();
+    }
   }, [page, query, category]);
 
   const categoryOptions = [

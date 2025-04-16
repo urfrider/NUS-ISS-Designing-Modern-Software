@@ -82,7 +82,7 @@ const EditProduct = () => {
           config
         );
         setProduct(response.data);
-        setFormData(response.data);
+        setForm(response.data);
       } catch (error) {
         toast.error("Error fetching product");
       } finally {

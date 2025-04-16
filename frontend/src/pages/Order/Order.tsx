@@ -37,10 +37,10 @@ function Order() {
         <div>Total Amount</div>
       </div>
       {orders.map((order: any, key: any) => (
-        <div className="flex flex-col">
+        <div key={`orderDiv-${key}`} className="flex flex-col">
           <div className="flex flex-row  w-56 justify-between">
-            <div key={key}>{order.id}</div>
-            <div key={key}>{order.totalAmount}</div>
+            <div>{order.id}</div>
+            <div>{order.totalAmount}</div>
           </div>
         </div>
       ))}
