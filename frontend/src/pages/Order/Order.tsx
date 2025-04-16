@@ -133,20 +133,20 @@ function Orders() {
       key: "status",
       render: (status: string) => getOrderStatusTag(status),
     },
-    {
-      title: "ACTION",
-      key: "action",
-      render: (_: any, record: any) => (
-        <Button
-          type="primary"
-          size="small"
-          onClick={() => navigate(`/order/${record.id}`)}
-          style={{ backgroundColor: token.colorPrimary }}
-        >
-          View Details
-        </Button>
-      ),
-    },
+    // {
+    //   title: "ACTION",
+    //   key: "action",
+    //   render: (_: any, record: any) => (
+    //     <Button
+    //       type="primary"
+    //       size="small"
+    //       onClick={() => navigate(`/order/${record.id}`)}
+    //       style={{ backgroundColor: token.colorPrimary }}
+    //     >
+    //       View Details
+    //     </Button>
+    //   ),
+    // },
   ];
 
   const expandedRowRender = (record: any) => {
