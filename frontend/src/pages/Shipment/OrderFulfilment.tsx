@@ -183,6 +183,7 @@ function OrderFulfilment() {
       doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
       doc.text("Ship To:", 10, 35);
+      doc.text(`Order ID: ${orderId}`, 10, 53);
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
       doc.text(address, 10, 40, { maxWidth: 80 }); // Wrap text if too long
@@ -203,24 +204,40 @@ function OrderFulfilment() {
       JsBarcode(canvas, trackingId, {
         format: "CODE128",
         width: 2,
-        height: 40,
+        height: 60,
       });
       const barcodeDataUrl = canvas.toDataURL("image/png");
-      doc.addImage(barcodeDataUrl, "PNG", 10, 80, 80, 20); // x, y, width, height
+      doc.addImage(barcodeDataUrl, "PNG", 10, 77, 80, 25); // x, y, width, height
 
       // Add a footer line
-      doc.line(5, 110, 95, 110);
+      doc.line(5, 106, 95, 106);
 
       // Add packing list
       doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
-      doc.text("Packing List:", 10, 120);
+      doc.text("Packing List:", 10, 115);
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
 
-      let yPosition = 125; // Start position for the packing list
+      let yPosition = 120; // Start position for the packing list
       items.forEach((item: any, index: number) => {
         const productName = getProductName(item.productId);
+
+        // Check if the current position exceeds the page height
+        if (yPosition > 135) {
+          doc.addPage(); // Add a new page
+          doc.setLineWidth(0.5);
+          doc.rect(5, 5, 90, 140); // x, y, width, height
+
+          yPosition = 15; // Reset yPosition for the new page
+          doc.setFontSize(12);
+          doc.setFont("helvetica", "bold");
+          doc.text("Packing List (Continued):", 10, yPosition);
+          yPosition += 5; // Move down for the next line
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "normal");
+        }
+
         doc.text(
           `${index + 1}. ${productName} (Quantity: ${item.quantity})`,
           10,
