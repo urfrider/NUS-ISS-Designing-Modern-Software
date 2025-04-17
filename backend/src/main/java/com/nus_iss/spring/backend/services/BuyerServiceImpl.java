@@ -81,6 +81,20 @@ public class BuyerServiceImpl implements BuyerService {
         }
     }
 
+    @Override
+    @Transactional
+    public String getBuyerAddress(Long buyerId) {
+        Optional<Buyer> buyerOptional = buyerRepository.findById(buyerId);
+        
+        if (buyerOptional.isPresent()) {
+            Buyer buyer = buyerOptional.get();
+            return buyer.getAddress();
+        } else {
+            System.out.println("Buyer not found with ID: " + buyerId);  // Print if not found
+            throw new RuntimeException("Buyer not found");
+        }
+    }
+
     // public List<OrderDTO> getOrderHistory(Long buyerId) {
     //     Buyer buyer = buyerRepository.findById(buyerId)
     //             .orElseThrow(() -> new RuntimeException("Buyer not found"));

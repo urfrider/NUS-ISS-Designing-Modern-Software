@@ -12,6 +12,8 @@ public interface BuyerService {
     BuyerDto editBuyerProfile(BuyerDto buyerDto);
     
     BuyerDto deleteBuyerProfile(Long buyerId);
+
+    String getBuyerAddress(Long buyerId);
     
     void checkout(Long buyerId);
 }
