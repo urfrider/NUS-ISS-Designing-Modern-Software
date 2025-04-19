@@ -13,6 +13,7 @@ import Layout from "./Layout";
 import PrivateRoute from "./components/PrivateRoute";
 import EditProduct from "./pages/Product/EditProduct";
 import ProductReviews from "./pages/Product/ProductReviews";
+import OrderFulfilment from "./pages/Shipment/OrderFulfilment";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
             <Route path="/products/add" element={<AddProduct />} />
             <Route path="/editProduct/:id" element={<EditProduct />} />
             <Route path="/product/:id/reviews" element={<ProductReviews />} />
+            <Route path="/products/orders" element={<OrderFulfilment />} />
           </Route>
 
           {/* Catch-all for unauthorized access */}

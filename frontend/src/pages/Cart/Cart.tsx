@@ -34,6 +34,7 @@ function Cart() {
       }
     );
     setCart(response.data);
+    console.log("cart contents", response.data);
   };
 
   const onClearCart = async () => {
@@ -107,7 +108,7 @@ function Cart() {
           >
             {record.image && (
               <img
-                src={record.image}
+                src={`data:image/png;base64,${record.image}`}
                 alt={text}
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
@@ -168,8 +169,10 @@ function Cart() {
       variant: item.variant || "",
       price: item.price,
       quantity: item.quantity,
-      image: item.image,
+      image: item.images,
     })) || [];
+
+  console.log("tableData", tableData);
 
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto", padding: "2rem" }}>
