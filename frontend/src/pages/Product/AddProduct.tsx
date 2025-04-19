@@ -32,6 +32,15 @@ export interface ProductFormData {
   discountPercentage: number;
 }
 
+export const categoryOptions = [
+  { label: "IT", value: "IT" },
+  { label: "Fashion", value: "Fashion" },
+  { label: "Beauty", value: "Beauty" },
+  { label: "Home", value: "Home" },
+  { label: "Health", value: "Health" },
+  { label: "Others", value: "Others" },
+];
+
 export const AddProduct = () => {
   const user = useSelector((state: RootState) => state.user);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -99,15 +108,6 @@ export const AddProduct = () => {
   };
 
   const [form] = Form.useForm();
-
-  const categoryOptions = [
-    { label: "IT", value: "IT" },
-    { label: "Fashion", value: "Fashion" },
-    { label: "Beauty", value: "Beauty" },
-    { label: "Home", value: "Home" },
-    { label: "Health", value: "Health" },
-    { label: "Others", value: "Others" },
-  ];
 
   const props: UploadProps = {
     action: undefined,
