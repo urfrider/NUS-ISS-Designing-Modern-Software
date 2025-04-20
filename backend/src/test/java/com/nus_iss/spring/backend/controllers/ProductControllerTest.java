@@ -1,4 +1,4 @@
-package com.nus_iss.spring.backend.product;
+package com.nus_iss.spring.backend.controllers;
 
 import static org.mockito.Mockito.when;
 
