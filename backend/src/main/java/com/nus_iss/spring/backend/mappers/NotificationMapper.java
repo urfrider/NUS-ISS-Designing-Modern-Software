@@ -1,6 +1,9 @@
 package com.nus_iss.spring.backend.mappers;
 
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.nus_iss.spring.backend.dtos.NotificationDto;
 import com.nus_iss.spring.backend.entities.Notification;
 
@@ -38,5 +41,19 @@ public class NotificationMapper {
         notification.setReciepientId(notificationDto.getReciepientId());
 
         return notification;
+    }
+
+    public static List<NotificationDto> toDtoList(List<Notification> notifications) {
+        return notifications.stream()
+            .map(n -> new NotificationDto(
+                n.getId(),
+                n.getSenderId(),
+                n.getMessage(),
+                n.getType(),
+                n.getCreatedAt(),
+                n.getIsRead(),
+                n.getReciepientId()
+            ))
+            .collect(Collectors.toList());
     }
 }

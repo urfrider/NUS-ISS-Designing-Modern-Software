@@ -1,5 +1,7 @@
 package com.nus_iss.spring.backend.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,5 +49,12 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.save(newNotification);
 
         return "Notification updated!";
+    }
+
+    @Override
+    public List<NotificationDto> getNotificationsById(Long reciepientId) {
+        List<Notification> notifications = notificationRepository.findByReciepientId(reciepientId);
+
+        return NotificationMapper.toDtoList(notifications);
     }
 }
