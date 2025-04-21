@@ -2,7 +2,15 @@ import { RootState } from "../../redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../redux/userSlice";
-import { BUYER, SELLER } from "../../constants/constants";
+import { BUYER } from "../../constants/constants";
+import { Button, Flex, Layout, List, Typography } from "antd";
+import {
+  BookOutlined,
+  ContactsOutlined,
+  DollarOutlined,
+  RobotOutlined,
+} from "@ant-design/icons";
+import { Content } from "antd/es/layout/layout";
 
 function Profile() {
   const user = useSelector((state: RootState) => state.user);
@@ -18,33 +26,93 @@ function Profile() {
     navigate("/editProfile");
   };
 
+  const data = [
+    {
+      icon: <RobotOutlined />,
+      sublist: [{ title: "Username", description: user.username }],
+    },
+    {
+      icon: <DollarOutlined />,
+      sublist: [
+        {
+          title: "Balance",
+          description: user.balance,
+        },
+      ],
+    },
+    {
+      icon: <ContactsOutlined />,
+      sublist: [
+        {
+          title: "Role",
+          description: user.role === BUYER ? "Buyer" : "Seller",
+        },
+      ],
+    },
+    {
+      icon: <BookOutlined />,
+      sublist: [
+        {
+          title: user.role === BUYER ? "Address" : "UEN",
+          description: user.role === BUYER ? user.address : user.uen,
+        },
+      ],
+    },
+  ];
+
+  const { Text } = Typography;
+
   return (
-    <div>
-      <div className="flex flex-col mt-32 items-center min-h-screen gap-4">
-        <h1 className="text-2xl font-bold">Profile</h1>
-        <div className="flex flex-col text-left gap-4">
-          <h2 className="text-xl mt-4">Username: {user.username}</h2>
-          <h2 className="text-xl">Balance: {user.balance}</h2>
-          <h2 className="text-xl">Role: {user.role}</h2>
-          {user.role === SELLER && <h2 className="text-xl">UEN: {user.uen}</h2>}
-          {user.role === BUYER && (
-            <h2 className="text-xl">Address: {user.address}</h2>
-          )}
-        </div>
-        <button
-          className="mt-8 w-48 border bg-white border-purple-300 rounded-md p-2 hover:bg-purple-300 duration-300"
-          onClick={onEditProfile}
+    <Layout style={{ minHeight: "100vh" }}>
+      <Content
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#EDF0FF",
+        }}
+      >
+        <Flex
+          vertical
+          align="center"
+          style={{
+            width: "700px",
+            backgroundColor: "white",
+            padding: 40,
+            borderRadius: "10px",
+          }}
         >
-          Edit Profile
-        </button>
-        <button
-          className="w-48 border bg-white border-purple-300 rounded-md p-2 hover:bg-purple-300 duration-300"
-          onClick={onLogout}
-        >
-          Logout
-        </button>
-      </div>
-    </div>
+          <Typography.Title level={3}>My Profile</Typography.Title>
+          <Flex justify="center">
+            <List
+              itemLayout="horizontal"
+              dataSource={data}
+              renderItem={(item) => (
+                <List.Item>
+                  <List.Item.Meta avatar={item.icon} />
+                  <List
+                    itemLayout="vertical"
+                    dataSource={item.sublist}
+                    renderItem={(subitem) => (
+                      <List.Item style={{ width: "500px", maxWidth: "500px" }}>
+                        <Text strong>{subitem.title}</Text>
+                        <Typography>{subitem.description}</Typography>
+                      </List.Item>
+                    )}
+                  ></List>
+                </List.Item>
+              )}
+            />
+          </Flex>
+          <Flex gap={80}>
+            <Button onClick={onLogout}>Log Out</Button>
+            <Button type="primary" onClick={onEditProfile}>
+              Edit
+            </Button>
+          </Flex>
+        </Flex>
+      </Content>
+    </Layout>
   );
 }
 

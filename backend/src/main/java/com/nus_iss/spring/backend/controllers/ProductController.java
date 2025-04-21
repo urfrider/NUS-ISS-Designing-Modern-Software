@@ -100,8 +100,8 @@ public class ProductController {
     }
     
     @PutMapping("/{id}")
-@PreAuthorize("hasAnyAuthority('ROLE_BUYER', 'ROLE_SELLER')")
-public ResponseEntity<?> updateProduct(
+    @PreAuthorize("hasAnyAuthority('ROLE_BUYER', 'ROLE_SELLER')")
+    public ResponseEntity<?> updateProduct(
         @PathVariable Long id,
         @RequestParam("name") String name,
         @RequestParam("description") String description,
@@ -111,30 +111,30 @@ public ResponseEntity<?> updateProduct(
         @RequestParam("username") String username,
         @RequestParam(value = "hasDiscount", required = false, defaultValue = "false") boolean hasDiscount,
         @RequestParam(value = "discountPercentage", required = false, defaultValue = "0") double discountPercentage,
-        @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
+        @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
+    ) {
+        try {
+            logger.info("UPDATING PRODUCT: {}", name);
 
-    try {
-        logger.info("UPDATING PRODUCT: {}", name);
+            CreateProductDto createProductDto = new CreateProductDto();
+            createProductDto.setCategory(category);
+            createProductDto.setDescription(description);
+            createProductDto.setImageFile(imageFile);
+            createProductDto.setName(name);
+            createProductDto.setPrice(price);
+            createProductDto.setUsername(username);
+            createProductDto.setStock(stock);
+            createProductDto.setHasDiscount(hasDiscount);
+            createProductDto.setDiscountPercentage(discountPercentage);
+            
+            // Call service layer to update product
+            Long productId = productService.updateProduct(createProductDto, id);
 
-        CreateProductDto createProductDto = new CreateProductDto();
-        createProductDto.setCategory(category);
-        createProductDto.setDescription(description);
-        createProductDto.setImageFile(imageFile);
-        createProductDto.setName(name);
-        createProductDto.setPrice(price);
-        createProductDto.setUsername(username);
-        createProductDto.setStock(stock);
-        createProductDto.setHasDiscount(hasDiscount);
-        createProductDto.setDiscountPercentage(discountPercentage);
-        
-        // Call service layer to update product
-        Long productId = productService.updateProduct(createProductDto, id);
-
-        return ResponseEntity.ok("Product with ID: " + productId + " updated successfully!");
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            return ResponseEntity.ok("Product with ID: " + productId + " updated successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
-}
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER', 'ROLE_SELLER')")
