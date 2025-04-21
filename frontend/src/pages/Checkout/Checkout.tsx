@@ -46,6 +46,16 @@ function Checkout() {
       data["paypalEmail"] = paypalEmail;
     }
 
+    await makePayment(data);
+    await sendNotification();
+    // navigate("/cart");
+  };
+  
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
+  async function makePayment(data: any) {
     try {
       await axios.post(
         `${import.meta.env.VITE_API_URL!}/api/payment`,
@@ -60,15 +70,29 @@ function Checkout() {
     } catch (e) {
       console.log(e);
     }
+  }
 
-    // navigate("/cart");
-  };
-
-  useEffect(() => {
-    fetchCart();
-  }, []);
-
-  console.log(cart);
+  async function sendNotification() {
+      for (const item of cart.items) {
+        try {
+          await axios.post(
+            `${import.meta.env.VITE_API_URL!}/notif/createNotification`,
+            {
+              senderId: user.id,
+              message: `An order for '${item.name}' has been placed!`,
+              type: "ORDER_CREATED",
+              createdAt: new Date().toISOString(),
+              isRead: false,
+              reciepientId: item.sellerId,
+            },
+            config
+          );
+          toast.success(`Order successful`);
+        } catch (e) {
+          console.log(e);
+        }
+      }
+  }
 
   return (
     <div className="flex flex-col justify-center items-center gap-4 mt-16">

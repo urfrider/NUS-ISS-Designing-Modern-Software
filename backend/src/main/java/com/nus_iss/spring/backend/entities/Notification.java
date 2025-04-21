@@ -25,13 +25,10 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private User user;
-    
     private String message;
     private String type;
     private Date createdAt;
     private Boolean isRead;
-
+    private Long senderId;   
+    private Long reciepientId;
 }

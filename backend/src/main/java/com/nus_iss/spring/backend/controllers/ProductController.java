@@ -21,7 +21,6 @@ import com.nus_iss.spring.backend.dtos.CreateProductDto;
 import com.nus_iss.spring.backend.dtos.ProductDto;
 import com.nus_iss.spring.backend.services.interfaces.ProductService;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -25,10 +25,8 @@ public class NotificationServiceImpl implements NotificationService {
 
         Notification newNotification = NotificationMapper.toEntity(notificationDto);
 
-        User existingUser = userRepository.findByUsername(notificationDto.getUser().getUsername())
+        userRepository.findById(notificationDto.getSenderId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
-        newNotification.setUser(existingUser);
 
         notificationRepository.save(newNotification);
 
@@ -40,12 +38,12 @@ public class NotificationServiceImpl implements NotificationService {
 
         Notification newNotification = NotificationMapper.toEntity(notificationDto);
 
-        User existingUser = userRepository.findByUsername(notificationDto.getUser().getUsername())
+        userRepository.findById(notificationDto.getSenderId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        newNotification.setUser(existingUser);
 
         notificationRepository.findById(notificationDto.getId())
                 .orElseThrow(() -> new RuntimeException("Notification not found"));
+                
         notificationRepository.save(newNotification);
 
         return "Notification updated!";

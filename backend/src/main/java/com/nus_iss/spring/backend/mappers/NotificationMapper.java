@@ -17,7 +17,8 @@ public class NotificationMapper {
         dto.setType(notification.getType());
         dto.setCreatedAt(notification.getCreatedAt());
         dto.setIsRead(notification.getIsRead());
-        dto.setUser(UserMapper.toBuyerSellerDto(notification.getUser()));
+        dto.setSenderId(notification.getSenderId());
+        dto.setReciepientId(notification.getReciepientId());
 
         return dto;
     }
@@ -33,8 +34,9 @@ public class NotificationMapper {
         notification.setType(notificationDto.getType());
         notification.setCreatedAt(notificationDto.getCreatedAt());
         notification.setIsRead(notificationDto.getIsRead());
-        notification.setUser(UserMapper.toEntity(notificationDto.getUser()));
-        System.out.println("Update " + notification);
+        notification.setSenderId(notificationDto.getSenderId());
+        notification.setReciepientId(notificationDto.getReciepientId());
+
         return notification;
     }
 }
