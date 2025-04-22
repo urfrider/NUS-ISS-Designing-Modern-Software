@@ -3,8 +3,21 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import axios from "axios";
 import ProductCard from "../Product/ProductCard";
-import { Button, Col, Flex, Form, Input, Layout, Row, Select } from "antd";
+import {
+  Button,
+  Card,
+  Col,
+  Flex,
+  Form,
+  Input,
+  Layout,
+  Row,
+  Select,
+} from "antd";
 import { Content } from "antd/es/layout/layout";
+
+import HeroBanner from "../../components/HeroBanner/HeroBanner";
+import { useDesignToken } from "../../DesignToken";
 
 export interface SearchType {
   query: string;
@@ -33,6 +46,7 @@ function HomePage() {
   const [page, setPage] = useState<number>(0);
   const [cart, setCart] = useState<any>([]);
 
+  const token = useDesignToken();
   const config = {
     headers: {
       Authorization: `Bearer ${user.token}`,
@@ -139,12 +153,14 @@ function HomePage() {
     <Layout style={{ minHeight: "100vh" }}>
       <Content
         style={{
+          flexDirection: "column",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "#EDF0FF",
+          backgroundColor: token.colorTextWhite,
         }}
       >
+        <HeroBanner />
         <Flex
           vertical
           align="center"
@@ -152,12 +168,13 @@ function HomePage() {
             width: "100%",
             backgroundColor: "white",
             padding: 40,
+            height: "100vh",
           }}
         >
           <SearchBar />
-          <Row gutter={[16, 16]} justify="start" style={{ width: "100%" }}>
+          <Row gutter={16} justify="start" style={{ width: "100%" }}>
             {products.map((product: any, key: number) => (
-              <Col key={key} xs={24} sm={12} md={8} lg={6}>
+              <Col key={key}>
                 <ProductCard product={product} user={user} cartId={cart?.id} />
               </Col>
             ))}
@@ -177,70 +194,3 @@ function HomePage() {
 }
 
 export default HomePage;
-
-//   return (
-//     <div>
-//       <div className="flex justify-center items-center min-h-screen flex-col">
-//         <div className="bg-purple-500 mt-10 p-2 rounded-md flex flex-col gap-2">
-//           <form
-//             onSubmit={(e) => {
-//               e.preventDefault();
-//               searchProducts();
-//             }}
-//             className="flex gap-2 items-center"
-//           >
-//             <input
-//               className="w-[300px] p-1"
-//               onChange={(e) => setQuery(e.target.value)}
-//             />
-//             <button
-//               type="submit"
-//               onClick={searchProducts}
-//               className="text-white cursor-pointer"
-//             >
-//               Search
-//             </button>
-//           </form>
-//           <select
-//             onChange={(e) => setCategory(e.target.value)}
-//             className="border p-1"
-//           >
-//             <option value="">Select Category</option>
-//             <option value="IT">IT</option>
-//             <option value="Fashion">Fashion</option>
-//             <option value="Beauty">Beauty</option>
-//             <option value="Home">Home</option>
-//             <option value="Health">Health</option>
-//             <option value="Others">Others</option>
-//           </select>
-//         </div>
-//         <div className="flex items-center flex-col gap-2 text-white border-white border p-4 rounded-md">
-//           {products.map((product: any, key: number) => (
-//             <div
-//               key={`div-${key}`}
-//               className="flex flex-wrap justify-center gap-4 p-8"
-//             >
-//               <ProductCard product={product} user={user} cartId={cart?.id} />
-//             </div>
-//           ))}
-//         </div>
-//         <div className="mb-10 flex gap-2">
-//           <button
-//             onClick={prevPage}
-//             disabled={page === 0}
-//             className="disabled:bg-slate-400 py-1 px-2 w-[70px] bg-purple-500 text-white rounded-md"
-//           >
-//             Prev
-//           </button>
-//           <button
-//             onClick={nextPage}
-//             disabled={page === totalPages - 1}
-//             className="disabled:bg-slate-400 py-1 px-2 w-[70px] bg-purple-500 text-white rounded-md"
-//           >
-//             Next
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }

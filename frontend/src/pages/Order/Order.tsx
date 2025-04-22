@@ -288,7 +288,7 @@ function Orders() {
               >
                 <Button
                   type="primary"
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate("/home")}
                   style={{ backgroundColor: token.colorPrimary }}
                 >
                   Start Shopping
