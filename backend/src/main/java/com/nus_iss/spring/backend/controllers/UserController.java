@@ -129,7 +129,6 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
     public ResponseEntity<BuyerDto> editBuyerProfile(@RequestBody BuyerDto user) {
         BuyerDto buyer = this.buyerService.editBuyerProfile(user);
-
         if (buyer == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
