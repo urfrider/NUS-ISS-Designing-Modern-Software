@@ -19,6 +19,8 @@ const CustomCard: React.FC<CustomCardProps> = ({ children, ...rest }) => {
         color: token.colorTextBase,
         fontFamily: token.fontFamily,
         borderRadius: token.borderRadiusMed,
+        background: token.colorBgWhite,
+
         ...rest.style,
       }}
     >

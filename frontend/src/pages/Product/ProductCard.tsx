@@ -68,7 +68,7 @@ const ProductCard = ({ product, user, cartId }: any) => {
   };
 
   return (
-    <CustomCard style={{ width: "250px", maxHeight: "430px" }}>
+    <CustomCard style={{ width: "300px", maxHeight: "430px" }}>
       <Flex vertical gap={10} align={"center"}>
         <ProductCardImgContainer
           src={`data:image/png;base64,${product.images}`}
@@ -100,7 +100,7 @@ const ProductCard = ({ product, user, cartId }: any) => {
         {user.role == BUYER && (
           <Flex gap={10}>
             <CustomButton
-              type="text"
+              type="default"
               onClick={navigateToReviews}
               style={{ marginTop: 10, width: "100%" }}
             >

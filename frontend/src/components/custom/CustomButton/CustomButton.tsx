@@ -12,13 +12,19 @@ const CustomButton: React.FC<CustomButtonProps> = ({
 }) => {
   const token = useDesignToken();
 
-  const shouldApplyCustomStyles = type !== "text" && type !== "link";
+  const isDefaultType = type === "default";
+  const shouldApplyCustomStyles =
+    type !== "text" && type !== "link" && !isDefaultType;
 
   return (
     <Button
       type={type}
       {...rest}
       style={{
+        ...(isDefaultType && {
+          backgroundColor: "#FFFFFF",
+          color: token.colorTextBase,
+        }),
         ...(shouldApplyCustomStyles && {
           backgroundColor: token.colorPrimary,
           color: token.colorTextWhite,
