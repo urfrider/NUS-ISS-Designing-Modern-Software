@@ -239,7 +239,7 @@ function Cart() {
               }}
               onClick={() => navigate("/checkout")}
             >
-              CHECKOUT
+              Checkout
             </Button>
           </Card>
 
