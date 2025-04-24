@@ -62,7 +62,7 @@ function EditProfile() {
               {
                 id,
                 username,
-                updatedAddress,
+                address: updatedAddress,
               },
               config
             )
@@ -71,7 +71,7 @@ function EditProfile() {
               {
                 id,
                 username,
-                updatedUen,
+                uen: updatedUen,
               },
               config
             );
@@ -174,6 +174,8 @@ function EditProfile() {
 
 export default EditProfile;
 
-{/* <button onClick={addReview} className="mt-4 p-2 bg-blue-500 text-white rounded">
+{
+  /* <button onClick={addReview} className="mt-4 p-2 bg-blue-500 text-white rounded">
   Add Review
-</button>; */}
+</button>; */
+}
