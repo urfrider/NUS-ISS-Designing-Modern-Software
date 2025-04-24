@@ -1,5 +1,10 @@
 pipeline {
     agent any
+
+    environment {
+        DOCKER_IMAGE = 'nus-iss-backend'
+        DOCKER_TAG = 'latest'
+    }
     
     stages {
         stage('Checkout') {
@@ -11,9 +16,10 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo "Building the project..."
-                // Build steps go here, for example:
-                // sh './gradlew build'
+                sh '''
+                cd ./backend
+                ./gradlew clean build
+                '''
             }
         }
 
@@ -25,14 +31,44 @@ pipeline {
                     string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
                 ]) {
                     echo "Testing the project..."
-                    // sh '''
-                    // cd ./backend
-                    // chmod +x gradlew
+                    sh '''
+                    cd ./backend
+                    chmod +x gradlew
                     
-                    // ./gradlew clean test
-                    // '''
+                    ./gradlew clean test
+                    '''
                 }
             }
+        }
+
+        stage('Dockerize') {
+            steps {
+                script {
+                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ./backend"
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    // Stop & remove existing container if any
+                    sh """
+                    docker stop ${DOCKER_IMAGE} || true
+                    docker rm ${DOCKER_IMAGE} || true
+                    docker run -d --name ${DOCKER_IMAGE} -p 8080:8080 ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment successful!'
+        }
+        failure {
+            echo 'Pipeline failed.'
         }
     }
 }
