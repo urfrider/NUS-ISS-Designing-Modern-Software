@@ -51,9 +51,8 @@ public class BuyerServiceImpl implements BuyerService {
             Buyer buyer = buyerOptional.get();
             buyer.setUsername(buyerDto.getUsername());
             buyer.setAddress(buyerDto.getAddress());
-            buyer.setBalance(buyerDto.getBalance());
             buyerRepository.save(buyer);
-            return BuyerMapper.toDto(buyer);
+            return buyerDto;
         } else {
             throw new RuntimeException("Buyer not found");
         }
