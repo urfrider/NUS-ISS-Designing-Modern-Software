@@ -3,19 +3,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import axios from "axios";
 import ProductCard from "../Product/ProductCard";
-import {
-  Button,
-  Card,
-  Col,
-  Empty,
-  Flex,
-  Form,
-  Input,
-  Layout,
-  Row,
-  Select,
-  TabsProps,
-} from "antd";
+import { Button, Col, Empty, Flex, Input, Layout, Row, TabsProps } from "antd";
 import { Content } from "antd/es/layout/layout";
 
 import HeroBanner from "../../components/HeroBanner/HeroBanner";

@@ -10,7 +10,6 @@ import {
   Space,
   Tag,
   Typography,
-  Collapse,
   Badge,
   Row,
   Col,
@@ -31,7 +30,6 @@ import { useDesignToken } from "../../DesignToken";
 import moment from "moment";
 
 const { Title, Text } = Typography;
-const { Panel } = Collapse;
 
 function Orders() {
   const user = useSelector((state: RootState) => state.user);

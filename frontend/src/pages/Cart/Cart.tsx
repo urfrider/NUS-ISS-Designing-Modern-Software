@@ -145,7 +145,7 @@ function Cart() {
       title: "TOTAL",
       dataIndex: "total",
       key: "total",
-      render: (text: string, record: any) =>
+      render: (record: any) =>
         `$${(record.price * record.quantity).toFixed(2)}`,
     },
     {

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { BUYER, SELLER } from "../../constants/constants";
 import { useNavigate } from "react-router-dom";
-import { Button, Card, Flex, InputNumber, Modal, Typography } from "antd";
+import { Button, Flex, InputNumber, Modal, Typography } from "antd";
 import CustomCard from "../../components/custom/CustomCard/CustomCard";
 import { ProductCardImgContainer } from "./ProductStyles";
 import { useDesignToken } from "../../DesignToken";
@@ -48,9 +48,7 @@ const ProductCard = ({ product, user, cartId }: any) => {
     navigate(`/editProduct/${product.id}`);
   };
 
-  function navigateToReviews(
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ): void {
+  function navigateToReviews(): void {
     navigate(`/product/${product.id}/reviews`, {
       state: { user: user, product: product, cartId: cartId },
     });
