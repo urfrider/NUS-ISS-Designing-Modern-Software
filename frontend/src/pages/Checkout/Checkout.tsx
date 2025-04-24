@@ -65,21 +65,31 @@ function Checkout() {
   const handlePlaceOrder = async () => {
     setIsLoading(true);
 
+    var data: any = {
+      username: user?.username,
+      cartId: cart?.id,
+    };
+
+    if (paymentMethod == "creditCard") {
+      data["cardNumber"] = creditCardNumber;
+      data["cardHolder"] = creditCardHolder;
+      data["cardExpiry"] = creditCardExpiry;
+      data["cardCvc"] = creditCardCVC;
+    } else if (paymentMethod == "paypal") {
+      data["paypalEmail"] = paypalEmail;
+    }
+
+    await makePayment(data);
+    await sendNotification();
+    // navigate("/cart");
+  };
+  
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
+  async function makePayment(data: any) {
     try {
-      let data: any = {
-        username: user?.username,
-        cartId: cart?.id,
-      };
-
-      if (paymentMethod === "creditCard") {
-        data["cardNumber"] = creditCardNumber;
-        data["cardHolder"] = creditCardHolder;
-        data["cardExpiry"] = creditCardExpiry;
-        data["cardCvc"] = creditCardCVC;
-      } else if (paymentMethod === "paypal") {
-        data["paypalEmail"] = paypalEmail;
-      }
-
       await axios.post(
         `${import.meta.env.VITE_API_URL!}/api/payment`,
         {
@@ -89,7 +99,6 @@ function Checkout() {
         },
         config
       );
-
       toast.success(
         `Payment successful with ${getPaymentMethodName(paymentMethod)}`
       );
@@ -101,6 +110,27 @@ function Checkout() {
       setIsLoading(false);
     }
   };
+
+  async function sendNotification() {
+      for (const item of cart.items) {
+        try {
+          await axios.post(
+            `${import.meta.env.VITE_API_URL!}/notif/createNotification`,
+            {
+              senderId: user.id,
+              message: `An order for '${item.name}' has been placed!`,
+              type: "ORDER_CREATED",
+              createdAt: new Date().toISOString(),
+              isRead: false,
+              reciepientId: item.sellerId,
+            },
+            config
+          );
+        } catch (e) {
+          console.log(e);
+        }
+      }
+  }
 
   const getPaymentMethodName = (method: string) => {
     switch (method) {

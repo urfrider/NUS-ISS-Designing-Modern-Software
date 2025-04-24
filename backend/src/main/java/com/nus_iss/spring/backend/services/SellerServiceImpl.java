@@ -23,10 +23,8 @@ public class SellerServiceImpl implements SellerService{
         Optional<Seller> sellerOptional = sellerRepository.findById(id);
         
         if (sellerOptional.isPresent()) {
-            System.out.println("Seller found: " + sellerOptional.get());  // Print if found
             return SellerMapper.toDto(sellerOptional.get());
         } else {
-            System.out.println("Seller not found with ID: " + id);  // Print if not found
             throw new RuntimeException("Seller not found");
         }
     }
@@ -36,10 +34,8 @@ public class SellerServiceImpl implements SellerService{
         Optional<Seller> sellerOptional = sellerRepository.findByUsername(username);
         
         if (sellerOptional.isPresent()) {
-            System.out.println("Seller found: " + sellerOptional.get());  // Print if found
             return sellerOptional.get();
         } else {
-            System.out.println("Seller not found with username: " + username);  // Print if not found
             throw new RuntimeException("Seller not found");
         }
     }
@@ -58,7 +54,6 @@ public class SellerServiceImpl implements SellerService{
             sellerRepository.save(seller);
             return SellerMapper.toDto(seller);
         } else {
-            System.out.println("Seller not found with ID: " + sellerId);  // Print if not found
             throw new RuntimeException("Seller not found");
         }
     }
@@ -73,7 +68,6 @@ public class SellerServiceImpl implements SellerService{
             sellerRepository.delete(seller);
             return SellerMapper.toDto(seller);
         } else {
-            System.out.println("Seller not found with ID: " + sellerId);  // Print if not found
             throw new RuntimeException("Seller not found");
         }
     }
