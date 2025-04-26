@@ -61,7 +61,7 @@ function HomePage() {
       const response = await axios.get(
         `${
           import.meta.env.VITE_API_URL
-        }/api/products/search?name=${query}&category=${category}&page=${page}&size=5`,
+        }/api/products/search?name=${query}&category=${category}&page=${page}&size=8`,
         config
       );
       setProducts(response.data.content);
