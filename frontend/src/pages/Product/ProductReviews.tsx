@@ -19,7 +19,7 @@ import {
   Tooltip,
   Skeleton,
 } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { StarFilled, UserOutlined } from "@ant-design/icons";
 import { useDesignToken } from "../../DesignToken";
 
 const { Content } = Layout;
@@ -67,6 +67,7 @@ const ProductReviews = () => {
   const [loadingProfiles, setLoadingProfiles] = useState<boolean>(false);
   const [form] = Form.useForm();
   const token = useDesignToken();
+  const [hasUserReviewed, setHasUserReviewed] = useState<boolean>(false);
 
   const config = {
     headers: {
@@ -127,7 +128,13 @@ const ProductReviews = () => {
       const data = response.data.reverse();
       setReviews(data);
 
-      // Fetch buyer profiles for all unique buyer IDs
+      if (user?.id) {
+        const userReview = data.find(
+          (review: ReviewType) => review.buyer === user.id
+        );
+        setHasUserReviewed(!!userReview);
+      }
+
       const uniqueBuyerIds = [
         ...new Set((data as ReviewType[]).map((review) => review.buyer)),
       ];
@@ -320,48 +327,108 @@ const ProductReviews = () => {
                   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
                 }}
               >
-                <Form form={form} onFinish={addReview} layout="vertical">
-                  <Form.Item
-                    name="rating"
-                    label="Your Rating"
-                    rules={[
-                      { required: true, message: "Please rate this product" },
-                    ]}
-                  >
-                    <Select placeholder="Select a rating">
-                      <Select.Option value={1}>Poor</Select.Option>
-                      <Select.Option value={2}>Fair</Select.Option>
-                      <Select.Option value={3}>Good</Select.Option>
-                      <Select.Option value={4}>Very Good</Select.Option>
-                      <Select.Option value={5}>Excellent</Select.Option>
-                    </Select>
-                  </Form.Item>
-
-                  <Form.Item
-                    name="content"
-                    label="Your Review"
-                    rules={[
-                      { required: true, message: "Please write your review" },
-                    ]}
-                  >
-                    <TextArea
-                      rows={4}
-                      placeholder="Share your experience with this product..."
-                    />
-                  </Form.Item>
-
-                  <Form.Item>
-                    <Button
-                      type="primary"
-                      htmlType="submit"
+                {hasUserReviewed ? (
+                  <Flex vertical align="center" gap={16}>
+                    <Text
                       style={{
-                        backgroundColor: token.colorPrimary,
+                        fontSize: token.fontSizeLg,
+                        color: token.colorTextBase,
+                        textAlign: "center",
                       }}
                     >
-                      Submit Review
-                    </Button>
-                  </Form.Item>
-                </Form>
+                      You have already reviewed this product.
+                    </Text>
+                    <Flex gap={8} align="center">
+                      <Text type="secondary">
+                        Thank you for sharing your feedback!
+                      </Text>
+                    </Flex>
+                  </Flex>
+                ) : (
+                  <Form form={form} onFinish={addReview} layout="vertical">
+                    <Form.Item
+                      name="rating"
+                      label="Your Rating"
+                      rules={[
+                        { required: true, message: "Please rate this product" },
+                      ]}
+                    >
+                      <Select placeholder="Select a rating">
+                        <Select.Option value={1}>
+                          <StarFilled style={{ color: token.colorPrimary }} />{" "}
+                          Poor
+                        </Select.Option>
+                        <Select.Option value={2}>
+                          <Space>
+                            <StarFilled style={{ color: token.colorPrimary }} />
+                            <StarFilled
+                              style={{ color: token.colorPrimary }}
+                            />{" "}
+                            Fair
+                          </Space>
+                        </Select.Option>
+                        <Select.Option value={3}>
+                          <Space>
+                            <StarFilled style={{ color: token.colorPrimary }} />
+                            <StarFilled style={{ color: token.colorPrimary }} />
+                            <StarFilled
+                              style={{ color: token.colorPrimary }}
+                            />{" "}
+                            Good
+                          </Space>
+                        </Select.Option>
+                        <Select.Option value={4}>
+                          <Space>
+                            <StarFilled style={{ color: token.colorPrimary }} />
+                            <StarFilled style={{ color: token.colorPrimary }} />
+                            <StarFilled style={{ color: token.colorPrimary }} />
+                            <StarFilled
+                              style={{ color: token.colorPrimary }}
+                            />{" "}
+                            Very Good
+                          </Space>
+                        </Select.Option>
+                        <Select.Option value={5}>
+                          <Space>
+                            <StarFilled style={{ color: token.colorPrimary }} />
+                            <StarFilled style={{ color: token.colorPrimary }} />
+                            <StarFilled style={{ color: token.colorPrimary }} />
+                            <StarFilled style={{ color: token.colorPrimary }} />
+                            <StarFilled
+                              style={{ color: token.colorPrimary }}
+                            />{" "}
+                            Excellent
+                          </Space>
+                        </Select.Option>
+                      </Select>
+                    </Form.Item>
+
+                    <Form.Item
+                      name="content"
+                      label="Your Review"
+                      rules={[
+                        { required: true, message: "Please write your review" },
+                      ]}
+                    >
+                      <TextArea
+                        rows={4}
+                        placeholder="Share your experience with this product..."
+                      />
+                    </Form.Item>
+
+                    <Form.Item>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        style={{
+                          backgroundColor: token.colorPrimary,
+                        }}
+                      >
+                        Submit Review
+                      </Button>
+                    </Form.Item>
+                  </Form>
+                )}
               </Card>
             </Flex>
 

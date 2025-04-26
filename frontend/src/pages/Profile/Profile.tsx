@@ -30,6 +30,8 @@ import {
 } from "@ant-design/icons";
 import { Content } from "antd/es/layout/layout";
 import { useDesignToken } from "../../DesignToken";
+import CustomButton from "../../components/custom/CustomButton/CustomButton";
+import CustomCard from "../../components/custom/CustomCard/CustomCard";
 
 function Profile() {
   const user = useSelector((state: RootState) => state.user);
@@ -93,13 +95,7 @@ function Profile() {
       >
         <Row gutter={[24, 24]} justify="center">
           <Col xs={24} md={22} lg={20} xl={18}>
-            <Card
-              bordered={false}
-              style={{
-                borderRadius: token.borderRadiusMed,
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-              }}
-            >
+            <CustomCard>
               {/* Header Section */}
               <Flex
                 align="center"
@@ -110,17 +106,21 @@ function Profile() {
                   My Profile
                 </Title>
                 <Flex gap={12}>
-                  <Button onClick={onLogout} icon={<LogoutOutlined />}>
+                  <CustomButton
+                    danger
+                    onClick={onLogout}
+                    icon={<LogoutOutlined />}
+                  >
                     Log Out
-                  </Button>
-                  <Button
+                  </CustomButton>
+                  <CustomButton
                     type="primary"
                     onClick={onEditProfile}
                     icon={<EditOutlined />}
                     style={{ background: token.colorPrimary }}
                   >
                     Edit Profile
-                  </Button>
+                  </CustomButton>
                 </Flex>
               </Flex>
 
@@ -152,11 +152,9 @@ function Profile() {
                     </div>
 
                     {/* Stats */}
-                    <Card
+                    <CustomCard
                       style={{
-                        width: "100%",
                         marginTop: 16,
-                        borderRadius: token.borderRadiusMed,
                       }}
                     >
                       <Statistic
@@ -168,29 +166,27 @@ function Profile() {
                         style={{ textAlign: "center" }}
                         valueStyle={{ color: token.colorPrimary }}
                       />
-                    </Card>
+                    </CustomCard>
 
                     {/* Action Buttons */}
                     <Flex
                       vertical
                       style={{ width: "100%", gap: 12, marginTop: 8 }}
                     >
-                      <Button
-                        block
+                      <CustomButton
                         icon={<ShoppingOutlined />}
                         onClick={onViewOrders}
                       >
                         My Orders
-                      </Button>
+                      </CustomButton>
 
                       {user.role !== BUYER && (
-                        <Button
-                          block
+                        <CustomButton
                           icon={<ShopOutlined />}
                           onClick={onViewProducts}
                         >
                           My Products
-                        </Button>
+                        </CustomButton>
                       )}
                     </Flex>
                   </Flex>
@@ -198,14 +194,17 @@ function Profile() {
 
                 {/* Right Column - Details */}
                 <Col xs={24} md={16}>
-                  <Card
+                  <CustomCard
                     title={
                       <Flex align="center" gap={8}>
                         <UserOutlined />
                         <span>Account Details</span>
                       </Flex>
                     }
-                    style={{ borderRadius: token.borderRadiusMed }}
+                    style={{
+                      borderRadius: token.borderRadiusMed,
+                      background: token.colorBgWhite,
+                    }}
                   >
                     {/* <Descriptions
                       column={{ xs: 1, sm: 1, md: 1 }}
@@ -266,7 +265,7 @@ function Profile() {
                         </Flex>
                       </Descriptions.Item>
                     </Descriptions> */}
-                    <Card
+                    <CustomCard
                       title="Username"
                       style={{
                         borderRadius: token.borderRadiusSmall,
@@ -276,8 +275,8 @@ function Profile() {
                       <Paragraph>
                         {user.username || "No shipping address provided."}
                       </Paragraph>
-                    </Card>{" "}
-                    <Card
+                    </CustomCard>
+                    <CustomCard
                       title="Role"
                       style={{
                         marginTop: 24,
@@ -288,9 +287,9 @@ function Profile() {
                       <Paragraph>
                         {user.role === BUYER ? "Buyer" : "Seller"}
                       </Paragraph>
-                    </Card>{" "}
+                    </CustomCard>{" "}
                     {user.role === BUYER ? (
-                      <Card
+                      <CustomCard
                         title="Shipping Information"
                         style={{
                           marginTop: 24,
@@ -301,9 +300,9 @@ function Profile() {
                         <Paragraph>
                           {user.address || "No shipping address provided."}
                         </Paragraph>
-                      </Card>
+                      </CustomCard>
                     ) : (
-                      <Card
+                      <CustomCard
                         title="Seller Information"
                         style={{
                           marginTop: 24,
@@ -314,31 +313,31 @@ function Profile() {
                         <Paragraph>
                           <strong>UEN:</strong> {user.uen || "Not provided"}
                         </Paragraph>
-                      </Card>
+                      </CustomCard>
                     )}
-                  </Card>
+                  </CustomCard>
 
                   {/* Account Privacy & Security */}
-                  <Card
+                  <CustomCard
                     title="Account Security"
                     style={{
                       marginTop: 24,
                       borderRadius: token.borderRadiusMed,
                     }}
                     extra={
-                      <Button type="link" onClick={onEditProfile}>
+                      <CustomButton type="link" onClick={onEditProfile}>
                         Update
-                      </Button>
+                      </CustomButton>
                     }
                   >
                     <Flex align="center" justify="space-between">
                       <Text>Password</Text>
                       <Text type="secondary">••••••••</Text>
                     </Flex>
-                  </Card>
+                  </CustomCard>
                 </Col>
               </Row>
-            </Card>
+            </CustomCard>
           </Col>
         </Row>
       </Content>

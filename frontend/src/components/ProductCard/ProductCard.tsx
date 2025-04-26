@@ -1,17 +1,17 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { BUYER, SELLER } from "../../constants/constants";
 import { useNavigate } from "react-router-dom";
 import { Button, Flex, InputNumber, Modal, Typography } from "antd";
-import CustomCard from "../../components/custom/CustomCard/CustomCard";
-import { ProductCardImgContainer } from "./ProductStyles";
+import CustomCard from "../custom/CustomCard/CustomCard";
+import { ProductCardImgContainer } from "../../pages/Product/ProductStyles";
 import { useDesignToken } from "../../DesignToken";
-import CustomButton from "../../components/custom/CustomButton/CustomButton";
-import CustomTypography from "../../components/custom/CustomTypography/CustomTypography";
+import CustomButton from "../custom/CustomButton/CustomButton";
+import CustomTypography from "../custom/CustomTypography/CustomTypography";
 
 const ProductCard = ({ product, user, cartId }: any) => {
-  const [quantity, setQuantity] = useState(0);
+  const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -25,7 +25,7 @@ const ProductCard = ({ product, user, cartId }: any) => {
     const data = {
       username: user?.username,
       productId: product.id,
-      quantity,
+      quantity: quantity < 1 ? 1 : quantity,
       cartId,
     };
     try {
@@ -64,6 +64,12 @@ const ProductCard = ({ product, user, cartId }: any) => {
     display: "block",
     maxWidth: "100%",
   };
+
+  useEffect(() => {
+    if (quantity < 1) {
+      setQuantity(1);
+    }
+  }, [quantity]);
 
   return (
     <CustomCard style={{ width: "300px", maxHeight: "430px" }}>
@@ -119,7 +125,7 @@ const ProductCard = ({ product, user, cartId }: any) => {
               okText="Add"
               onCancel={() => {
                 setIsModalOpen(false);
-                setQuantity(0);
+                setQuantity(1);
               }}
               style={{ maxWidth: "400px" }}
             >
@@ -130,7 +136,7 @@ const ProductCard = ({ product, user, cartId }: any) => {
               </CustomTypography.Text>
               <InputNumber
                 value={quantity}
-                onChange={(value) => setQuantity(value || 0)}
+                onChange={(value) => setQuantity(value || 1)}
                 min={1}
                 style={{ width: "100%", marginBottom: 5 }}
               />
