@@ -3,7 +3,12 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { BUYER, SELLER } from "../../constants/constants";
 import { useNavigate } from "react-router-dom";
-import { Button, Card, Flex, InputNumber, Modal, Typography } from "antd";
+import { Button, Flex, InputNumber, Modal, Typography } from "antd";
+import CustomCard from "../../components/custom/CustomCard/CustomCard";
+import { ProductCardImgContainer } from "./ProductStyles";
+import { useDesignToken } from "../../DesignToken";
+import CustomButton from "../../components/custom/CustomButton/CustomButton";
+import CustomTypography from "../../components/custom/CustomTypography/CustomTypography";
 
 const ProductCard = ({ product, user, cartId }: any) => {
   const [quantity, setQuantity] = useState(0);
@@ -13,6 +18,8 @@ const ProductCard = ({ product, user, cartId }: any) => {
   const showModal = () => {
     setIsModalOpen(true);
   };
+
+  const token = useDesignToken();
 
   const addToCart = async () => {
     const data = {
@@ -27,9 +34,12 @@ const ProductCard = ({ product, user, cartId }: any) => {
           Authorization: `Bearer ${user?.token}`,
         },
       });
+
+      console.log("successfully added to cart");
       toast.success(`Added to cart!`);
     } catch (e: any) {
-      toast.error(e.response.data);
+      console.log("error adding to cart", e.response.data.error);
+      toast.error(e.response.data.error);
     }
     setIsModalOpen(false);
   };
@@ -38,16 +48,111 @@ const ProductCard = ({ product, user, cartId }: any) => {
     navigate(`/editProduct/${product.id}`);
   };
 
-  function navigateToReviews(
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ): void {
+  function navigateToReviews(): void {
     navigate(`/product/${product.id}/reviews`, {
       state: { user: user, product: product, cartId: cartId },
     });
   }
+
+  const textStyles = {
+    color: token.colorTextBase,
+
+    fontSize: token.fontSizeSmall,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    display: "block",
+    maxWidth: "100%",
+  };
+
   return (
-    <Flex style={{justifyContent: "space-around"}}>
-      <Card
+    <CustomCard style={{ width: "300px", maxHeight: "430px" }}>
+      <Flex vertical gap={10} align={"center"}>
+        <ProductCardImgContainer
+          src={`data:image/png;base64,${product.images}`}
+          alt={product.name}
+          background={token.colorBgBase}
+          borderRadius={token.borderRadiusSmall}
+        />
+        <CustomTypography.Text
+          strong
+          style={{
+            ...textStyles,
+            fontSize: token.fontSizeLg,
+          }}
+        >
+          {product.name}
+        </CustomTypography.Text>
+        <CustomTypography.Text
+          style={{
+            ...textStyles,
+            opacity: token.opacityTextSecondary,
+          }}
+        >
+          {product.description}
+        </CustomTypography.Text>
+        <CustomTypography.Text strong style={{ fontSize: token.fontSizeXl }}>
+          ${product.price.toFixed(2)}
+        </CustomTypography.Text>
+
+        {user.role == BUYER && (
+          <Flex gap={10}>
+            <CustomButton
+              type="default"
+              onClick={navigateToReviews}
+              style={{ marginTop: 10, width: "100%" }}
+            >
+              Reviews
+            </CustomButton>
+            <CustomButton
+              type="primary"
+              style={{ marginTop: 10, width: "100%" }}
+              onClick={showModal}
+            >
+              Add to Cart
+            </CustomButton>
+
+            <Modal
+              title={`Item: ${product.name}`}
+              open={isModalOpen}
+              onOk={addToCart}
+              okText="Add"
+              onCancel={() => {
+                setIsModalOpen(false);
+                setQuantity(0);
+              }}
+              style={{ maxWidth: "400px" }}
+            >
+              <CustomTypography.Text
+                style={{ paddingBottom: 10, paddingTop: 10 }}
+              >
+                Quantity
+              </CustomTypography.Text>
+              <InputNumber
+                value={quantity}
+                onChange={(value) => setQuantity(value || 0)}
+                min={1}
+                style={{ width: "100%", marginBottom: 5 }}
+              />
+            </Modal>
+          </Flex>
+        )}
+
+        {user.role === SELLER && (
+          <Button
+            type="primary"
+            style={{ marginTop: 10, width: "100%" }}
+            onClick={editProduct}
+          >
+            Edit Product
+          </Button>
+        )}
+      </Flex>
+    </CustomCard>
+  );
+  return (
+    <Flex>
+      <CustomCard
         title={
           <img
             className="w-[300px] h-[200px]"
@@ -70,8 +175,6 @@ const ProductCard = ({ product, user, cartId }: any) => {
         <Typography style={{ paddingBottom: 5, color: "#0055BD" }}>
           ${product.price.toFixed(2)}
         </Typography>
-        {/* <Typography>{product.category}</Typography> */}
-        {/* <Typography>{product.stock}</Typography> */}
 
         {user.role == BUYER && (
           <Flex style={{ gap: 10 }}>
@@ -122,67 +225,9 @@ const ProductCard = ({ product, user, cartId }: any) => {
             Edit Product
           </Button>
         )}
-      </Card>
+      </CustomCard>
     </Flex>
   );
 };
 
 export default ProductCard;
-
-// <div className="border rounded-lg shadow-lg p-4 max-w-xs bg-white">
-//   <img
-//     className="w-[300px] h-[200px]"
-//     src={`data:image/png;base64,${product.images}`}
-//     alt={product.name}
-//   />
-//   <h2 className="text-lg font-bold text-purple-600">{product.name}</h2>
-//   <p className="text-gray-600">{product.description}</p>
-//   <p className="text-purple-600 font-semibold">
-//     ${product.price.toFixed(2)}
-//   </p>
-//   <p className="text-sm text-gray-500">Category: {product.category}</p>
-//   <div className="flex justify-between">
-//     <p className="text-sm text-gray-500">Stock: {product.stock}</p>
-
-//     {user.role == SELLER && (
-//       <button
-//         onClick={editProduct}
-//         className="mt-4 w-full bg-purple-500 text-white py-2 rounded-md hover:bg-purple-600 transition"
-//       >
-//         Edit Product
-//       </button>
-//     )}
-//   </div>
-//   {user.role == BUYER && (
-//     <Flex>
-//       <Button
-//         type="primary"
-//         style={{ marginTop: 10, width: "100%" }}
-//         onClick={showModal}
-//       >
-//         Add to Cart
-//       </Button>
-//       <Modal
-//         title={`Item: ${product.name}`}
-//         open={isModalOpen}
-//         onOk={addToCart}
-//         okText="Add"
-//         onCancel={() => {
-//           setIsModalOpen(false);
-//           setQuantity(0);
-//         }}
-//         style={{ maxWidth: "400px" }}
-//       >
-//         <Typography style={{ paddingBottom: 10, paddingTop: 10 }}>
-//           Quantity
-//         </Typography>
-//         <InputNumber
-//           value={quantity}
-//           onChange={(value) => setQuantity(value || 0)}
-//           min={1}
-//           style={{ width: "100%", marginBottom: 5 }}
-//         />
-//       </Modal>
-//     </Flex>
-//   )}
-// </div>

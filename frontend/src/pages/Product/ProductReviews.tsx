@@ -132,7 +132,7 @@ const ProductReviews = () => {
           <h2 className="text-xl font-semibold">Reviews</h2>
           {reviews.length > 0 ? (
             <ul className="mt-2 space-y-4">
-              {reviews.map((review) => (
+              {reviews.map((review: any) => (
                 <li
                   key={review.id}
                   className="p-4 border rounded shadow-sm bg-gray-50"

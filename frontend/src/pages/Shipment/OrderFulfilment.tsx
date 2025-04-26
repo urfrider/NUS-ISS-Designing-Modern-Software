@@ -1,13 +1,11 @@
 import { ShopOutlined } from "@ant-design/icons";
-import { RootState } from "../../redux/store";
 import { Typography, Card, Button, Tag, Spin } from "antd";
 import axios from "axios";
-import { get } from "http";
-import { parse } from "path";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import jsPDF from "jspdf";
 import JsBarcode from "jsbarcode";
+import { RootState } from "../../redux/store";
 
 const { Title, Text } = Typography;
 

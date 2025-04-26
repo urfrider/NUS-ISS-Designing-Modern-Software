@@ -9,3 +9,29 @@ body {
   padding: 0;
   font-feature-settings: "liga" 1, "kern" 1;
 }
+
+* {
+  font-family: "Inter", sans-serif;
+}
+
+::-webkit-scrollbar-horizontal {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+html {
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+}
+
+/* To specifically target only horizontal scrollbars */
+.hide-horizontal-scrollbar {
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.hide-horizontal-scrollbar::-webkit-scrollbar {
+  height: 0; /* For Chrome, Safari, and Opera */
+  display: none;
+}

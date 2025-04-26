@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 public class NotificationDto {
 
     private Long id;
-    private BuyerSellerDto user;
+    private Long senderId;
     private String message;
     private String type;
     private Date createdAt;
     private Boolean isRead;
-
+    private Long reciepientId;
 }
