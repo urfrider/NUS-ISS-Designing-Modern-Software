@@ -224,7 +224,7 @@ const EditProduct = () => {
           `${import.meta.env.VITE_API_URL}/api/products/${id}`,
           config
         );
-        console.log("here", response)
+        console.log("here", response);
         setProduct(response.data);
         // setForm(response.data);
       } catch (error) {
@@ -310,6 +310,13 @@ const EditProduct = () => {
     onSubmit(values);
     form.resetFields();
   };
+
+  const productImage = (
+    <img
+      src={`data:image/png;base64,${product.images}`}
+      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+    />
+  );
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -417,6 +424,7 @@ const EditProduct = () => {
                       message: "Please input item image!",
                     },
                   ]}
+                  initialValue={productImage}
                 >
                   <Upload {...props}>
                     <Button icon={<UploadOutlined />}>Upload</Button>
