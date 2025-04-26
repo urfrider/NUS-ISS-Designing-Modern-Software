@@ -31,6 +31,8 @@ import { useDesignToken } from "../../DesignToken";
 import moment from "moment";
 import { toast } from "react-toastify";
 import { ProductType } from "../Product/ProductReviews";
+import CustomCard from "../../components/custom/CustomCard/CustomCard";
+import CustomTable from "../../components/custom/CustomTable/CustomTable";
 
 const { Title, Text } = Typography;
 
@@ -201,7 +203,7 @@ function Orders() {
 
   const expandedRowRender = (record: any) => {
     return (
-      <Card bordered={false} style={{ background: "#f9f9f9" }}>
+      <CustomCard bordered={false} style={{ background: "#f9f9f9" }}>
         <Space direction="vertical" style={{ width: "100%" }}>
           <div>
             <Text type="secondary">Payment Method:</Text>{" "}
@@ -327,7 +329,7 @@ function Orders() {
             </>
           )}
         </Space>
-      </Card>
+      </CustomCard>
     );
   };
 
@@ -340,43 +342,41 @@ function Orders() {
 
       <Row gutter={[24, 24]}>
         <Col xs={24} md={6}>
-          <Card style={{ marginBottom: 24 }}>
+          <CustomCard style={{ marginBottom: 24 }}>
             <Statistic
               title="Total Orders"
               value={orders.length}
               prefix={<InboxOutlined />}
             />
-          </Card>
+          </CustomCard>
         </Col>
         <Col xs={24} md={18}>
-          <Card>
-            {loading ? (
-              <div style={{ textAlign: "center", padding: "50px 0" }}>
-                <Spin size="large" />
-              </div>
-            ) : orders.length > 0 ? (
-              <Table
-                columns={columns}
-                dataSource={orders}
-                rowKey={(record) => record.id.toString()}
-                expandable={{ expandedRowRender }}
-                pagination={{ pageSize: 5 }}
-              />
-            ) : (
-              <Empty
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description={<span>You haven't placed any orders yet</span>}
+          {loading ? (
+            <div style={{ textAlign: "center", padding: "50px 0" }}>
+              <Spin size="large" />
+            </div>
+          ) : orders.length > 0 ? (
+            <CustomTable
+              columns={columns}
+              dataSource={orders}
+              rowKey={(record) => record.id.toString()}
+              expandable={{ expandedRowRender }}
+              pagination={{ pageSize: 5 }}
+            />
+          ) : (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={<span>You haven't placed any orders yet</span>}
+            >
+              <Button
+                type="primary"
+                onClick={() => navigate("/home")}
+                style={{ backgroundColor: token.colorPrimary }}
               >
-                <Button
-                  type="primary"
-                  onClick={() => navigate("/home")}
-                  style={{ backgroundColor: token.colorPrimary }}
-                >
-                  Start Shopping
-                </Button>
-              </Empty>
-            )}
-          </Card>
+                Start Shopping
+              </Button>
+            </Empty>
+          )}
         </Col>
       </Row>
     </div>

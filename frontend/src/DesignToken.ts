@@ -9,6 +9,7 @@ export const lightTheme = {
     colorError: "#EF4444",
     colorWarning: "#FACC15",
     colorBgBase: "#F7F8FA",
+    colorBorderColor: "#D9D9D9",
     // colorBgBase: "#FFFFFF",
 
     colorTextBase: "#1F2937",
@@ -28,6 +29,10 @@ export const lightTheme = {
     borderRadiusSmall: "4px",
   },
   components: {
+    Table: {
+      // headerBg: "#FFFFFF",
+      // borderColor: "#d9d9d9",
+    },
     Tabs: {
       colorPrimary: "#8490FF",
       inkBarColor: "#8490FF",
@@ -55,6 +60,7 @@ export const lightTheme = {
     Input: {
       activeBorderColor: "#8490FF",
       hoverBorderColor: "#959DF7",
+      activeBg: "#FFFFFF",
     },
     Select: {
       colorPrimary: "#8490FF",

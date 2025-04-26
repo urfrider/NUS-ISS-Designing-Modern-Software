@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import ProductCard from "./ProductCard";
+import ProductCard from "../../components/ProductCard/ProductCard";
 import { Col, Flex, Row, Typography } from "antd";
 
 export const ViewProduct = () => {
@@ -45,7 +45,11 @@ export const ViewProduct = () => {
       >
         My Product Listings
       </Typography.Title>
-      <Row gutter={[16, 16]} justify="start" style={{ width: "100%", paddingBottom: 60 }}>
+      <Row
+        gutter={[16, 16]}
+        justify="start"
+        style={{ width: "100%", paddingBottom: 60 }}
+      >
         {products.map((product: any, key: number) => (
           <Col key={key} xs={24} sm={12} md={8} lg={6}>
             <ProductCard product={product} user={user} />

@@ -8,6 +8,8 @@ export const HeroBannerContainer = styled.div`
   align-items: center;
   justify-content: center;
   gap: 48px;
+  overflow-x: hidden;
+  position: relative;
 `;
 
 export const ButtonsContainer = styled.div`
@@ -60,7 +62,7 @@ export const CarousellContainer = styled.div`
   top: 0;
   width: 50%;
   height: 100%;
-  //   overflow: hidden;
+  // overflow: hidden;
 `;
 
 interface CarousellItemProps {

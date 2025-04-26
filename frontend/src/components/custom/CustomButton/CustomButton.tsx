@@ -6,7 +6,8 @@ interface CustomButtonProps extends ButtonProps {}
 
 const CustomButton: React.FC<CustomButtonProps> = ({
   children,
-  type,
+  type = "default",
+  danger,
   style,
   ...rest
 }) => {
@@ -16,20 +17,31 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   const shouldApplyCustomStyles =
     type !== "text" && type !== "link" && !isDefaultType;
 
+  // Prepare your custom base styles
+  const customBaseStyle = {
+    ...(isDefaultType && {
+      backgroundColor: "#FFFFFF",
+      color: danger ? token.colorError : token.colorTextBase,
+    }),
+    ...(shouldApplyCustomStyles && {
+      backgroundColor: danger ? token.colorError : token.colorPrimary,
+      color: token.colorTextWhite,
+    }),
+    // Handle danger styling for text and link buttons
+    ...((type === "text" || type === "link") &&
+      danger && {
+        color: token.colorError,
+      }),
+  };
+
   return (
     <Button
       type={type}
-      {...rest}
+      danger={danger}
+      {...rest} // pass all other AntD props
       style={{
-        ...(isDefaultType && {
-          backgroundColor: "#FFFFFF",
-          color: token.colorTextBase,
-        }),
-        ...(shouldApplyCustomStyles && {
-          backgroundColor: token.colorPrimary,
-          color: token.colorTextWhite,
-        }),
-        ...style,
+        ...customBaseStyle, // first apply custom base style
+        ...style, // allow inline style to override everything
       }}
     >
       {children}

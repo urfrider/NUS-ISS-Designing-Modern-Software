@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import axios from "axios";
-import ProductCard from "../Product/ProductCard";
+import ProductCard from "../../components/ProductCard/ProductCard";
 import { Button, Col, Empty, Flex, Input, Layout, Row, TabsProps } from "antd";
 import { Content } from "antd/es/layout/layout";
 
@@ -54,9 +54,6 @@ function HomePage() {
   };
 
   const searchProducts = async () => {
-    console.log("category", category);
-    console.log("query", query);
-
     try {
       const response = await axios.get(
         `${
@@ -135,8 +132,8 @@ function HomePage() {
           />
         </Row>
         <Row
-          gutter={32}
-          justify="start"
+          gutter={[32, 32]}
+          justify="center"
           style={{ width: "100%", padding: "32px 64px" }}
           wrap={true}
         >
@@ -169,13 +166,16 @@ function HomePage() {
               <Input.Search
                 placeholder="Search"
                 onSearch={onSearch}
-                style={{ width: 200, marginBottom: 16 }}
+                style={{
+                  width: 200,
+                  marginBottom: 16,
+                }}
               />
             </Row>
 
             <Row
-              gutter={32}
-              justify="start"
+              gutter={[32, 32]}
+              justify="center"
               style={{ width: "100%", padding: "32px 64px" }}
               wrap={true}
             >
@@ -191,7 +191,7 @@ function HomePage() {
                 products
                   .filter((product) => product.category === label)
                   .map((product: any, index: number) => (
-                    <Col key={index}>
+                    <Col style={{ marginTop: "24px" }} key={index}>
                       <ProductCard
                         product={product}
                         user={user}
