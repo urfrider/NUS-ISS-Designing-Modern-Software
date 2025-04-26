@@ -9,6 +9,8 @@ export const lightTheme = {
     colorError: "#EF4444",
     colorWarning: "#FACC15",
     colorBgBase: "#F7F8FA",
+    // colorBgBase: "#FFFFFF",
+
     colorTextBase: "#1F2937",
     colorTextBaseSecondary: "#313C4C",
     opacityTextSecondary: "0.7",
