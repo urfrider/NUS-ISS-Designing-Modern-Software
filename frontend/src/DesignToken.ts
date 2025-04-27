@@ -65,6 +65,9 @@ export const lightTheme = {
     Select: {
       colorPrimary: "#8490FF",
       optionSelectedColor: "#8490FF",
+      selectorBg: "#FFFFFF", // This will set the selector background color
+      optionSelectedBg: "rgba(132, 144, 255, 0.1)",
+      colorBgElevated: "#FFFFFF", // For dropdown background
     },
     DatePicker: {
       colorPrimary: "#8490FF",

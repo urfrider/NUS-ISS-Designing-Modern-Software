@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { BUYER, SELLER } from "../../constants/constants";
 import { useNavigate } from "react-router-dom";
-import { Button, Flex, InputNumber, Modal, Typography } from "antd";
+import { Button, Flex } from "antd";
 import CustomCard from "../custom/CustomCard/CustomCard";
-import { ProductCardImgContainer } from "../../pages/Product/ProductStyles";
+import { ProductCardImgContainer } from "./ProductCardStyles";
 import { useDesignToken } from "../../DesignToken";
 import CustomButton from "../custom/CustomButton/CustomButton";
 import CustomTypography from "../custom/CustomTypography/CustomTypography";
+import ProductDetailsModal from "../ProductDetailsModal/ProductDetailsModal";
 
 const ProductCard = ({ product, user, cartId }: any) => {
   const [quantity, setQuantity] = useState(1);
@@ -25,9 +26,10 @@ const ProductCard = ({ product, user, cartId }: any) => {
     const data = {
       username: user?.username,
       productId: product.id,
-      quantity: quantity < 1 ? 1 : quantity,
+      quantity: quantity,
       cartId,
     };
+
     try {
       await axios.post(`${import.meta.env.VITE_API_URL!}/api/cart/add`, data, {
         headers: {
@@ -37,11 +39,16 @@ const ProductCard = ({ product, user, cartId }: any) => {
 
       console.log("successfully added to cart");
       toast.success(`Added to cart!`);
+      setIsModalOpen(false);
     } catch (e: any) {
       console.log("error adding to cart", e.response.data.error);
       toast.error(e.response.data.error);
     }
+  };
+
+  const handleModalCancel = () => {
     setIsModalOpen(false);
+    setQuantity(1);
   };
 
   const editProduct = () => {
@@ -56,7 +63,6 @@ const ProductCard = ({ product, user, cartId }: any) => {
 
   const textStyles = {
     color: token.colorTextBase,
-
     fontSize: token.fontSizeSmall,
     overflow: "hidden",
     textOverflow: "ellipsis",
@@ -101,7 +107,7 @@ const ProductCard = ({ product, user, cartId }: any) => {
           ${product.price.toFixed(2)}
         </CustomTypography.Text>
 
-        {user.role == BUYER && (
+        {user.role === BUYER && (
           <Flex gap={10}>
             <CustomButton
               type="default"
@@ -118,29 +124,14 @@ const ProductCard = ({ product, user, cartId }: any) => {
               Add to Cart
             </CustomButton>
 
-            <Modal
-              title={`Item: ${product.name}`}
-              open={isModalOpen}
+            <ProductDetailsModal
+              product={product}
+              isOpen={isModalOpen}
+              quantity={quantity}
+              onQuantityChange={setQuantity}
+              onCancel={handleModalCancel}
               onOk={addToCart}
-              okText="Add"
-              onCancel={() => {
-                setIsModalOpen(false);
-                setQuantity(1);
-              }}
-              style={{ maxWidth: "400px" }}
-            >
-              <CustomTypography.Text
-                style={{ paddingBottom: 10, paddingTop: 10 }}
-              >
-                Quantity
-              </CustomTypography.Text>
-              <InputNumber
-                value={quantity}
-                onChange={(value) => setQuantity(value || 1)}
-                min={1}
-                style={{ width: "100%", marginBottom: 5 }}
-              />
-            </Modal>
+            />
           </Flex>
         )}
 

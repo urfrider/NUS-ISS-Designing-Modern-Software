@@ -16,6 +16,7 @@ import {
   Form,
   Flex,
   theme,
+  Layout,
 } from "antd";
 import {
   CreditCardOutlined,
@@ -30,6 +31,7 @@ import { useDesignToken } from "../../DesignToken";
 import CustomTypography from "../../components/custom/CustomTypography/CustomTypography";
 import CustomCard from "../../components/custom/CustomCard/CustomCard";
 import CustomButton from "../../components/custom/CustomButton/CustomButton";
+import { Content } from "antd/es/layout/layout";
 
 const { Title, Text } = CustomTypography;
 
@@ -154,190 +156,206 @@ function Checkout() {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <CustomButton
-        type="link"
-        onClick={() => navigate("/cart")}
-        icon={<ArrowLeftOutlined />}
-        style={{ marginBottom: 16, position: "absolute", left: 85.5 }}
+    <Layout style={{ minHeight: "100vh", background: token.colorBgWhite }}>
+      <Content
+        style={{
+          padding: "24px",
+          width: "1200px",
+          margin: "0 auto",
+        }}
       >
-        Back to Cart
-      </CustomButton>
-      <Title level={2} style={{ textAlign: "center" }}>
-        Checkout
-      </Title>
-
-      <Flex justify="center" gap={24} style={{ marginTop: 40 }}>
-        <CustomCard
-          title={<Title level={4}>Order Summary</Title>}
-          style={{
-            background: token.colorBgWhite,
-            borderRadius: token.borderRadiusMed,
-            width: "50%",
-          }}
+        <CustomButton
+          type="link"
+          onClick={() => navigate("/cart")}
+          icon={<ArrowLeftOutlined />}
+          style={{ marginBottom: 16, position: "absolute", left: 85.5 }}
         >
-          <List
-            itemLayout="horizontal"
-            dataSource={cart?.items || []}
-            renderItem={(item: any) => (
-              <List.Item actions={[<Text strong>x{item?.quantity}</Text>]}>
-                <List.Item.Meta
-                  title={item?.name}
-                  description={
-                    <Text type="secondary">
-                      ${item?.price?.toFixed(2)} each
+          Back to Cart
+        </CustomButton>
+        <Title level={2} style={{ textAlign: "center" }}>
+          Checkout
+        </Title>
+
+        <Flex justify="center" gap={24} style={{ marginTop: 40 }}>
+          <CustomCard
+            title={<Title level={4}>Order Summary</Title>}
+            style={{
+              background: token.colorBgWhite,
+              borderRadius: token.borderRadiusMed,
+              width: "50%",
+            }}
+          >
+            <List
+              itemLayout="horizontal"
+              dataSource={cart?.items || []}
+              renderItem={(item: any) => (
+                <List.Item actions={[<Text strong>x{item?.quantity}</Text>]}>
+                  <List.Item.Meta
+                    title={item?.name}
+                    description={
+                      <Text type="secondary">
+                        ${item?.price?.toFixed(2)} each
+                      </Text>
+                    }
+                  />
+                  <div>${(item?.price * item?.quantity).toFixed(2)}</div>
+                </List.Item>
+              )}
+              footer={
+                <div>
+                  {/* <Divider style={{ margin: "12px 0" }} /> */}
+                  <div className="flex justify-between">
+                    <Text strong>Subtotal:</Text>
+                    <Text strong>
+                      ${cart?.totalAmount?.toFixed(2) || "0.00"}
                     </Text>
-                  }
-                />
-                <div>${(item?.price * item?.quantity).toFixed(2)}</div>
-              </List.Item>
-            )}
-            footer={
-              <div>
-                {/* <Divider style={{ margin: "12px 0" }} /> */}
-                <div className="flex justify-between">
-                  <Text strong>Subtotal:</Text>
-                  <Text strong>${cart?.totalAmount?.toFixed(2) || "0.00"}</Text>
+                  </div>
                 </div>
-              </div>
-            }
-            locale={{ emptyText: "Your cart is empty" }}
-          />
-        </CustomCard>
+              }
+              locale={{ emptyText: "Your cart is empty" }}
+            />
+          </CustomCard>
 
-        <CustomCard
-          title={<Title level={4}>Payment Method</Title>}
-          style={{
-            background: token.colorBgWhite,
-            borderRadius: token.borderRadiusMed,
-            width: "30%",
-          }}
-        >
-          <Form layout="vertical">
-            <Radio.Group
-              value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-              style={{ width: "100%" }}
-            >
-              <Space direction="vertical" style={{ width: "100%" }}>
-                <Radio value="cash">
-                  <Space>
-                    <DollarOutlined style={{ color: token.colorSuccess }} />
-                    <span>Cash Balance</span>
-                    <Badge
-                      count={`$${user.balance?.toFixed(2)}`}
-                      style={{
-                        backgroundColor: token.colorPrimary,
-                        fontWeight: "normal",
-                      }}
-                    />
-                  </Space>
-                </Radio>
+          <CustomCard
+            title={<Title level={4}>Payment Method</Title>}
+            style={{
+              background: token.colorBgWhite,
+              borderRadius: token.borderRadiusMed,
+              width: "30%",
+            }}
+          >
+            <Form layout="vertical">
+              <Radio.Group
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                style={{ width: "100%" }}
+              >
+                <Space direction="vertical" style={{ width: "100%" }}>
+                  <Radio value="cash">
+                    <Space>
+                      <DollarOutlined style={{ color: token.colorSuccess }} />
+                      <span>Cash Balance</span>
+                      <Badge
+                        count={`$${user.balance?.toFixed(2)}`}
+                        style={{
+                          backgroundColor: token.colorPrimary,
+                          fontWeight: "normal",
+                        }}
+                      />
+                    </Space>
+                  </Radio>
 
-                <Radio value="paypal">
-                  <Space>
-                    <PayCircleOutlined style={{ color: "#0070BA" }} />
-                    <span>PayPal</span>
-                  </Space>
-                </Radio>
+                  <Radio value="paypal">
+                    <Space>
+                      <PayCircleOutlined style={{ color: "#0070BA" }} />
+                      <span>PayPal</span>
+                    </Space>
+                  </Radio>
 
-                {paymentMethod === "paypal" && (
-                  <Form.Item style={{ margin: "0 0 16px 24px" }}>
-                    <Input
-                      placeholder="Email address"
-                      value={paypalEmail}
-                      onChange={(e) => setPaypalEmail(e.target.value)}
-                      style={{ width: "100%" }}
-                      prefix={<UserOutlined />}
-                    />
-                  </Form.Item>
-                )}
+                  {paymentMethod === "paypal" && (
+                    <Form.Item style={{ margin: "0 0 16px 24px" }}>
+                      <Input
+                        placeholder="Email address"
+                        value={paypalEmail}
+                        onChange={(e) => setPaypalEmail(e.target.value)}
+                        style={{ width: "100%" }}
+                        prefix={<UserOutlined />}
+                      />
+                    </Form.Item>
+                  )}
 
-                <Radio value="creditCard">
-                  <Space>
-                    <CreditCardOutlined style={{ color: token.colorOrange }} />
-                    <span>Credit Card</span>
-                  </Space>
-                </Radio>
+                  <Radio value="creditCard">
+                    <Space>
+                      <CreditCardOutlined
+                        style={{ color: token.colorOrange }}
+                      />
+                      <span>Credit Card</span>
+                    </Space>
+                  </Radio>
 
-                {paymentMethod === "creditCard" && (
-                  <div style={{ margin: "0 0 16px 24px" }}>
-                    <Space direction="vertical" style={{ width: "100%" }}>
-                      <Form.Item style={{ marginBottom: 12 }}>
-                        <Input
-                          placeholder="Card Number"
-                          value={creditCardNumber}
-                          onChange={(e) => setCreditCardNumber(e.target.value)}
-                          prefix={<CreditCardOutlined />}
-                          maxLength={19}
-                        />
-                      </Form.Item>
-                      <Form.Item style={{ marginBottom: 12 }}>
-                        <Input
-                          placeholder="Cardholder Name"
-                          value={creditCardHolder}
-                          onChange={(e) => setCreditCardHolder(e.target.value)}
-                          prefix={<UserOutlined />}
-                        />
-                      </Form.Item>
-                      <div className="grid grid-cols-2 gap-4">
+                  {paymentMethod === "creditCard" && (
+                    <div style={{ margin: "0 0 16px 24px" }}>
+                      <Space direction="vertical" style={{ width: "100%" }}>
                         <Form.Item style={{ marginBottom: 12 }}>
                           <Input
-                            placeholder="MM/YY"
-                            value={creditCardExpiry}
+                            placeholder="Card Number"
+                            value={creditCardNumber}
                             onChange={(e) =>
-                              setCreditCardExpiry(e.target.value)
+                              setCreditCardNumber(e.target.value)
                             }
-                            prefix={<CalendarOutlined />}
-                            maxLength={5}
+                            prefix={<CreditCardOutlined />}
+                            maxLength={19}
                           />
                         </Form.Item>
-                        <Form.Item style={{ marginBottom: 0 }}>
+                        <Form.Item style={{ marginBottom: 12 }}>
                           <Input
-                            placeholder="CVC"
-                            value={creditCardCVC}
-                            onChange={(e) => setCreditCardCVC(e.target.value)}
-                            prefix={<SafetyOutlined />}
-                            maxLength={4}
+                            placeholder="Cardholder Name"
+                            value={creditCardHolder}
+                            onChange={(e) =>
+                              setCreditCardHolder(e.target.value)
+                            }
+                            prefix={<UserOutlined />}
                           />
                         </Form.Item>
-                      </div>
-                    </Space>
-                  </div>
-                )}
-              </Space>
-            </Radio.Group>
+                        <div className="grid grid-cols-2 gap-4">
+                          <Form.Item style={{ marginBottom: 12 }}>
+                            <Input
+                              placeholder="MM/YY"
+                              value={creditCardExpiry}
+                              onChange={(e) =>
+                                setCreditCardExpiry(e.target.value)
+                              }
+                              prefix={<CalendarOutlined />}
+                              maxLength={5}
+                            />
+                          </Form.Item>
+                          <Form.Item style={{ marginBottom: 0 }}>
+                            <Input
+                              placeholder="CVC"
+                              value={creditCardCVC}
+                              onChange={(e) => setCreditCardCVC(e.target.value)}
+                              prefix={<SafetyOutlined />}
+                              maxLength={4}
+                            />
+                          </Form.Item>
+                        </div>
+                      </Space>
+                    </div>
+                  )}
+                </Space>
+              </Radio.Group>
 
-            <Divider />
+              <Divider />
 
-            <CustomButton
-              type="primary"
-              size="large"
-              block
-              onClick={handlePlaceOrder}
-              loading={isLoading}
-              disabled={
-                (paymentMethod === "paypal" && !paypalEmail) ||
-                (paymentMethod === "creditCard" &&
-                  (!creditCardNumber ||
-                    !creditCardHolder ||
-                    !creditCardExpiry ||
-                    !creditCardCVC)) ||
-                !cart?.items?.length
-              }
-              style={{
-                backgroundColor: token.colorPrimary,
-                height: 50,
-                fontSize: 16,
-                fontWeight: 600,
-              }}
-            >
-              Pay ${cart?.totalAmount?.toFixed(2) || "0.00"}
-            </CustomButton>
-          </Form>
-        </CustomCard>
-      </Flex>
-    </div>
+              <CustomButton
+                type="primary"
+                size="large"
+                block
+                onClick={handlePlaceOrder}
+                loading={isLoading}
+                disabled={
+                  (paymentMethod === "paypal" && !paypalEmail) ||
+                  (paymentMethod === "creditCard" &&
+                    (!creditCardNumber ||
+                      !creditCardHolder ||
+                      !creditCardExpiry ||
+                      !creditCardCVC)) ||
+                  !cart?.items?.length
+                }
+                style={{
+                  backgroundColor: token.colorPrimary,
+                  height: 50,
+                  fontSize: 16,
+                  fontWeight: 600,
+                }}
+              >
+                Pay ${cart?.totalAmount?.toFixed(2) || "0.00"}
+              </CustomButton>
+            </Form>
+          </CustomCard>
+        </Flex>
+      </Content>
+    </Layout>
   );
 }
 
