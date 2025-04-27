@@ -13,6 +13,7 @@ import {
   InputNumber,
   Divider,
   Space,
+  Layout,
 } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useDesignToken } from "../../DesignToken";
@@ -20,6 +21,7 @@ import { CartItemType } from "../../types/Cart";
 import CustomButton from "../../components/custom/CustomButton/CustomButton";
 import CustomCard from "../../components/custom/CustomCard/CustomCard";
 import CustomTable from "../../components/custom/CustomTable/CustomTable";
+import { Content } from "antd/es/layout/layout";
 
 const { Title, Text } = Typography;
 
@@ -213,88 +215,99 @@ function Cart() {
   }, [cart]);
 
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "2rem" }}>
-      <Title level={2} style={{ textAlign: "center", marginBottom: 40 }}>
-        Your Cart
-      </Title>
+    <Layout style={{ minHeight: "100vh", background: token.colorBgWhite }}>
+      <Content
+        style={{
+          padding: "24px",
+          width: "1200px",
+          margin: "0 auto",
+        }}
+      >
+        <Title level={2} style={{ textAlign: "center", marginBottom: 40 }}>
+          Your Cart
+        </Title>
 
-      <Row gutter={24}>
-        <Col xs={24} lg={16}>
-          <CustomTable
-            columns={columns}
-            dataSource={tableData}
-            pagination={false}
-            locale={{ emptyText: "Your cart is empty" }}
-          />
-        </Col>
+        <Row gutter={24}>
+          <Col xs={24} lg={16}>
+            <CustomTable
+              columns={columns}
+              dataSource={tableData}
+              pagination={false}
+              locale={{ emptyText: "Your cart is empty" }}
+            />
+          </Col>
 
-        <Col xs={24} lg={8}>
-          <CustomCard title="Order Summary" style={{ marginBottom: 20 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: 10,
-              }}
-            >
-              <Text>Subtotal</Text>
-              <Text>${cart.totalAmount?.toFixed(2) || "0.00"}</Text>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: 10,
-              }}
-            >
-              <Text>Shipping</Text>
-              <Text>Free</Text>
-            </div>
+          <Col xs={24} lg={8}>
+            <CustomCard title="Order Summary" style={{ marginBottom: 20 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: 10,
+                }}
+              >
+                <Text>Subtotal</Text>
+                <Text>${cart.totalAmount?.toFixed(2) || "0.00"}</Text>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: 10,
+                }}
+              >
+                <Text>Shipping</Text>
+                <Text>Free</Text>
+              </div>
 
-            <CustomButton type="link" style={{ padding: 0, marginBottom: 10 }}>
-              Add coupon code
-            </CustomButton>
+              <CustomButton
+                type="link"
+                style={{ padding: 0, marginBottom: 10 }}
+              >
+                Add coupon code
+              </CustomButton>
 
-            <Divider style={{ margin: "10px 0" }} />
+              <Divider style={{ margin: "10px 0" }} />
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: 10,
-              }}
-            >
-              <Text strong>Total</Text>
-              <Text strong>${cart.totalAmount?.toFixed(2) || "0.00"}</Text>
-            </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: 10,
+                }}
+              >
+                <Text strong>Total</Text>
+                <Text strong>${cart.totalAmount?.toFixed(2) || "0.00"}</Text>
+              </div>
 
-            <CustomButton
-              disabled={!allowMoveToCheckout}
-              type="primary"
-              block
-              style={{
-                marginTop: 10,
-                backgroundColor: token.colorPrimary,
-              }}
-              onClick={() => {
-                if (allowMoveToCheckout) {
-                  handleMoveToCheckout();
-                }
-              }}
-            >
-              Checkout
-            </CustomButton>
-          </CustomCard>
+              <CustomButton
+                disabled={!allowMoveToCheckout}
+                type="primary"
+                block
+                style={{
+                  marginTop: 10,
+                  backgroundColor: token.colorPrimary,
+                }}
+                onClick={() => {
+                  if (allowMoveToCheckout) {
+                    handleMoveToCheckout();
+                  }
+                }}
+              >
+                Checkout
+              </CustomButton>
+            </CustomCard>
 
-          <Space>
-            <CustomButton danger onClick={onClearCart}>
-              Clear Cart
-            </CustomButton>
-            <CustomButton onClick={onUndo}>Undo</CustomButton>
-          </Space>
-        </Col>
-      </Row>
-    </div>
+            <Space>
+              <CustomButton danger onClick={onClearCart}>
+                Clear Cart
+              </CustomButton>
+              <CustomButton onClick={onUndo}>Undo</CustomButton>
+            </Space>
+          </Col>
+        </Row>
+      </Content>
+    </Layout>
   );
 }
 

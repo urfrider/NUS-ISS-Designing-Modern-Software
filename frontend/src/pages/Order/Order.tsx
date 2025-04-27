@@ -17,6 +17,7 @@ import {
   Empty,
   Spin,
   Image,
+  Layout,
 } from "antd";
 import {
   ShoppingOutlined,
@@ -33,6 +34,7 @@ import { toast } from "react-toastify";
 import { ProductType } from "../Product/ProductReviews";
 import CustomCard from "../../components/custom/CustomCard/CustomCard";
 import CustomTable from "../../components/custom/CustomTable/CustomTable";
+import { Content } from "antd/es/layout/layout";
 
 const { Title, Text } = Typography;
 
@@ -334,52 +336,60 @@ function Orders() {
   };
 
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "2rem" }}>
-      <Title level={2} style={{ textAlign: "center", marginBottom: 40 }}>
-        <ShoppingOutlined style={{ marginRight: 12 }} />
-        Your Orders
-      </Title>
+    <Layout style={{ minHeight: "100vh", background: token.colorBgWhite }}>
+      <Content
+        style={{
+          padding: "24px",
+          width: "1200px",
+          margin: "0 auto",
+        }}
+      >
+        <Title level={2} style={{ textAlign: "center", marginBottom: 40 }}>
+          <ShoppingOutlined style={{ marginRight: 12 }} />
+          Your Orders
+        </Title>
 
-      <Row gutter={[24, 24]}>
-        <Col xs={24} md={6}>
-          <CustomCard style={{ marginBottom: 24 }}>
-            <Statistic
-              title="Total Orders"
-              value={orders.length}
-              prefix={<InboxOutlined />}
-            />
-          </CustomCard>
-        </Col>
-        <Col xs={24} md={18}>
-          {loading ? (
-            <div style={{ textAlign: "center", padding: "50px 0" }}>
-              <Spin size="large" />
-            </div>
-          ) : orders.length > 0 ? (
-            <CustomTable
-              columns={columns}
-              dataSource={orders}
-              rowKey={(record) => record.id.toString()}
-              expandable={{ expandedRowRender }}
-              pagination={{ pageSize: 5 }}
-            />
-          ) : (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={<span>You haven't placed any orders yet</span>}
-            >
-              <Button
-                type="primary"
-                onClick={() => navigate("/home")}
-                style={{ backgroundColor: token.colorPrimary }}
+        <Row gutter={[24, 24]}>
+          <Col xs={24} md={6}>
+            <CustomCard style={{ marginBottom: 24 }}>
+              <Statistic
+                title="Total Orders"
+                value={orders.length}
+                prefix={<InboxOutlined />}
+              />
+            </CustomCard>
+          </Col>
+          <Col xs={24} md={18}>
+            {loading ? (
+              <div style={{ textAlign: "center", padding: "50px 0" }}>
+                <Spin size="large" />
+              </div>
+            ) : orders.length > 0 ? (
+              <CustomTable
+                columns={columns}
+                dataSource={orders}
+                rowKey={(record) => record.id.toString()}
+                expandable={{ expandedRowRender }}
+                pagination={{ pageSize: 5 }}
+              />
+            ) : (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={<span>You haven't placed any orders yet</span>}
               >
-                Start Shopping
-              </Button>
-            </Empty>
-          )}
-        </Col>
-      </Row>
-    </div>
+                <Button
+                  type="primary"
+                  onClick={() => navigate("/home")}
+                  style={{ backgroundColor: token.colorPrimary }}
+                >
+                  Start Shopping
+                </Button>
+              </Empty>
+            )}
+          </Col>
+        </Row>
+      </Content>
+    </Layout>
   );
 }
 
