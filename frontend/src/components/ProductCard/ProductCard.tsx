@@ -5,7 +5,7 @@ import { BUYER, SELLER } from "../../constants/constants";
 import { useNavigate } from "react-router-dom";
 import { Button, Flex, InputNumber, Modal, Typography } from "antd";
 import CustomCard from "../custom/CustomCard/CustomCard";
-import { ProductCardImgContainer } from "../../pages/Product/ProductStyles";
+import { ProductCardImgContainer } from "./ProductCardStyles";
 import { useDesignToken } from "../../DesignToken";
 import CustomButton from "../custom/CustomButton/CustomButton";
 import CustomTypography from "../custom/CustomTypography/CustomTypography";
