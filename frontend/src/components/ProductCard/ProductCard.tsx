@@ -3,13 +3,15 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { BUYER, SELLER } from "../../constants/constants";
 import { useNavigate } from "react-router-dom";
-import { Button, Flex } from "antd";
+import { Button, Flex, Typography } from "antd";
 import CustomCard from "../custom/CustomCard/CustomCard";
 import { ProductCardImgContainer } from "./ProductCardStyles";
 import { useDesignToken } from "../../DesignToken";
 import CustomButton from "../custom/CustomButton/CustomButton";
 import CustomTypography from "../custom/CustomTypography/CustomTypography";
 import ProductDetailsModal from "../ProductDetailsModal/ProductDetailsModal";
+
+const { Text } = Typography;
 
 const ProductCard = ({ product, user, cartId }: any) => {
   const [quantity, setQuantity] = useState(1);
@@ -77,9 +79,14 @@ const ProductCard = ({ product, user, cartId }: any) => {
     }
   }, [quantity]);
 
+  // Calculate discounted price if hasDiscount is true
+  const discountedPrice = product.hasDiscount
+    ? product.price * (1 - product.discountPercentage / 100)
+    : null;
+
   return (
-    <CustomCard style={{ width: "300px", maxHeight: "430px" }}>
-      <Flex vertical gap={10} align={"center"}>
+    <CustomCard style={{ width: "300px", height: "430px" }}>
+      <Flex vertical gap={10} align={"center"} justify="space-between">
         <ProductCardImgContainer
           src={`data:image/png;base64,${product.images}`}
           alt={product.name}
@@ -103,9 +110,45 @@ const ProductCard = ({ product, user, cartId }: any) => {
         >
           {product.description}
         </CustomTypography.Text>
-        <CustomTypography.Text strong style={{ fontSize: token.fontSizeXl }}>
-          ${product.price.toFixed(2)}
-        </CustomTypography.Text>
+
+        {/* Price display with discount handling */}
+        {product.hasDiscount ? (
+          <Flex align="center" gap={8}>
+            <Text
+              delete
+              type="secondary"
+              style={{ fontSize: token.fontSizeLg }}
+            >
+              ${product.price.toFixed(2)}
+            </Text>
+            <CustomTypography.Text
+              strong
+              style={{ fontSize: token.fontSizeXl, color: token.colorError }}
+            >
+              ${discountedPrice?.toFixed(2)}
+            </CustomTypography.Text>
+          </Flex>
+        ) : (
+          <CustomTypography.Text strong style={{ fontSize: token.fontSizeXl }}>
+            ${product.price.toFixed(2)}
+          </CustomTypography.Text>
+        )}
+
+        {/* Display discount percentage badge when applicable */}
+        {product.hasDiscount && (
+          <Text
+            style={{
+              backgroundColor: token.colorError,
+              color: token.colorBgWhite,
+              fontSize: token.fontSizeSmall,
+              padding: "2px 8px",
+              borderRadius: token.borderRadiusSmall,
+              marginTop: "-8px",
+            }}
+          >
+            {product.discountPercentage}% OFF
+          </Text>
+        )}
 
         {user.role === BUYER && (
           <Flex gap={10}>
