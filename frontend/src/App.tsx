@@ -14,42 +14,46 @@ import PrivateRoute from "./components/PrivateRoute";
 import EditProduct from "./pages/Product/EditProduct";
 import ProductReviews from "./pages/Product/ProductReviews";
 import OrderFulfilment from "./pages/Shipment/OrderFulfilment";
+import { ConfigProvider } from "antd";
+import { lightTheme } from "./DesignToken";
 
 function App() {
   return (
     <>
-      <BrowserRouter>
-        <ToastContainer />
-        <Routes>
-          {/* Public Route */}
-          <Route path="/" element={<Login />} />
+      <ConfigProvider theme={lightTheme}>
+        <BrowserRouter>
+          <ToastContainer />
+          <Routes>
+            {/* Public Route */}
+            <Route path="/" element={<Login />} />
 
-          {/* Protected Routes */}
-          <Route
-            element={
-              <PrivateRoute>
-                <Layout />
-              </PrivateRoute>
-            }
-          >
-            <Route path="/home" element={<Home />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/editProfile" element={<EditProfile />} />
-            <Route path="/orders" element={<Order />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/editProfile" element={<EditProfile />} />
-            <Route path="/products" element={<ViewProduct />} />
-            <Route path="/products/add" element={<AddProduct />} />
-            <Route path="/editProduct/:id" element={<EditProduct />} />
-            <Route path="/product/:id/reviews" element={<ProductReviews />} />
-            <Route path="/products/orders" element={<OrderFulfilment />} />
-          </Route>
+            {/* Protected Routes */}
+            <Route
+              element={
+                <PrivateRoute>
+                  <Layout />
+                </PrivateRoute>
+              }
+            >
+              <Route path="/home" element={<Home />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/editProfile" element={<EditProfile />} />
+              <Route path="/orders" element={<Order />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/editProfile" element={<EditProfile />} />
+              <Route path="/products" element={<ViewProduct />} />
+              <Route path="/products/add" element={<AddProduct />} />
+              <Route path="/editProduct/:id" element={<EditProduct />} />
+              <Route path="/product/:id/reviews" element={<ProductReviews />} />
+              <Route path="/products/orders" element={<OrderFulfilment />} />
+            </Route>
 
-          {/* Catch-all for unauthorized access */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
+            {/* Catch-all for unauthorized access */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </ConfigProvider>
     </>
   );
 }

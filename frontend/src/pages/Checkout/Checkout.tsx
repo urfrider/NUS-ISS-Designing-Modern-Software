@@ -14,6 +14,8 @@ import {
   Divider,
   Badge,
   Form,
+  Flex,
+  theme,
 } from "antd";
 import {
   CreditCardOutlined,
@@ -26,11 +28,12 @@ import {
 } from "@ant-design/icons";
 import { useDesignToken } from "../../DesignToken";
 import CustomTypography from "../../components/custom/CustomTypography/CustomTypography";
+import CustomCard from "../../components/custom/CustomCard/CustomCard";
+import CustomButton from "../../components/custom/CustomButton/CustomButton";
 
 const { Title, Text } = CustomTypography;
 
 function Checkout() {
-  const theme = useDesignToken();
   const user = useSelector((state: RootState) => state.user);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [paypalEmail, setPaypalEmail] = useState("");
@@ -41,6 +44,7 @@ function Checkout() {
   const [cart, setCart] = useState<any>([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const token = useDesignToken();
 
   const config = {
     headers: {
@@ -65,21 +69,31 @@ function Checkout() {
   const handlePlaceOrder = async () => {
     setIsLoading(true);
 
+    var data: any = {
+      username: user?.username,
+      cartId: cart?.id,
+    };
+
+    if (paymentMethod == "creditCard") {
+      data["cardNumber"] = creditCardNumber;
+      data["cardHolder"] = creditCardHolder;
+      data["cardExpiry"] = creditCardExpiry;
+      data["cardCvc"] = creditCardCVC;
+    } else if (paymentMethod == "paypal") {
+      data["paypalEmail"] = paypalEmail;
+    }
+
+    await makePayment(data);
+    await sendNotification();
+    // navigate("/cart");
+  };
+
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
+  async function makePayment(data: any) {
     try {
-      let data: any = {
-        username: user?.username,
-        cartId: cart?.id,
-      };
-
-      if (paymentMethod === "creditCard") {
-        data["cardNumber"] = creditCardNumber;
-        data["cardHolder"] = creditCardHolder;
-        data["cardExpiry"] = creditCardExpiry;
-        data["cardCvc"] = creditCardCVC;
-      } else if (paymentMethod === "paypal") {
-        data["paypalEmail"] = paypalEmail;
-      }
-
       await axios.post(
         `${import.meta.env.VITE_API_URL!}/api/payment`,
         {
@@ -89,7 +103,6 @@ function Checkout() {
         },
         config
       );
-
       toast.success(
         `Payment successful with ${getPaymentMethodName(paymentMethod)}`
       );
@@ -100,7 +113,28 @@ function Checkout() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }
+
+  async function sendNotification() {
+    for (const item of cart.items) {
+      try {
+        await axios.post(
+          `${import.meta.env.VITE_API_URL!}/notif/createNotification`,
+          {
+            senderId: user.id,
+            message: `An order for '${item.name}' has been placed!`,
+            type: "ORDER_CREATED",
+            createdAt: new Date().toISOString(),
+            isRead: false,
+            reciepientId: item.sellerId,
+          },
+          config
+        );
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  }
 
   const getPaymentMethodName = (method: string) => {
     switch (method) {
@@ -121,24 +155,26 @@ function Checkout() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Button
+      <CustomButton
         type="link"
         onClick={() => navigate("/cart")}
         icon={<ArrowLeftOutlined />}
         style={{ marginBottom: 16, position: "absolute", left: 85.5 }}
       >
         Back to Cart
-      </Button>
+      </CustomButton>
       <Title level={2} style={{ textAlign: "center" }}>
-        {/* <ShoppingCartOutlined /> */}
         Checkout
       </Title>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <Card
+      <Flex justify="center" gap={24} style={{ marginTop: 40 }}>
+        <CustomCard
           title={<Title level={4}>Order Summary</Title>}
-          bordered={false}
-          style={{ background: "white", borderRadius: 8 }}
+          style={{
+            background: token.colorBgWhite,
+            borderRadius: token.borderRadiusMed,
+            width: "50%",
+          }}
         >
           <List
             itemLayout="horizontal"
@@ -158,7 +194,7 @@ function Checkout() {
             )}
             footer={
               <div>
-                <Divider style={{ margin: "12px 0" }} />
+                {/* <Divider style={{ margin: "12px 0" }} /> */}
                 <div className="flex justify-between">
                   <Text strong>Subtotal:</Text>
                   <Text strong>${cart?.totalAmount?.toFixed(2) || "0.00"}</Text>
@@ -167,12 +203,15 @@ function Checkout() {
             }
             locale={{ emptyText: "Your cart is empty" }}
           />
-        </Card>
+        </CustomCard>
 
-        <Card
+        <CustomCard
           title={<Title level={4}>Payment Method</Title>}
-          bordered={false}
-          style={{ background: "white", borderRadius: 8 }}
+          style={{
+            background: token.colorBgWhite,
+            borderRadius: token.borderRadiusMed,
+            width: "30%",
+          }}
         >
           <Form layout="vertical">
             <Radio.Group
@@ -183,12 +222,12 @@ function Checkout() {
               <Space direction="vertical" style={{ width: "100%" }}>
                 <Radio value="cash">
                   <Space>
-                    <DollarOutlined style={{ color: theme.colorSuccess }} />
+                    <DollarOutlined style={{ color: token.colorSuccess }} />
                     <span>Cash Balance</span>
                     <Badge
                       count={`$${user.balance?.toFixed(2)}`}
                       style={{
-                        backgroundColor: theme.colorPrimary,
+                        backgroundColor: token.colorPrimary,
                         fontWeight: "normal",
                       }}
                     />
@@ -216,7 +255,7 @@ function Checkout() {
 
                 <Radio value="creditCard">
                   <Space>
-                    <CreditCardOutlined style={{ color: theme.colorOrange }} />
+                    <CreditCardOutlined style={{ color: token.colorOrange }} />
                     <span>Credit Card</span>
                   </Space>
                 </Radio>
@@ -271,7 +310,7 @@ function Checkout() {
 
             <Divider />
 
-            <Button
+            <CustomButton
               type="primary"
               size="large"
               block
@@ -287,17 +326,17 @@ function Checkout() {
                 !cart?.items?.length
               }
               style={{
-                backgroundColor: theme.colorPrimary,
+                backgroundColor: token.colorPrimary,
                 height: 50,
                 fontSize: 16,
                 fontWeight: 600,
               }}
             >
               Pay ${cart?.totalAmount?.toFixed(2) || "0.00"}
-            </Button>
+            </CustomButton>
           </Form>
-        </Card>
-      </div>
+        </CustomCard>
+      </Flex>
     </div>
   );
 }

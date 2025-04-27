@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../../redux/store";
@@ -16,8 +16,19 @@ import {
 } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useDesignToken } from "../../DesignToken";
+import { CartItemType } from "../../types/Cart";
+import CustomButton from "../../components/custom/CustomButton/CustomButton";
+import CustomCard from "../../components/custom/CustomCard/CustomCard";
+import CustomTable from "../../components/custom/CustomTable/CustomTable";
 
 const { Title, Text } = Typography;
+
+interface TableCartItem extends CartItemType {
+  id: string;
+  key?: string;
+  variant?: string;
+  itemTotal: number;
+}
 
 function Cart() {
   const user = useSelector((state: RootState) => state.user);
@@ -80,8 +91,26 @@ function Cart() {
   };
 
   const removeItem = async (itemId: number) => {
+    //todo: wait for kim to reply i need the itemid to send it back
+    const data = {
+      cartId: cart?.id,
+      username: user?.username,
+      productId: itemId,
+      quantity: 0,
+    };
+
     try {
-      console.log(`Remove item ${itemId}`);
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL!}/api/cart/remove`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      );
+      setCart(response.data);
+      console.log(`Item ${itemId} removed successfully`);
     } catch (e) {
       console.log(e);
     }
@@ -133,6 +162,7 @@ function Cart() {
       key: "quantity",
       render: (quantity: number, record: any) => (
         <InputNumber
+          disabled
           min={1}
           max={10}
           defaultValue={quantity}
@@ -143,16 +173,15 @@ function Cart() {
     },
     {
       title: "TOTAL",
-      dataIndex: "total",
+      dataIndex: "itemTotal",
       key: "total",
-      render: (text: string, record: any) =>
-        `$${(record.price * record.quantity).toFixed(2)}`,
+      render: (itemTotal: number) => `$${itemTotal}`,
     },
     {
       title: "",
       key: "action",
       render: (_: any, record: any) => (
-        <Button
+        <CustomButton
           type="text"
           icon={<DeleteOutlined />}
           onClick={() => removeItem(record.id)}
@@ -162,7 +191,7 @@ function Cart() {
   ];
 
   const tableData =
-    cart?.items?.map((item: any, index: number) => ({
+    cart?.items?.map((item: TableCartItem, index: number) => ({
       key: index,
       id: item.id,
       name: item.name,
@@ -170,9 +199,18 @@ function Cart() {
       price: item.price,
       quantity: item.quantity,
       image: item.images,
+      itemTotal: (item.price * item.quantity).toFixed(2) ?? 0,
     })) || [];
 
   console.log("tableData", tableData);
+
+  const handleMoveToCheckout = () => {
+    navigate("/checkout");
+  };
+
+  const allowMoveToCheckout: boolean = useMemo(() => {
+    return cart?.items?.length !== 0;
+  }, [cart]);
 
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto", padding: "2rem" }}>
@@ -182,7 +220,7 @@ function Cart() {
 
       <Row gutter={24}>
         <Col xs={24} lg={16}>
-          <Table
+          <CustomTable
             columns={columns}
             dataSource={tableData}
             pagination={false}
@@ -191,7 +229,7 @@ function Cart() {
         </Col>
 
         <Col xs={24} lg={8}>
-          <Card title="Order Summary" style={{ marginBottom: 20 }}>
+          <CustomCard title="Order Summary" style={{ marginBottom: 20 }}>
             <div
               style={{
                 display: "flex",
@@ -213,9 +251,9 @@ function Cart() {
               <Text>Free</Text>
             </div>
 
-            <Button type="link" style={{ padding: 0, marginBottom: 10 }}>
+            <CustomButton type="link" style={{ padding: 0, marginBottom: 10 }}>
               Add coupon code
-            </Button>
+            </CustomButton>
 
             <Divider style={{ margin: "10px 0" }} />
 
@@ -230,24 +268,29 @@ function Cart() {
               <Text strong>${cart.totalAmount?.toFixed(2) || "0.00"}</Text>
             </div>
 
-            <Button
+            <CustomButton
+              disabled={!allowMoveToCheckout}
               type="primary"
               block
               style={{
                 marginTop: 10,
                 backgroundColor: token.colorPrimary,
               }}
-              onClick={() => navigate("/checkout")}
+              onClick={() => {
+                if (allowMoveToCheckout) {
+                  handleMoveToCheckout();
+                }
+              }}
             >
-              CHECKOUT
-            </Button>
-          </Card>
+              Checkout
+            </CustomButton>
+          </CustomCard>
 
           <Space>
-            <Button danger onClick={onClearCart}>
+            <CustomButton danger onClick={onClearCart}>
               Clear Cart
-            </Button>
-            <Button onClick={onUndo}>Undo</Button>
+            </CustomButton>
+            <CustomButton onClick={onUndo}>Undo</CustomButton>
           </Space>
         </Col>
       </Row>

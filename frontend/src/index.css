@@ -9,3 +9,7 @@ body {
   padding: 0;
   font-feature-settings: "liga" 1, "kern" 1;
 }
+
+* {
+  font-family: "Inter", sans-serif;
+}

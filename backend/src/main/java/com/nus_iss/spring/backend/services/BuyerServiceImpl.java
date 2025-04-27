@@ -17,18 +17,14 @@ import com.nus_iss.spring.backend.services.interfaces.BuyerService;
 @RequiredArgsConstructor
 public class BuyerServiceImpl implements BuyerService {
     private final BuyerRepository buyerRepository;
-    // private final OrderRepository orderRepository;
-    // private final ProductRepository productRepository;
     
     @Override
     public BuyerDto getBuyerById(Long id) {
         Optional<Buyer> buyerOptional = buyerRepository.findById(id);
         
         if (buyerOptional.isPresent()) {
-            System.out.println("Buyer found: " + buyerOptional.get());  // Print if found
             return BuyerMapper.toDto(buyerOptional.get());
         } else {
-            System.out.println("Buyer not found with ID: " + id);  // Print if not found
             throw new RuntimeException("Buyer not found");
         }
     }
@@ -39,10 +35,8 @@ public class BuyerServiceImpl implements BuyerService {
         Optional<Buyer> buyerOptional = buyerRepository.findByUsername(username);
         
         if (buyerOptional.isPresent()) {
-            System.out.println("Buyer found: " + buyerOptional.get());  // Print if found
             return buyerOptional.get();
         } else {
-            System.out.println("Buyer not found with username: " + username);  // Print if not found
             throw new RuntimeException("Buyer not found");
         }
     }
@@ -57,11 +51,9 @@ public class BuyerServiceImpl implements BuyerService {
             Buyer buyer = buyerOptional.get();
             buyer.setUsername(buyerDto.getUsername());
             buyer.setAddress(buyerDto.getAddress());
-            buyer.setBalance(buyerDto.getBalance());
             buyerRepository.save(buyer);
-            return BuyerMapper.toDto(buyer);
+            return buyerDto;
         } else {
-            System.out.println("Buyer not found with ID: " + buyerId);  // Print if not found
             throw new RuntimeException("Buyer not found");
         }
     }
@@ -76,7 +68,6 @@ public class BuyerServiceImpl implements BuyerService {
             buyerRepository.delete(buyer);
             return BuyerMapper.toDto(buyer);
         } else {
-            System.out.println("Buyer not found with ID: " + buyerId);  // Print if not found
             throw new RuntimeException("Buyer not found");
         }
     }
@@ -90,7 +81,6 @@ public class BuyerServiceImpl implements BuyerService {
             Buyer buyer = buyerOptional.get();
             return buyer.getAddress();
         } else {
-            System.out.println("Buyer not found with ID: " + buyerId);  // Print if not found
             throw new RuntimeException("Buyer not found");
         }
     }
