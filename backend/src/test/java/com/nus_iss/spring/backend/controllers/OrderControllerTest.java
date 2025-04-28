@@ -4,7 +4,6 @@ import com.nus_iss.spring.backend.dtos.OrderDto;
 import com.nus_iss.spring.backend.dtos.OrderItemDto;
 import com.nus_iss.spring.backend.services.BuyerServiceImpl;
 import com.nus_iss.spring.backend.services.OrderServiceImpl;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

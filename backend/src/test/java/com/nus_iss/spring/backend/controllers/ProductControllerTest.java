@@ -13,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.nus_iss.spring.backend.controllers.ProductController;
 import com.nus_iss.spring.backend.dtos.ProductDto;
 import com.nus_iss.spring.backend.services.interfaces.ProductService;
 
