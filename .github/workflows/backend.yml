@@ -63,3 +63,25 @@ jobs:
         with:
           name: test-reports-html
           path: backend/build/reports/tests/test
+
+      # Step 5: Build backend
+      - name: Build backend
+        run: |
+          cd backend
+          ./gradlew build
+
+      - name: Upload built backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-artifact
+          path: backend/build/libs/*.jar
+
+      # Step 7: Docker build and push
+      - name: Docker build and push backend
+        run: |
+          pwd
+          docker build -t guokecheng/molymarket:backend ./backend
+          docker push guokecheng/molymarket:backend
+
+      
+      

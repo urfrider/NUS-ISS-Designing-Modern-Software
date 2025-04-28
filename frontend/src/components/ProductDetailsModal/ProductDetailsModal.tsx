@@ -1,7 +1,18 @@
-import { Modal, Flex, Space, Image, Divider, InputNumber, Form } from "antd";
+import {
+  Modal,
+  Flex,
+  Space,
+  Image,
+  Divider,
+  InputNumber,
+  Form,
+  Typography,
+} from "antd";
 import { useDesignToken } from "../../DesignToken";
 import CustomTypography from "../custom/CustomTypography/CustomTypography";
 import { useEffect } from "react";
+
+const { Text } = Typography;
 
 interface ProductDetailsModalProps {
   product: {
@@ -54,6 +65,14 @@ const ProductDetailsModal = ({
       });
   };
 
+  // Calculate discounted price if hasDiscount is true
+  const discountedPrice = product.hasDiscount
+    ? product.price * (1 - product.discountPercentage / 100)
+    : product.price;
+
+  // Calculate total price based on quantity and whether there's a discount
+  const totalPrice = quantity * discountedPrice;
+
   return (
     <Modal
       title="Product Details"
@@ -80,17 +99,43 @@ const ProductDetailsModal = ({
             {product.name}
           </CustomTypography.Title>
 
-          <CustomTypography.Title
-            level={4}
-            style={{ margin: 0, color: token.colorPrimary }}
-          >
-            ${product.price.toFixed(2)}
-          </CustomTypography.Title>
+          {/* Price display with discount handling */}
+          {product.hasDiscount ? (
+            <Flex align="center" gap={8}>
+              <Text
+                delete
+                type="secondary"
+                style={{ fontSize: token.fontSizeLg }}
+              >
+                ${product.price.toFixed(2)}
+              </Text>
+              <CustomTypography.Title
+                level={4}
+                style={{ margin: 0, color: token.colorError }}
+              >
+                ${discountedPrice.toFixed(2)}
+              </CustomTypography.Title>
 
-          {product.hasDiscount && (
-            <CustomTypography.Text type="success">
-              <strong>{product.discountPercentage}% OFF</strong>
-            </CustomTypography.Text>
+              <Text
+                style={{
+                  backgroundColor: token.colorError,
+                  color: token.colorBgWhite,
+                  fontSize: token.fontSizeSmall,
+                  padding: "2px 8px",
+                  borderRadius: token.borderRadiusSmall,
+                  marginLeft: "4px",
+                }}
+              >
+                {product.discountPercentage}% OFF
+              </Text>
+            </Flex>
+          ) : (
+            <CustomTypography.Title
+              level={4}
+              style={{ margin: 0, color: token.colorPrimary }}
+            >
+              ${product.price.toFixed(2)}
+            </CustomTypography.Title>
           )}
 
           <CustomTypography.Text type="secondary">
@@ -151,8 +196,15 @@ const ProductDetailsModal = ({
               />
             </Form.Item>
 
+            {/* Updated total price display */}
             <CustomTypography.Text type="secondary">
-              Total: ${(quantity * product.price).toFixed(2)}
+              Total: <Text strong>${totalPrice.toFixed(2)}</Text>
+              {product.hasDiscount && (
+                <Text type="secondary" style={{ marginLeft: "8px" }}>
+                  (You save: $
+                  {(quantity * product.price - totalPrice).toFixed(2)})
+                </Text>
+              )}
             </CustomTypography.Text>
           </Form>
         </Space>
