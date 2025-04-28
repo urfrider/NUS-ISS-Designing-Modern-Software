@@ -273,8 +273,12 @@ function LandingPage() {
                 <Flex vertical>
                   <Form.Item label="Role" name="role" required>
                     <Radio.Group onChange={handleRoleChange}>
-                      <Radio value={BUYER}>Buyer</Radio>
-                      <Radio value={SELLER}>Seller</Radio>
+                      <Radio value={BUYER} data-testid="buyer-radio">
+                        Buyer
+                      </Radio>
+                      <Radio value={SELLER} data-testid="seller-radio">
+                        Seller
+                      </Radio>
                     </Radio.Group>
                   </Form.Item>
 
@@ -344,6 +348,7 @@ function LandingPage() {
                         backgroundColor: token.colorPrimary,
                         width: "100%",
                       }}
+                      data-testid="register-button"
                     >
                       Register
                     </Button>

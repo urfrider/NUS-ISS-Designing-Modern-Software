@@ -1,13 +1,11 @@
 import { ShopOutlined } from "@ant-design/icons";
-import { RootState } from "@reduxjs/toolkit/query";
 import { Typography, Card, Button, Tag, Spin } from "antd";
 import axios from "axios";
-import { get } from "http";
-import { parse } from "path";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import jsPDF from "jspdf";
 import JsBarcode from "jsbarcode";
+import { RootState } from "../../redux/store";
 
 const { Title, Text } = Typography;
 
@@ -44,7 +42,7 @@ function OrderFulfilment() {
     }
   };
 
-  const getBuyerIdByOrderId = async (orderId: int) => {
+  const getBuyerIdByOrderId = async (orderId: number) => {
     try {
       setLoading(true);
       const response = await axios.get(
@@ -64,7 +62,7 @@ function OrderFulfilment() {
     }
   };
 
-  const getAddressByBuyerId = async (buyerId: int) => {
+  const getAddressByBuyerId = async (buyerId: number) => {
     try {
       setLoading(true);
       const response = await axios.get(

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { RootState } from "../../redux/store";
 import {
@@ -10,13 +10,14 @@ import {
   Space,
   Tag,
   Typography,
-  Collapse,
   Badge,
   Row,
   Col,
   Divider,
   Empty,
   Spin,
+  Image,
+  Layout,
 } from "antd";
 import {
   ShoppingOutlined,
@@ -29,16 +30,28 @@ import {
 } from "@ant-design/icons";
 import { useDesignToken } from "../../DesignToken";
 import moment from "moment";
+import { toast } from "react-toastify";
+import { ProductType } from "../Product/ProductReviews";
+import CustomCard from "../../components/custom/CustomCard/CustomCard";
+import CustomTable from "../../components/custom/CustomTable/CustomTable";
+import { Content } from "antd/es/layout/layout";
 
 const { Title, Text } = Typography;
-const { Panel } = Collapse;
 
 function Orders() {
   const user = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
   const [orders, setOrders] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [productDetails, setProductDetails] = useState<{
+    [key: string]: ProductType;
+  }>({});
+  const [loadingProducts, setLoadingProducts] = useState<{
+    [key: string]: boolean;
+  }>({});
   const token = useDesignToken();
+  const location = useLocation();
+  const { product: initialProduct } = location.state || {};
 
   const config = {
     headers: {
@@ -56,7 +69,23 @@ function Orders() {
           config
         );
         setOrders(response.data);
-        console.log("order response", response.data);
+
+        // Fetch product details for all products in orders
+        const productIds = new Set();
+        response.data.forEach((order: any) => {
+          if (order.orderItems && order.orderItems.length > 0) {
+            order.orderItems.forEach((item: any) => {
+              if (item.productId) {
+                productIds.add(item.productId);
+              }
+            });
+          }
+        });
+
+        // Fetch details for each product
+        productIds.forEach((productId: any) => {
+          fetchProductDetails(productId);
+        });
       } catch (error) {
         console.error("Failed to fetch orders:", error);
       } finally {
@@ -67,7 +96,32 @@ function Orders() {
     fetchOrders();
   }, []);
 
+  const fetchProductDetails = async (productId: string) => {
+    if (!productId) return;
+
+    try {
+      setLoadingProducts((prev) => ({ ...prev, [productId]: true }));
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/products/${productId}`,
+        config
+      );
+      setProductDetails((prev) => ({
+        ...prev,
+        [productId]: response.data,
+      }));
+    } catch (error) {
+      toast.error(`Failed to fetch details for product ${productId}`);
+    } finally {
+      setLoadingProducts((prev) => ({ ...prev, [productId]: false }));
+    }
+  };
+
+  useEffect(() => {
+    console.log("productDetails", productDetails);
+  }, [productDetails]);
+
   const getOrderStatusTag = (status: string) => {
+    console.log("status", status);
     switch (status?.toLowerCase()) {
       case "completed":
         return (
@@ -151,7 +205,7 @@ function Orders() {
 
   const expandedRowRender = (record: any) => {
     return (
-      <Card bordered={false} style={{ background: "#f9f9f9" }}>
+      <CustomCard bordered={false} style={{ background: "#f9f9f9" }}>
         <Space direction="vertical" style={{ width: "100%" }}>
           <div>
             <Text type="secondary">Payment Method:</Text>{" "}
@@ -163,46 +217,73 @@ function Orders() {
           </Divider>
 
           <Table
-            dataSource={record.items}
+            dataSource={record.orderItems}
             pagination={false}
-            showHeader={false}
+            showHeader={true}
             columns={[
               {
                 title: "Product",
-                dataIndex: "name",
-                key: "name",
-                render: (text: string, item: any) => (
-                  <Space>
-                    <div
-                      style={{
-                        width: 50,
-                        height: 50,
-                        backgroundColor: "#f0f0f0",
-                        display: "inline-block",
-                      }}
-                    >
-                      {item.image && (
-                        <img
-                          src={`data:image/png;base64,${item.image}`}
-                          alt={text}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      )}
-                    </div>
-                    <div>
-                      <div>
-                        <Text strong>{text}</Text>
+                dataIndex: "productId",
+                key: "product",
+                render: (productId: string, item: any) => {
+                  const product = productDetails[productId];
+                  return (
+                    <Space>
+                      <div
+                        style={{
+                          width: 60,
+                          height: 60,
+                          backgroundColor: "#f0f0f0",
+                          display: "inline-block",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {loadingProducts[productId] ? (
+                          <Spin size="small" />
+                        ) : product?.images && product.images.length > 0 ? (
+                          <Image
+                            src={`data:image/png;base64,${product.images}`}
+                            alt={product.name}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                            preview={false}
+                          />
+                        ) : (
+                          <InboxOutlined style={{ fontSize: 24, margin: 18 }} />
+                        )}
                       </div>
-                      {item.variant && (
-                        <div style={{ color: "#888" }}>{item.variant}</div>
-                      )}
-                    </div>
-                  </Space>
-                ),
+                      <div>
+                        <div>
+                          <Text strong>
+                            {loadingProducts[productId] ? (
+                              <Spin size="small" />
+                            ) : product ? (
+                              <Button
+                                type="link"
+                                onClick={() => {
+                                  navigate(`/product/${productId}`);
+                                }}
+                                style={{ padding: 0 }}
+                              >
+                                {product.name}
+                              </Button>
+                            ) : (
+                              `Product ID: ${productId}`
+                            )}
+                          </Text>
+                        </div>
+                        {product?.category && (
+                          <div style={{ color: "#888" }}>
+                            {product.category}
+                          </div>
+                        )}
+                      </div>
+                    </Space>
+                  );
+                },
               },
               {
                 title: "Price",
@@ -229,6 +310,12 @@ function Orders() {
                   <Text strong>${(item.price * item.quantity).toFixed(2)}</Text>
                 ),
               },
+              {
+                title: "Status",
+                dataIndex: "status",
+                key: "status",
+                render: (status: string) => getOrderStatusTag(status),
+              },
             ]}
           />
 
@@ -244,40 +331,44 @@ function Orders() {
             </>
           )}
         </Space>
-      </Card>
+      </CustomCard>
     );
   };
 
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "2rem" }}>
-      <Title level={2} style={{ textAlign: "center", marginBottom: 40 }}>
-        <ShoppingOutlined style={{ marginRight: 12 }} />
-        Your Orders
-      </Title>
+    <Layout style={{ minHeight: "100vh", background: token.colorBgWhite }}>
+      <Content
+        style={{
+          padding: "24px",
+          width: "1200px",
+          margin: "0 auto",
+        }}
+      >
+        <Title level={2} style={{ textAlign: "center", marginBottom: 40 }}>
+          <ShoppingOutlined style={{ marginRight: 12 }} />
+          Your Orders
+        </Title>
 
-      <Row gutter={[24, 24]}>
-        <Col xs={24} md={6}>
-          <Card style={{ marginBottom: 24 }}>
-            <Statistic
-              title="Total Orders"
-              value={orders.length}
-              prefix={<InboxOutlined />}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} md={18}>
-          <Card>
+        <Row gutter={[24, 24]}>
+          <Col xs={24} md={6}>
+            <CustomCard style={{ marginBottom: 24 }}>
+              <Statistic
+                title="Total Orders"
+                value={orders.length}
+                prefix={<InboxOutlined />}
+              />
+            </CustomCard>
+          </Col>
+          <Col xs={24} md={18}>
             {loading ? (
               <div style={{ textAlign: "center", padding: "50px 0" }}>
                 <Spin size="large" />
               </div>
             ) : orders.length > 0 ? (
-              <Table
+              <CustomTable
                 columns={columns}
-                dataSource={orders.map((order: any) => ({
-                  ...order,
-                  key: order.id,
-                }))}
+                dataSource={orders}
+                rowKey={(record) => record.id.toString()}
                 expandable={{ expandedRowRender }}
                 pagination={{ pageSize: 5 }}
               />
@@ -295,10 +386,10 @@ function Orders() {
                 </Button>
               </Empty>
             )}
-          </Card>
-        </Col>
-      </Row>
-    </div>
+          </Col>
+        </Row>
+      </Content>
+    </Layout>
   );
 }
 

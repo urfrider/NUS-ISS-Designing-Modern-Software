@@ -6,9 +6,14 @@ import { useDesignToken } from "../../../DesignToken";
 
 interface CustomCardProps extends CardProps {
   children: ReactNode;
+  boxShadowEnable?: boolean;
 }
 
-const CustomCard: React.FC<CustomCardProps> = ({ children, ...rest }) => {
+const CustomCard: React.FC<CustomCardProps> = ({
+  children,
+  boxShadowEnable = false,
+  ...rest
+}) => {
   const token = useDesignToken();
 
   return (
@@ -20,7 +25,9 @@ const CustomCard: React.FC<CustomCardProps> = ({ children, ...rest }) => {
         fontFamily: token.fontFamily,
         borderRadius: token.borderRadiusMed,
         background: token.colorBgWhite,
-
+        boxShadow: boxShadowEnable
+          ? "0 4px 12px rgba(0, 0, 0, 0.1)"
+          : undefined,
         ...rest.style,
       }}
     >

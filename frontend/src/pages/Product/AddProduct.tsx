@@ -8,6 +8,7 @@ import {
   Button,
   Checkbox,
   Col,
+  Divider,
   Flex,
   Form,
   Input,
@@ -17,12 +18,29 @@ import {
   Select,
   Typography,
   Upload,
+  Card,
+  Space,
 } from "antd";
 import { Content } from "antd/es/layout/layout";
-import { UploadOutlined } from "@ant-design/icons";
-import type { CheckboxProps, UploadProps } from "antd";
+import {
+  UploadOutlined,
+  PlusOutlined,
+  DeleteOutlined,
+  DollarOutlined,
+  TagOutlined,
+  InboxOutlined,
+} from "@ant-design/icons";
+import type { UploadProps, UploadFile } from "antd";
+import { useDesignToken } from "../../DesignToken";
+import CustomCard from "../../components/custom/CustomCard/CustomCard";
+import CustomTypography from "../../components/custom/CustomTypography/CustomTypography";
+import CustomButton from "../../components/custom/CustomButton/CustomButton";
+import CustomInputNumber from "../../components/custom/CustomInputNumber/CustomInputNumber";
+import CustomInputComponent from "../../components/custom/CustomInput/CustomInput";
+import { CustomSelect } from "../../components/custom/CustomSelect/CustomSelect";
+import { AddProductImagePreview } from "./ProductStyles";
 
-interface ProductFormData {
+export interface ProductFormData {
   name: string;
   description: string;
   category: string;
@@ -32,34 +50,25 @@ interface ProductFormData {
   discountPercentage: number;
 }
 
+export const categoryOptions = [
+  { label: "IT", value: "IT" },
+  { label: "Fashion", value: "Fashion" },
+  { label: "Beauty", value: "Beauty" },
+  { label: "Home", value: "Home" },
+  { label: "Health", value: "Health" },
+  { label: "Others", value: "Others" },
+];
+
 export const AddProduct = () => {
   const user = useSelector((state: RootState) => state.user);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [hasDiscount, setHasDiscount] = useState(false);
-  const {
-    // register,
-    // handleSubmit,
-    // formState: { errors },
-  } = useForm<ProductFormData>({
-    defaultValues: {
-      name: "",
-      description: "",
-      category: "",
-      stock: 0,
-      price: 0,
-      hasDiscount: false,
-      discountPercentage: 0,
-    },
-  });
-
-  // const onImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (event.target.files) {
-  //     setImageFile(event.target.files[0]);
-  //   }
-  // };
-
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [form] = Form.useForm();
+  const token = useDesignToken();
+  const { CustomTextArea, CustomInput } = CustomInputComponent;
   const onSubmit = async (data: ProductFormData) => {
-    console.log(imageFile);
     if (!imageFile) {
       toast.error("Please upload an image!");
       return;
@@ -93,87 +102,101 @@ export const AddProduct = () => {
       );
       toast.success("Product successfully added!");
       form.resetFields();
+      setImagePreview(null);
+      setFileList([]);
+      setImageFile(null);
     } catch (e) {
       console.log(e);
+      toast.error("Failed to add product. Please try again.");
     }
   };
 
-  const [form] = Form.useForm();
-
-  const categoryOptions = [
-    { label: "IT", value: "IT" },
-    { label: "Fashion", value: "Fashion" },
-    { label: "Beauty", value: "Beauty" },
-    { label: "Home", value: "Home" },
-    { label: "Health", value: "Health" },
-    { label: "Others", value: "Others" },
-  ];
-
-  const props: UploadProps = {
-    action: undefined,
+  const uploadProps: UploadProps = {
+    accept: "image/*",
+    fileList: fileList,
+    listType: "picture-card",
+    maxCount: 1,
     beforeUpload: (file) => {
-      console.log("File selected:", file);
       setImageFile(file);
+
+      // Create image preview
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+
       return false;
     },
-    onChange({ file, fileList }) {
-      if (file.status !== "uploading") {
-        console.log(file, fileList);
-        // setImageFile(file.originFileObj as File);
-      }
+    onRemove: () => {
+      setImageFile(null);
+      setImagePreview(null);
+      setFileList([]);
+      return true;
     },
-  };
-
-  const onChange: CheckboxProps["onChange"] = () => {
-    setHasDiscount((prev) => !prev);
+    onChange: ({ fileList: newFileList }) => {
+      setFileList(newFileList);
+    },
   };
 
   const onFinish = (values: ProductFormData) => {
     onSubmit(values);
-    form.resetFields();
-    setHasDiscount(false);
   };
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
+    <Layout style={{ minHeight: "100vh", background: token.colorBgBase }}>
       <Content
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#EDF0FF",
-        }}
+        style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}
       >
-        <Flex
-          vertical
+        <CustomCard
+          bordered={false}
           style={{
-            backgroundColor: "white",
-            borderRadius: "10px",
-            paddingLeft: 30,
-            paddingRight: 30,
-            width: "30%",
+            borderRadius: token.borderRadiusMed,
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+            minWidth: 850,
           }}
         >
           <Typography.Title
             level={3}
-            style={{ textAlign: "center", marginTop: 20, marginBottom: 20 }}
+            style={{
+              marginBottom: 24,
+              color: token.colorTextBase,
+              textAlign: "center",
+            }}
           >
-            Create Product
+            Create New Product
           </Typography.Title>
-          <Flex vertical>
-            <Form layout="vertical" form={form} onFinish={onFinish}>
-              <Flex vertical>
+
+          <Divider style={{ marginTop: 0 }} />
+
+          <Form
+            layout="vertical"
+            form={form}
+            onFinish={onFinish}
+            requiredMark={false}
+            style={{ maxWidth: "800px", margin: "0 auto" }}
+          >
+            <Row gutter={24}>
+              <Col xs={24} md={12}>
                 <Form.Item
-                  label="Name"
+                  label="Product Name"
                   name="name"
                   rules={[
                     {
                       required: true,
                       message: "Please input product name!",
                     },
+                    {
+                      max: 50,
+                      message: "Product name cannot be more than 50 characters",
+                    },
                   ]}
                 >
-                  <Input placeholder="Name" />
+                  <CustomInput
+                    style={{ backgroundColor: token.colorBgWhite }}
+                    placeholder="Enter product name"
+                    size="large"
+                  />
                 </Form.Item>
 
                 <Form.Item
@@ -182,25 +205,61 @@ export const AddProduct = () => {
                   rules={[
                     {
                       required: true,
-                      message: "Please input item description!",
+                      message: "Please input product description!",
                     },
                   ]}
                 >
-                  <Input placeholder="Description" />
+                  <CustomTextArea
+                    placeholder="Enter product description"
+                    rows={4}
+                    showCount
+                    maxLength={255}
+                  />
                 </Form.Item>
 
-                <Form.Item
-                  label="Price"
-                  name="price"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please input item price!",
-                    },
-                  ]}
-                >
-                  <InputNumber prefix="$" style={{ width: "100%" }} />
-                </Form.Item>
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Form.Item
+                      label="Price"
+                      name="price"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input price!",
+                        },
+                      ]}
+                    >
+                      <CustomInputNumber
+                        prefix={<DollarOutlined />}
+                        style={{ width: "100%" }}
+                        min={0}
+                        step={0.01}
+                        precision={2}
+                        placeholder="0.00"
+                        size="large"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item
+                      label="Stock"
+                      name="stock"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input stock!",
+                        },
+                      ]}
+                    >
+                      <CustomInputNumber
+                        placeholder="Quantity"
+                        style={{ width: "100%" }}
+                        min={0}
+                        size="large"
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
 
                 <Form.Item
                   label="Category"
@@ -208,15 +267,17 @@ export const AddProduct = () => {
                   rules={[
                     {
                       required: true,
-                      message: "Please select item category!",
+                      message: "Please select product category!",
                     },
                   ]}
                 >
                   <Select
                     showSearch
                     style={{ width: "100%" }}
-                    placeholder="Category"
+                    placeholder="Select category"
                     optionFilterProp="label"
+                    size="large"
+                    suffixIcon={<TagOutlined />}
                     filterSort={(optionA, optionB) =>
                       (optionA?.label ?? "")
                         .toLowerCase()
@@ -225,152 +286,153 @@ export const AddProduct = () => {
                     options={categoryOptions}
                   />
                 </Form.Item>
+              </Col>
 
+              <Col xs={24} md={12}>
                 <Form.Item
-                  label="Image"
+                  label="Product Image"
                   name="image"
                   rules={[
                     {
                       required: true,
-                      message: "Please input item image!",
+                      message: "Please upload a product image!",
                     },
                   ]}
+                  style={{ marginBottom: "24px" }}
                 >
-                  <Upload {...props}>
-                    <Button icon={<UploadOutlined />}>Upload</Button>
-                  </Upload>
-                </Form.Item>
-
-                <Form.Item
-                  label="Stock"
-                  name="stock"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please input stock available!",
-                    },
-                  ]}
-                >
-                  <InputNumber placeholder="Stock" style={{ width: "100%" }} />
-                </Form.Item>
-
-                <Row gutter={16} align="middle">
-                  <Col span={12}>
-                    <Form.Item label="Has Discount" name="hasDiscount">
-                      <Checkbox onChange={onChange}></Checkbox>
-                    </Form.Item>
-                  </Col>
-
-                  <Col span={12}>
-                    {hasDiscount && (
-                      <Form.Item
-                        label="Discount Percentage"
-                        name="discountPercentage"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please input discount percentage!",
-                          },
-                        ]}
-                      >
-                        <InputNumber suffix="%" style={{ width: "100%" }} />
-                      </Form.Item>
+                  <Upload.Dragger
+                    {...uploadProps}
+                    height={200}
+                    style={{
+                      borderRadius: token.borderRadiusSmall,
+                      borderColor: token.colorBorderColor,
+                      // background: token.colorBgWhite,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: 8,
+                    }}
+                  >
+                    {imagePreview ? (
+                      <AddProductImagePreview
+                        src={imagePreview}
+                        alt="Product preview"
+                      />
+                    ) : (
+                      <Space direction="vertical" size="small">
+                        <p className="ant-upload-drag-icon">
+                          <InboxOutlined
+                            style={{
+                              color: token.colorBlue,
+                              fontSize: "48px",
+                            }}
+                          />
+                        </p>
+                        <p style={{ color: token.colorTextBase }}>
+                          Click or drag file to upload
+                        </p>
+                        <p
+                          style={{
+                            color: token.colorTextBaseSecondary,
+                            opacity: token.opacityTextSecondary,
+                          }}
+                        >
+                          Single image upload only
+                        </p>
+                      </Space>
                     )}
-                  </Col>
-                </Row>
+                  </Upload.Dragger>
+                </Form.Item>
 
-                <Flex justify="center">
-                  <Form.Item label={null}>
-                    <Button type="primary" htmlType="submit">
-                      Submit
-                    </Button>
-                  </Form.Item>
-                </Flex>
-              </Flex>
-            </Form>
-          </Flex>
-        </Flex>
+                <CustomCard
+                  size="small"
+                  title="Discount Settings"
+                  style={{
+                    // background: "rgba(132, 144, 255, 0.05)",
+                    borderRadius: token.borderRadiusSmall,
+                  }}
+                >
+                  <Row gutter={16} align="top">
+                    <Col span={12}>
+                      <Form.Item
+                        name="hasDiscount"
+                        valuePropName="checked"
+                        style={{
+                          marginBottom: "8px",
+                        }}
+                      >
+                        <Checkbox
+                          style={{
+                            marginRight: "8px",
+                          }}
+                          onChange={(e) => {
+                            setHasDiscount(e.target.checked);
+                            if (!e.target.checked) {
+                              form.setFieldsValue({
+                                discountPercentage: undefined,
+                              });
+                            }
+                          }}
+                        />
+                        <CustomTypography.Text>
+                          Enable Discount
+                        </CustomTypography.Text>
+                      </Form.Item>
+                    </Col>
+
+                    <Col span={12}>
+                      {hasDiscount && (
+                        <Form.Item
+                          label="Discount Percentage"
+                          name="discountPercentage"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Required!",
+                            },
+                          ]}
+                          style={{ marginBottom: "8px" }}
+                        >
+                          <CustomInputNumber
+                            suffix="%"
+                            style={{ width: "100%" }}
+                            min={0}
+                            max={100}
+                            placeholder="0"
+                          />
+                        </Form.Item>
+                      )}
+                    </Col>
+                  </Row>
+                </CustomCard>
+              </Col>
+            </Row>
+
+            <Divider />
+
+            <Flex justify="center" gap="middle" style={{ marginTop: "24px" }}>
+              <CustomButton
+                onClick={() => form.resetFields()}
+                size="large"
+                style={{ minWidth: "120px" }}
+              >
+                Reset
+              </CustomButton>
+              <CustomButton
+                type="primary"
+                htmlType="submit"
+                size="large"
+                style={{
+                  minWidth: "120px",
+                  background: token.colorPrimary,
+                }}
+              >
+                Create Product
+              </CustomButton>
+            </Flex>
+          </Form>
+        </CustomCard>
       </Content>
     </Layout>
   );
 };
-
-// <div className="h-full w-full flex flex-col justify-center items-center">
-//   <h1 className=" text-xl mb-4">Create Product</h1>
-//   <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
-//     <div className="flex gap-2">
-//       <span className="">Name</span>
-//       <input {...register("name", { required: true })} />
-//       {errors.name && <p className="text-red-500">Name is required.</p>}
-//     </div>
-//     <div className=" flex gap-2">
-//       <span className="">Description</span>
-//       <input {...register("description", { required: true })} />
-//       {errors.description && (
-//         <p className="text-red-500">Description is required.</p>
-//       )}
-//     </div>
-//     <div className=" flex gap-2">
-//       <span className="">Price</span>
-//       <input
-//         type="number"
-//         step="any"
-//         {...register("price", { required: true })}
-//       />
-//       {errors.price && <p className="text-red-500">Price is required.</p>}
-//     </div>
-//     <div className="flex gap-2 items-center">
-//       <span className="">Category</span>
-//       <select
-//         {...register("category", { required: true })}
-//         className="border p-1"
-//       >
-//         <option value="">Select Category</option>
-//         <option value="IT">IT</option>
-//         <option value="Fashion">Fashion</option>
-//         <option value="Beauty">Beauty</option>
-//         <option value="Home">Home</option>
-//         <option value="Health">Health</option>
-//         <option value="Others">Others</option>
-//       </select>
-//       {errors.category && (
-//         <p className="text-red-500">Category is required.</p>
-//       )}
-//     </div>
-//     <div className=" flex gap-2">
-//       <span className="">Image</span>
-//       <input type="file" accept="images/*" onChange={onImageUpload} />
-//     </div>
-//     <div className=" flex gap-2">
-//       <span className="">Stock</span>
-//       <input type="number" {...register("stock", { required: true })} />
-//       {errors.stock && <p className="text-red-500">Stock is required.</p>}
-//     </div>
-
-//     <div className="flex gap-2 items-center">
-//       <span className="">Has Discount</span>
-//       <input
-//         type="checkbox"
-//         {...register("hasDiscount")}
-//         onChange={(e) => setHasDiscount(e.target.checked)}
-//       />
-//     </div>
-
-//     {hasDiscount && (
-//       <div className="flex gap-2 items-center">
-//         <span className="">Discount Percentage</span>
-//         <input
-//           type="number"
-//           {...register("discountPercentage", { required: hasDiscount })}
-//           min="0"
-//           max="100"
-//         />
-//         {errors.discountPercentage && (
-//           <p className="text-red-500">Enter a valid discount percentage.</p>
-//         )}
-//       </div>
-//     )}
-
-//     <button>Submit</button>
-//   </form>
-// </div>

@@ -9,6 +9,9 @@ export const lightTheme = {
     colorError: "#EF4444",
     colorWarning: "#FACC15",
     colorBgBase: "#F7F8FA",
+    colorBorderColor: "#D9D9D9",
+    // colorBgBase: "#FFFFFF",
+
     colorTextBase: "#1F2937",
     colorTextBaseSecondary: "#313C4C",
     opacityTextSecondary: "0.7",
@@ -26,6 +29,10 @@ export const lightTheme = {
     borderRadiusSmall: "4px",
   },
   components: {
+    Table: {
+      // headerBg: "#FFFFFF",
+      // borderColor: "#d9d9d9",
+    },
     Tabs: {
       colorPrimary: "#8490FF",
       inkBarColor: "#8490FF",
@@ -53,10 +60,14 @@ export const lightTheme = {
     Input: {
       activeBorderColor: "#8490FF",
       hoverBorderColor: "#959DF7",
+      activeBg: "#FFFFFF",
     },
     Select: {
       colorPrimary: "#8490FF",
       optionSelectedColor: "#8490FF",
+      selectorBg: "#FFFFFF", // This will set the selector background color
+      optionSelectedBg: "rgba(132, 144, 255, 0.1)",
+      colorBgElevated: "#FFFFFF", // For dropdown background
     },
     DatePicker: {
       colorPrimary: "#8490FF",

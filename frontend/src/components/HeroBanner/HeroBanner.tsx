@@ -7,8 +7,6 @@ import {
   CarousellItem,
   HeroBannerContainer,
   HeroButton,
-  ImageCaption,
-  ImageCaptionText,
   PageButton,
 } from "./HeroBannerStyles";
 import { useEffect, useState } from "react";
