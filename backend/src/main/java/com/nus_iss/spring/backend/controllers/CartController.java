@@ -46,7 +46,7 @@ public class CartController {
         return ResponseEntity.ok(cartService.getCartByUsername(addToCartDto.getUsername()));
     }
 
-    @DeleteMapping("/remove")
+    @PostMapping("/remove")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
     public ResponseEntity<?> removeFromCart(@RequestBody AddToCartDto addToCartDto) {
         Long userId = addToCartDto.getCartId();

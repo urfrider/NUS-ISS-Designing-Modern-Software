@@ -55,8 +55,6 @@ public class CartServiceImpl implements CartService {
             .orElseThrow(() -> new RuntimeException("Product does not exist!"));
 
         logger.info("cartItemDto: {}", cartItemDto);
-        logger.info("product: {}", product);
-
 
         if (cartItemDto.getQuantity() > product.getStock()){
             throw new RuntimeException("Insufficient stock for product ID: " + product.getId());        }
@@ -87,7 +85,6 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public void removeFromCart(AddToCartDto cartItemDto) {
-        logger.info("UNDO COMMAND: {}", cartItemDto);
         Buyer buyer = buyerRepository.findByUsername(cartItemDto.getUsername())
             .orElseThrow(() -> new RuntimeException("Buyer does not exist!"));
         Cart cart = cartRepository.findByBuyer(buyer)

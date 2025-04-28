@@ -6,6 +6,8 @@ export interface CartItemType {
   images: string;
   sellerId: number;
   quantity: number;
+  hasDiscount: boolean;
+  discountPercentage: number;
 }
 
 export interface CartType {

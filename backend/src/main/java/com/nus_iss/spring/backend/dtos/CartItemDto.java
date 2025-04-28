@@ -10,9 +10,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartItemDto {
+    private Long productId;
     private String name;
     private String description;
     private Double price;
+    private Boolean hasDiscount;
+    private Double discountPercentage;    
     private String category;
     @Lob
     private byte[] images;

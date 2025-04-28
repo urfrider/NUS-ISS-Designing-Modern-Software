@@ -188,19 +188,25 @@ function Checkout() {
             <List
               itemLayout="horizontal"
               dataSource={cart?.items || []}
-              renderItem={(item: any) => (
-                <List.Item actions={[<Text strong>x{item?.quantity}</Text>]}>
-                  <List.Item.Meta
-                    title={item?.name}
-                    description={
-                      <Text type="secondary">
-                        ${item?.price?.toFixed(2)} each
-                      </Text>
-                    }
-                  />
-                  <div>${(item?.price * item?.quantity).toFixed(2)}</div>
-                </List.Item>
-              )}
+              renderItem={(item: any) => {
+                const itemPrice = item.hasDiscount
+                  ? item.price * ((100 - item.discountPercentage) / 100)
+                  : item.price;
+
+                return (
+                  <List.Item actions={[<Text strong>x{item?.quantity}</Text>]}>
+                    <List.Item.Meta
+                      title={item?.name}
+                      description={
+                        <Text type="secondary">
+                          ${itemPrice.toFixed(2)} each
+                        </Text>
+                      }
+                    />
+                    <div>${(itemPrice * item?.quantity).toFixed(2)}</div>
+                  </List.Item>
+                );
+              }}
               footer={
                 <div>
                   {/* <Divider style={{ margin: "12px 0" }} /> */}

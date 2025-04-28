@@ -27,6 +27,9 @@ public class CartMapper {
                 cartItemDto.setPrice(item.getProduct().getPrice());
                 cartItemDto.setQuantity(item.getQuantity());
                 cartItemDto.setSellerId(item.getProduct().getSeller().getId());
+                cartItemDto.setProductId(item.getProduct().getId());
+                cartItemDto.setDiscountPercentage(item.getProduct().getDiscountPercentage());
+                cartItemDto.setHasDiscount(item.getProduct().getHasDiscount());
                 return cartItemDto;
             })
             .collect(Collectors.toList());

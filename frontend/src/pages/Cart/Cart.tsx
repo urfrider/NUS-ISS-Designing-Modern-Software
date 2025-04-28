@@ -26,7 +26,7 @@ import { Content } from "antd/es/layout/layout";
 const { Title, Text } = Typography;
 
 interface TableCartItem extends CartItemType {
-  id: string;
+  productId: string;
   key?: string;
   variant?: string;
   itemTotal: number;
@@ -49,6 +49,8 @@ function Cart() {
     setCart(response.data);
     console.log("cart contents", response.data);
   };
+
+  console.log(cart);
 
   const onClearCart = async () => {
     try {
@@ -92,13 +94,13 @@ function Cart() {
     }
   };
 
-  const removeItem = async (itemId: number) => {
+  const removeItem = async (record: any) => {
     //todo: wait for kim to reply i need the itemid to send it back
     const data = {
       cartId: cart?.id,
       username: user?.username,
-      productId: itemId,
-      quantity: 0,
+      productId: record?.id,
+      quantity: record?.quantity,
     };
 
     try {
@@ -112,7 +114,7 @@ function Cart() {
         }
       );
       setCart(response.data);
-      console.log(`Item ${itemId} removed successfully`);
+      console.log(`Item ${record?.id} removed successfully`);
     } catch (e) {
       console.log(e);
     }
@@ -186,23 +188,29 @@ function Cart() {
         <CustomButton
           type="text"
           icon={<DeleteOutlined />}
-          onClick={() => removeItem(record.id)}
+          onClick={() => removeItem(record)}
         />
       ),
     },
   ];
 
   const tableData =
-    cart?.items?.map((item: TableCartItem, index: number) => ({
-      key: index,
-      id: item.id,
-      name: item.name,
-      variant: item.variant || "",
-      price: item.price,
-      quantity: item.quantity,
-      image: item.images,
-      itemTotal: (item.price * item.quantity).toFixed(2) ?? 0,
-    })) || [];
+    cart?.items?.map((item: TableCartItem, index: number) => {
+      const itemPrice = item.hasDiscount
+        ? item.price * ((100 - item.discountPercentage) / 100)
+        : item.price;
+
+      return {
+        key: index,
+        id: item.productId,
+        name: item.name,
+        variant: item.variant || "",
+        price: itemPrice,
+        quantity: item.quantity,
+        image: item.images,
+        itemTotal: (itemPrice * item.quantity).toFixed(2) ?? 0,
+      };
+    }) || [];
 
   console.log("tableData", tableData);
 

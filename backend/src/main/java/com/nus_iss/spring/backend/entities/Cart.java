@@ -39,7 +39,9 @@ public class Cart {
 
     public void updateTotalAmount(){
         this.totalAmount = cartItems.stream()
-            .map((item) -> item.getProduct().getPrice() * item.getQuantity())
+            .map((item) -> item.getProduct().getHasDiscount() ? 
+            item.getProduct().getPrice() * (100 - item.getProduct().getDiscountPercentage()) / 100 * item.getQuantity() : 
+            item.getProduct().getPrice() * item.getQuantity())
             .reduce(0.0, Double::sum);
     }
     
