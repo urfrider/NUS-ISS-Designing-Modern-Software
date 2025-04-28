@@ -41,6 +41,18 @@ jobs:
           cd backend
           ./gradlew clean test
 
+      # Step 5: Build backend
+      - name: Build backend
+        run: |
+          cd backend
+          ./gradlew build
+
+      - name: Upload built backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-artifact
+          path: backend/build/libs/*.jar
+
       # Step 5: Upload test results 
       - name: Upload test results
         if: always()
