@@ -79,7 +79,7 @@ pipeline {
             steps {
                  script {
                     sh  '''
-                    docker build -t guokecheng/molymarket:backend-jenkins ./backend"
+                    docker build -t guokecheng/molymarket:backend-jenkins ./backend
                     docker push guokecheng/molymarket:backend-jenkins
                     '''
                 }
