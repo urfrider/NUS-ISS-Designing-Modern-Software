@@ -90,7 +90,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['ec2-ssh-key']) {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no ec2-user@3.107.208.228
+                    ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-107-208-228.ap-southeast-2.compute.amazonaws.com
                     docker pull guokecheng/molymarket:backend-jenkins &&
                     docker stop molymarket-backend || true &&
                     docker rm molymarket-backend || true &&
