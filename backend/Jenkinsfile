@@ -87,7 +87,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no ec2-user@3.107.208.228 "
+                    ssh -o StrictHostKeyChecking=no ec2-user@3.107.208.228
                     docker pull guokecheng/molymarket:backend-jenkins &&
                     docker stop molymarket-backend || true &&
                     docker rm molymarket-backend || true &&
