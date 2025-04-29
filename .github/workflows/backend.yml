@@ -64,6 +64,13 @@ jobs:
           name: test-reports-html
           path: backend/build/reports/tests/test
 
+      - name: Create .env file
+        run: |
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> backend/.env
+          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> backend/.env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> backend/.env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> backend/.env
+
       # Step 5: Build backend
       - name: Build backend
         run: |
