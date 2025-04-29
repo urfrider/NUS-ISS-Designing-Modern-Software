@@ -88,24 +88,23 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sshagent(credentials: ['ec2-ssh-key']) {
-                    sh '''
-                    ssh ec2-user@ec2-3-107-208-228.ap-southeast-2.compute.amazonaws.com
-                    docker ps
-                    docker pull guokecheng/molymarket:backend-jenkins &&
-                    docker stop molymarket-backend || true &&
-                    docker rm molymarket-backend || true &&
-                    docker run -d --name molymarket-backend -p 8080:8080 guokecheng/molymarket:backend-jenkins
-                    docker ps
-                    '''
-                    // sh """
-                    // docker stop ${DOCKER_IMAGE} || true
-                    // docker rm ${DOCKER_IMAGE} || true
-                    // docker run -d --name ${DOCKER_IMAGE} -p 8080:8080 ${DOCKER_IMAGE}:${DOCKER_TAG}
-                    // """
+                script {
+                    def EC2_HOST = "ec2-user@3.107.208.228"
+        
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${EC2_HOST} '
+                        echo "=== [JENKINS DEPLOY] on \$(hostname) at \$(date)" > /home/ec2-user/jenkins_deploy_marker.txt &&
+                        docker pull guokecheng/molymarket:backend-jenkins &&
+                        docker stop molymarket-backend || true &&
+                        docker rm molymarket-backend || true &&
+                        docker run -d --name molymarket-backend -p 8080:8080 guokecheng/molymarket:backend-jenkins &&
+                        docker ps > /home/ec2-user/docker_ps_output.txt
+                    '
+                    """
                 }
             }
         }
+
     }
 
     post {
