@@ -90,11 +90,13 @@ pipeline {
             steps {
                 sshagent(credentials: ['ec2-ssh-key']) {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-107-208-228.ap-southeast-2.compute.amazonaws.com
+                    ssh ec2-user@ec2-3-107-208-228.ap-southeast-2.compute.amazonaws.com
+                    docker ps
                     docker pull guokecheng/molymarket:backend-jenkins &&
                     docker stop molymarket-backend || true &&
                     docker rm molymarket-backend || true &&
                     docker run -d --name molymarket-backend -p 8080:8080 guokecheng/molymarket:backend-jenkins
+                    docker ps
                     '''
                     // sh """
                     // docker stop ${DOCKER_IMAGE} || true
