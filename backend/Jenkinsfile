@@ -88,7 +88,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                script {
+                sshagent(credentials: ['ec2-ssh-key']) {
                     sh '''
                     ssh -o StrictHostKeyChecking=no ec2-user@3.107.208.228
                     docker pull guokecheng/molymarket:backend-jenkins &&
