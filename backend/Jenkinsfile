@@ -18,6 +18,8 @@ pipeline {
             steps {
                 sh '''
                 cd ./backend
+                chmod +x gradlew
+                
                 ./gradlew clean build
                 '''
             }
