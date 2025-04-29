@@ -4,13 +4,16 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'backend-jenkins'
         DOCKER_TAG = 'latest'
+        EC2_IP = '3.107.208.228'
+        GIT_REPO_URL = 'https://github.com/urfrider/NUS-ISS-Designing-Modern-Software.git'
+        GIT_BRANCH = 'main'
     }
     
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/urfrider/NUS-ISS-Designing-Modern-Software.git'
+                git branch: "${GIT_BRANCH}",
+                    url: "${GIT_REPO_URL}"
             }
         }
 
@@ -90,7 +93,7 @@ pipeline {
             steps {
                 sshagent(['ec2-ssh-key']) {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no ec2-user@3.107.208.228 '
+                    ssh -o StrictHostKeyChecking=no ec2-user@${EC2_IP} '
                         echo "=== [JENKINS DEPLOY] on $(hostname) at $(date)" > ~/jenkins_deploy_marker.txt &&
                         docker pull guokecheng/molymarket:backend-jenkins &&
                         docker stop molymarket-backend || true &&
