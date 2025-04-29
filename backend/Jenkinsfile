@@ -88,7 +88,6 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Stop & remove existing container if any
                     sh '''
                     ssh -o StrictHostKeyChecking=no ec2-user@3.107.208.228 "
                     docker pull guokecheng/molymarket:backend-jenkins &&
