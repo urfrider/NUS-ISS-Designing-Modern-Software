@@ -30,7 +30,7 @@ pipeline {
                 withCredentials([
                     string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
                     string(credentialsId: 'DB_USERNAME', variable: 'DB_USERNAME'),
-                    string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD')
+                    string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
                     string(credentialsId: 'SECRET_KEY', variable: 'SECRET_KEY')
                 ]) {
                     sh '''
