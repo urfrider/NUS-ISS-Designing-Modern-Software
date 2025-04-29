@@ -88,19 +88,17 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                script {
-                    def EC2_HOST = "ec2-user@3.107.208.228"
-        
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ${EC2_HOST} '
-                        echo "=== [JENKINS DEPLOY] on \$(hostname) at \$(date)" > /home/ec2-user/jenkins_deploy_marker.txt &&
+                sshagent(['ec2-ssh-key']) {
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no ec2-user@3.107.208.228 '
+                        echo "=== [JENKINS DEPLOY] on $(hostname) at $(date)" > ~/jenkins_deploy_marker.txt &&
                         docker pull guokecheng/molymarket:backend-jenkins &&
                         docker stop molymarket-backend || true &&
                         docker rm molymarket-backend || true &&
                         docker run -d --name molymarket-backend -p 8080:8080 guokecheng/molymarket:backend-jenkins &&
-                        docker ps > /home/ec2-user/docker_ps_output.txt
+                        docker ps > ~/docker_ps_output.txt
                     '
-                    """
+                    '''
                 }
             }
         }
