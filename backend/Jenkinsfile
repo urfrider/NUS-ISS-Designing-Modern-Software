@@ -75,6 +75,7 @@ pipeline {
         stage('Dockerize') {
             steps {
                 script {
+                    // Dockerise
                     sh '''
                     sh "docker build -t guokecheng/molymarket:backend-jenkins ./backend"
                     docker push guokecheng/molymarket:backend-jenkins
