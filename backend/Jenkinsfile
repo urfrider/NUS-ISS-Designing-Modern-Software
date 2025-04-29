@@ -46,7 +46,8 @@ pipeline {
         stage('Dockerize') {
             steps {
                 script {
-                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ./backend"
+                    sh "docker build -t guokecheng/molymarket:backend-jenkins ./backend"
+                    // sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ./backend"
                 }
             }
         }
@@ -56,10 +57,15 @@ pipeline {
                 script {
                     // Stop & remove existing container if any
                     sh """
-                    docker stop ${DOCKER_IMAGE} || true
-                    docker rm ${DOCKER_IMAGE} || true
-                    docker run -d --name ${DOCKER_IMAGE} -p 8080:8080 ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    docker stop molymarket-backend || true
+                    docker rm molymarket-backend || true
+                    docker run -d --name molymarket-backend -p 8080:8080 guokecheng/molymarket:backend-jenkins
                     """
+                    // sh """
+                    // docker stop ${DOCKER_IMAGE} || true
+                    // docker rm ${DOCKER_IMAGE} || true
+                    // docker run -d --name ${DOCKER_IMAGE} -p 8080:8080 ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    // """
                 }
             }
         }
