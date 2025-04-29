@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'nus-iss-backend'
+        DOCKER_IMAGE = 'backend-jenkins'
         DOCKER_TAG = 'latest'
     }
     
