@@ -69,7 +69,7 @@ jobs:
           echo "DB_HOST=${{ secrets.DB_HOST }}" >> backend/.env
           echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> backend/.env
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> backend/.env
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> backend/.env
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> backend/.env
 
       # Step 5: Build backend
       - name: Build backend
@@ -90,8 +90,8 @@ jobs:
       - name: Docker build and push backend
         run: |
           pwd
-          docker build -t guokecheng/molymarket:backend ./backend
-          docker push guokecheng/molymarket:backend
+          docker build -t guokecheng/molymarket:backend-github ./backend
+          docker push guokecheng/molymarket:backend-github
 
       
       
