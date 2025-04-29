@@ -64,8 +64,10 @@ pipeline {
 
         stage('Log in to Dockerhub') {
             steps {
-                
-                script {
+                withCredentials([
+                    string(credentialsId: 'DOCKERHUB_USERNAME', variable: 'DOCKERHUB_USERNAME'),
+                    string(credentialsId: 'DOCKERHUB_PASSWORD', variable: 'DOCKERHUB_PASSWORD')
+                ]) {
                     sh '''
                     echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
                     '''
@@ -75,13 +77,8 @@ pipeline {
 
         stage('Dockerize') {
             steps {
-                withCredentials([
-                    string(credentialsId: 'DOCKERHUB_USERNAME', variable: 'DOCKERHUB_USERNAME'),
-                    string(credentialsId: 'DOCKERHUB_PASSWORD', variable: 'DOCKERHUB_PASSWORD')
-                ]) {
-                    sh '''
-                    echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-                    '''
+                 script {
+                    sh "docker build -t guokecheng/molymarket:backend-jenkins ./backend"
                 }
             }
         }
