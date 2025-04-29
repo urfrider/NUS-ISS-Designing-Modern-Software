@@ -25,6 +25,25 @@ pipeline {
             }
         }
 
+        stage('Create .env File') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
+                    string(credentialsId: 'DB_USERNAME', variable: 'DB_USERNAME'),
+                    string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD')
+                    string(credentialsId: 'SECRET_KEY', variable: 'SECRET_KEY')
+                ]) {
+                    sh '''
+                    mkdir -p backend
+                    echo "DB_HOST=$DB_HOST" > backend/.env
+                    echo "DB_USERNAME=$DB_USERNAME" >> backend/.env
+                    echo "DB_PASSWORD=$DB_PASSWORD" >> backend/.env
+                    echo "SECRET_KEY=$SECRET_KEY" >> backend/.env
+                    '''
+                }
+            }
+        }
+
         stage('Test') {
             steps {
                 withCredentials([
