@@ -165,7 +165,7 @@ function Orders() {
       key: "createdAt",
       render: (date: string) => (
         <Space>
-          <CalendarOutlined />
+          {/* <CalendarOutlined /> */}
           <span>{moment(date).format("MMM DD, YYYY")}</span>
         </Space>
       ),
@@ -176,7 +176,7 @@ function Orders() {
       key: "totalAmount",
       render: (amount: number) => (
         <Space>
-          <DollarOutlined />
+          {/* <DollarOutlined /> */}
           <Text strong>${amount?.toFixed(2)}</Text>
         </Space>
       ),
@@ -295,12 +295,7 @@ function Orders() {
                 title: "Quantity",
                 dataIndex: "quantity",
                 key: "quantity",
-                render: (quantity: number) => (
-                  <Badge
-                    count={quantity}
-                    style={{ backgroundColor: token.colorPrimary }}
-                  />
-                ),
+                render: (quantity: number) => <Text> {quantity}</Text>,
               },
               {
                 title: "Total",

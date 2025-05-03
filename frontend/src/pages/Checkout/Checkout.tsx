@@ -17,6 +17,7 @@ import {
   Flex,
   theme,
   Layout,
+  Typography,
 } from "antd";
 import {
   CreditCardOutlined,
@@ -34,8 +35,9 @@ import CustomButton from "../../components/custom/CustomButton/CustomButton";
 import { Content } from "antd/es/layout/layout";
 
 const { Title, Text } = CustomTypography;
+const { Text: AntText } = Typography;
 
-function Checkout() {
+const Checkout = () => {
   const user = useSelector((state: RootState) => state.user);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [paypalEmail, setPaypalEmail] = useState("");
@@ -96,11 +98,12 @@ function Checkout() {
 
   async function makePayment(data: any) {
     try {
+      // Use the actual discounted total for payment
       await axios.post(
         `${import.meta.env.VITE_API_URL!}/api/payment`,
         {
           paymentType: paymentMethod,
-          amount: cart?.totalAmount,
+          amount: calculateOrderSummary().total,
           details: data,
         },
         config
@@ -151,6 +154,38 @@ function Checkout() {
     }
   };
 
+  // Calculate order summary with consideration for discounts
+  const calculateOrderSummary = () => {
+    if (!cart?.items || cart.items.length === 0) {
+      return {
+        subtotal: 0,
+        savings: 0,
+        total: 0,
+      };
+    }
+
+    let subtotal = 0;
+    let discountedTotal = 0;
+
+    cart.items.forEach((item: any) => {
+      const originalItemTotal = item.price * item.quantity;
+      subtotal += originalItemTotal;
+
+      const discountedItemPrice = item.hasDiscount
+        ? item.price * ((100 - item.discountPercentage) / 100)
+        : item.price;
+      discountedTotal += discountedItemPrice * item.quantity;
+    });
+
+    return {
+      subtotal: subtotal,
+      savings: subtotal - discountedTotal,
+      total: discountedTotal,
+    };
+  };
+
+  const orderSummary = calculateOrderSummary();
+
   useEffect(() => {
     fetchCart();
   }, []);
@@ -189,32 +224,127 @@ function Checkout() {
               itemLayout="horizontal"
               dataSource={cart?.items || []}
               renderItem={(item: any) => {
-                const itemPrice = item.hasDiscount
+                const originalPrice = item.price;
+                const discountedPrice = item.hasDiscount
                   ? item.price * ((100 - item.discountPercentage) / 100)
                   : item.price;
+                const originalItemTotal = originalPrice * item.quantity;
+                const discountedItemTotal = discountedPrice * item.quantity;
 
                 return (
                   <List.Item actions={[<Text strong>x{item?.quantity}</Text>]}>
                     <List.Item.Meta
-                      title={item?.name}
+                      title={
+                        <Flex align="center" gap={8}>
+                          {item.name}
+                          {/* {item.hasDiscount && (
+                            <AntText
+                              style={{
+                                backgroundColor: token.colorError,
+                                color: token.colorBgWhite,
+                                fontSize: token.fontSizeSmall,
+                                padding: "2px 8px",
+                                borderRadius: token.borderRadiusSmall,
+                              }}
+                            >
+                              {item.discountPercentage}% OFF
+                            </AntText>
+                          )} */}
+                        </Flex>
+                      }
                       description={
-                        <Text type="secondary">
-                          ${itemPrice.toFixed(2)} each
-                        </Text>
+                        item.hasDiscount ? (
+                          <Space>
+                            <AntText
+                              delete
+                              type="secondary"
+                              style={{ fontSize: token.fontSizeSmall }}
+                            >
+                              ${originalPrice.toFixed(2)} each
+                            </AntText>
+                            <AntText style={{ color: token.colorError }}>
+                              ${discountedPrice.toFixed(2)} each
+                            </AntText>
+                          </Space>
+                        ) : (
+                          <Text type="secondary">
+                            ${discountedPrice.toFixed(2)} each
+                          </Text>
+                        )
                       }
                     />
-                    <div>${(itemPrice * item?.quantity).toFixed(2)}</div>
+                    <div>
+                      {item.hasDiscount ? (
+                        <Space direction="vertical" size={0} align="end">
+                          <AntText
+                            delete
+                            type="secondary"
+                            style={{ fontSize: token.fontSizeSmall }}
+                          >
+                            ${originalItemTotal.toFixed(2)}
+                          </AntText>
+                          <AntText
+                            style={{
+                              color: token.colorError,
+                              fontWeight: "bold",
+                            }}
+                          >
+                            ${discountedItemTotal.toFixed(2)}
+                          </AntText>
+                        </Space>
+                      ) : (
+                        `$${discountedItemTotal.toFixed(2)}`
+                      )}
+                    </div>
                   </List.Item>
                 );
               }}
               footer={
                 <div>
-                  {/* <Divider style={{ margin: "12px 0" }} /> */}
+                  <Divider style={{ margin: "12px 0" }} />
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: 8,
+                    }}
+                  >
+                    <Text>Subtotal:</Text>
+                    <Text>${orderSummary.subtotal.toFixed(2)}</Text>
+                  </div>
+
+                  {orderSummary.savings > 0 && (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: 8,
+                      }}
+                    >
+                      <Text style={{ color: token.colorError }}>Savings:</Text>
+                      <Text style={{ color: token.colorError }}>
+                        -${orderSummary.savings.toFixed(2)}
+                      </Text>
+                    </div>
+                  )}
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: 8,
+                    }}
+                  >
+                    <Text>Shipping:</Text>
+                    <Text>Free</Text>
+                  </div>
+
+                  <Divider style={{ margin: "12px 0" }} />
+
                   <div className="flex justify-between">
-                    <Text strong>Subtotal:</Text>
-                    <Text strong>
-                      ${cart?.totalAmount?.toFixed(2) || "0.00"}
-                    </Text>
+                    <Text strong>Total:</Text>
+                    <Text strong>${orderSummary.total.toFixed(2)}</Text>
                   </div>
                 </div>
               }
@@ -355,7 +485,7 @@ function Checkout() {
                   fontWeight: 600,
                 }}
               >
-                Pay ${cart?.totalAmount?.toFixed(2) || "0.00"}
+                Pay ${orderSummary.total.toFixed(2) || "0.00"}
               </CustomButton>
             </Form>
           </CustomCard>
@@ -363,6 +493,6 @@ function Checkout() {
       </Content>
     </Layout>
   );
-}
+};
 
 export default Checkout;

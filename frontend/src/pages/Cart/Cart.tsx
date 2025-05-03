@@ -4,9 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { RootState } from "../../redux/store";
 import axios from "axios";
 import {
-  Table,
-  Card,
-  Button,
   Typography,
   Row,
   Col,
@@ -17,7 +14,7 @@ import {
 } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useDesignToken } from "../../DesignToken";
-import { CartItemType } from "../../types/Cart";
+import { CartItemType } from "../../types/CartTypes";
 import CustomButton from "../../components/custom/CustomButton/CustomButton";
 import CustomCard from "../../components/custom/CustomCard/CustomCard";
 import CustomTable from "../../components/custom/CustomTable/CustomTable";
@@ -32,7 +29,7 @@ interface TableCartItem extends CartItemType {
   itemTotal: number;
 }
 
-function Cart() {
+const Cart = () => {
   const user = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
   const [cart, setCart] = useState<any>([]);
@@ -150,6 +147,20 @@ function Cart() {
           <div>
             <div>{text}</div>
             <div style={{ color: "#888" }}>{record.variant}</div>
+            {record.hasDiscount && (
+              <Text
+                style={{
+                  backgroundColor: token.colorError,
+                  color: token.colorBgWhite,
+                  fontSize: token.fontSizeSmall,
+                  padding: "2px 8px",
+                  borderRadius: token.borderRadiusSmall,
+                  display: "inline-block",
+                }}
+              >
+                {record.discountPercentage}% OFF
+              </Text>
+            )}
           </div>
         </Space>
       ),
@@ -158,7 +169,23 @@ function Cart() {
       title: "PRICE",
       dataIndex: "price",
       key: "price",
-      render: (price: number) => `$${price.toFixed(2)}`,
+      render: (price: number, record: any) =>
+        record.hasDiscount ? (
+          <Space direction="vertical" size={0}>
+            <Text
+              delete
+              type="secondary"
+              style={{ fontSize: token.fontSizeSmall }}
+            >
+              ${record.originalPrice.toFixed(2)}
+            </Text>
+            <Text style={{ color: token.colorError, fontWeight: "bold" }}>
+              ${price.toFixed(2)}
+            </Text>
+          </Space>
+        ) : (
+          `$${price.toFixed(2)}`
+        ),
     },
     {
       title: "QUANTITY",
@@ -179,7 +206,23 @@ function Cart() {
       title: "TOTAL",
       dataIndex: "itemTotal",
       key: "total",
-      render: (itemTotal: number) => `$${itemTotal}`,
+      render: (itemTotal: number, record: any) =>
+        record.hasDiscount ? (
+          <Space direction="vertical" size={0}>
+            <Text
+              delete
+              type="secondary"
+              style={{ fontSize: token.fontSizeSmall }}
+            >
+              ${(record.originalPrice * record.quantity).toFixed(2)}
+            </Text>
+            <Text style={{ color: token.colorError, fontWeight: "bold" }}>
+              ${itemTotal}
+            </Text>
+          </Space>
+        ) : (
+          `$${itemTotal}`
+        ),
     },
     {
       title: "",
@@ -196,8 +239,9 @@ function Cart() {
 
   const tableData =
     cart?.items?.map((item: TableCartItem, index: number) => {
-      const itemPrice = item.hasDiscount
-        ? item.price * ((100 - item.discountPercentage) / 100)
+      const originalPrice = item.price;
+      const discountedPrice = item.hasDiscount
+        ? item.price * ((100 - item.discountPercentage!) / 100)
         : item.price;
 
       return {
@@ -205,10 +249,13 @@ function Cart() {
         id: item.productId,
         name: item.name,
         variant: item.variant || "",
-        price: itemPrice,
+        originalPrice: originalPrice,
+        price: discountedPrice,
         quantity: item.quantity,
         image: item.images,
-        itemTotal: (itemPrice * item.quantity).toFixed(2) ?? 0,
+        hasDiscount: item.hasDiscount,
+        discountPercentage: item.discountPercentage,
+        itemTotal: (discountedPrice * item.quantity).toFixed(2) ?? 0,
       };
     }) || [];
 
@@ -221,6 +268,38 @@ function Cart() {
   const allowMoveToCheckout: boolean = useMemo(() => {
     return cart?.items?.length !== 0;
   }, [cart]);
+
+  // Calculate order summary with consideration for discounts
+  const calculateOrderSummary = () => {
+    if (!cart?.items || cart.items.length === 0) {
+      return {
+        subtotal: 0,
+        savings: 0,
+        total: 0,
+      };
+    }
+
+    let subtotal = 0;
+    let discountedTotal = 0;
+
+    cart.items.forEach((item: TableCartItem) => {
+      const originalItemTotal = item.price * item.quantity;
+      subtotal += originalItemTotal;
+
+      const discountedItemPrice = item.hasDiscount
+        ? item.price * ((100 - item.discountPercentage!) / 100)
+        : item.price;
+      discountedTotal += discountedItemPrice * item.quantity;
+    });
+
+    return {
+      subtotal: subtotal,
+      savings: subtotal - discountedTotal,
+      total: discountedTotal,
+    };
+  };
+
+  const orderSummary = calculateOrderSummary();
 
   return (
     <Layout style={{ minHeight: "100vh", background: token.colorBgWhite }}>
@@ -255,8 +334,24 @@ function Cart() {
                 }}
               >
                 <Text>Subtotal</Text>
-                <Text>${cart.totalAmount?.toFixed(2) || "0.00"}</Text>
+                <Text>${orderSummary.subtotal.toFixed(2)}</Text>
               </div>
+
+              {orderSummary.savings > 0 && (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: 10,
+                  }}
+                >
+                  <Text style={{ color: token.colorError }}>Savings</Text>
+                  <Text style={{ color: token.colorError }}>
+                    -${orderSummary.savings.toFixed(2)}
+                  </Text>
+                </div>
+              )}
+
               <div
                 style={{
                   display: "flex",
@@ -285,7 +380,7 @@ function Cart() {
                 }}
               >
                 <Text strong>Total</Text>
-                <Text strong>${cart.totalAmount?.toFixed(2) || "0.00"}</Text>
+                <Text strong>${orderSummary.total.toFixed(2)}</Text>
               </div>
 
               <CustomButton
@@ -317,6 +412,6 @@ function Cart() {
       </Content>
     </Layout>
   );
-}
+};
 
 export default Cart;
