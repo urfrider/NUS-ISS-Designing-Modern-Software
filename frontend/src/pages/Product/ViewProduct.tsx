@@ -35,6 +35,7 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useDesignToken } from "../../DesignToken";
+import CustomButton from "../../components/custom/CustomButton/CustomButton";
 
 const { Content } = Layout;
 const { Search } = Input;
@@ -345,7 +346,7 @@ export const ViewProduct = () => {
               </Select>
             </Col> */}
             <Col xs={12} md={1}>
-              <Button onClick={resetFilters}>Reset</Button>
+              <CustomButton onClick={resetFilters}>Reset</CustomButton>
             </Col>
           </Row>
         </Card>

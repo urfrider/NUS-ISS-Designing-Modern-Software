@@ -256,6 +256,7 @@ function HomePage() {
           justifyContent: "center",
           alignItems: "center",
           backgroundColor: token.colorTextWhite,
+          padding: "32 0",
         }}
       >
         <HeroBanner />
@@ -275,8 +276,7 @@ function HomePage() {
             onChange={onChange}
             centered
           />
-
-          <Flex style={{ gap: 10, marginTop: 16 }}>
+          <Flex style={{ gap: 10 }}>
             <Button onClick={prevPage} disabled={page === 0} type="link">
               Previous Page
             </Button>

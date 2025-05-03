@@ -1,19 +1,50 @@
-import { ShopOutlined } from "@ant-design/icons";
-import { Typography, Card, Button, Tag, Spin } from "antd";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import axios from "axios";
 import jsPDF from "jspdf";
 import JsBarcode from "jsbarcode";
 import { RootState } from "../../redux/store";
+import { toast } from "react-toastify";
+import {
+  Layout,
+  Typography,
+  Divider,
+  Flex,
+  Spin,
+  Empty,
+  Space,
+  Badge,
+  Tabs,
+  Row,
+  Col,
+} from "antd";
+import { Content } from "antd/es/layout/layout";
+import {
+  ShopOutlined,
+  InboxOutlined,
+  PrinterOutlined,
+  RocketOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  TagOutlined,
+  DollarOutlined,
+  EnvironmentOutlined,
+} from "@ant-design/icons";
+import { useDesignToken } from "../../DesignToken";
+import CustomCard from "../../components/custom/CustomCard/CustomCard";
+import CustomTypography from "../../components/custom/CustomTypography/CustomTypography";
+import CustomButton from "../../components/custom/CustomButton/CustomButton";
 
 const { Title, Text } = Typography;
+const { TabPane } = Tabs;
 
-function OrderFulfilment() {
+function OrderFulfillment() {
   const user = useSelector((state: RootState) => state.user);
   const [loading, setLoading] = useState<boolean>(true);
   const [orders, setOrders] = useState<any>([]);
   const [products, setProducts] = useState<any>([]);
+  const [activeTab, setActiveTab] = useState<string>("pending");
+  const token = useDesignToken();
 
   const config = {
     headers: {
@@ -37,6 +68,7 @@ function OrderFulfilment() {
       setOrders(response.data);
     } catch (error) {
       console.error("Failed to fetch orders:", error);
+      toast.error("Failed to load orders. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -44,7 +76,6 @@ function OrderFulfilment() {
 
   const getBuyerIdByOrderId = async (orderId: number) => {
     try {
-      setLoading(true);
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/orders/seller/${user.id}`,
         config
@@ -57,14 +88,12 @@ function OrderFulfilment() {
       }
     } catch (error) {
       console.error("Failed to fetch orders:", error);
-    } finally {
-      setLoading(false);
+      toast.error("Failed to retrieve buyer information.");
     }
   };
 
   const getAddressByBuyerId = async (buyerId: number) => {
     try {
-      setLoading(true);
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/address/${buyerId}`,
         config
@@ -72,8 +101,7 @@ function OrderFulfilment() {
       return response.data;
     } catch (error) {
       console.error("Failed to fetch address:", error);
-    } finally {
-      setLoading(false);
+      toast.error("Failed to retrieve shipping address.");
     }
   };
 
@@ -83,6 +111,8 @@ function OrderFulfilment() {
         (order: any) =>
           order.orderId === parseInt(orderId) && order.status === "PENDING"
       );
+
+      setLoading(true);
       await Promise.all(
         itemsToShip.map((item: any) =>
           axios.post(
@@ -92,9 +122,14 @@ function OrderFulfilment() {
           )
         )
       );
+
+      toast.success("Order has been shipped successfully!");
       await fetchOrders(); // Refresh the orders after shipping
     } catch (error) {
       console.error("Failed to ship order:", error);
+      toast.error("Failed to ship order. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -108,6 +143,7 @@ function OrderFulfilment() {
       setProducts(response.data);
     } catch (error) {
       console.error("Failed to fetch products:", error);
+      toast.error("Failed to load product details.");
     } finally {
       setLoading(false);
     }
@@ -145,6 +181,7 @@ function OrderFulfilment() {
 
   const printShippingLabel = async (orderId: number) => {
     try {
+      setLoading(true);
       // Fetch the buyer's address
       const address = await getBuyerAddress(orderId);
 
@@ -247,126 +284,299 @@ function OrderFulfilment() {
 
       // Save the PDF
       doc.save(`Shipping_Label_Order_${orderId}.pdf`);
+      toast.success("Shipping label generated successfully!");
     } catch (error) {
       console.error("Failed to generate shipping label:", error);
+      toast.error("Failed to generate shipping label. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "DELIVERED":
+        return token.colorSuccess;
+      case "CANCELLED":
+        return token.colorError;
+      case "PENDING":
+        return token.colorWarning;
+      default:
+        return "cyan";
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "DELIVERED":
+        return <CheckCircleOutlined />;
+      case "CANCELLED":
+        return <CloseCircleOutlined />;
+      case "PENDING":
+        return <InboxOutlined />;
+      default:
+        return <TagOutlined />;
+    }
+  };
+
+  const renderOrderItems = (items: any[]) => {
+    return (
+      <div style={{ marginTop: 12 }}>
+        {items.map((item: any) => (
+          <Flex
+            key={item.id}
+            align="center"
+            justify="space-between"
+            style={{
+              padding: "12px",
+              borderRadius: token.borderRadiusSmall,
+              marginBottom: "12px",
+              background: token.colorBgWhite,
+              boxShadow: "0 1px 2px rgba(0, 0, 0, 0.03)",
+            }}
+          >
+            <Flex vertical gap={4}>
+              <CustomTypography.Text strong style={{ fontSize: 15 }}>
+                {getProductName(item.productId)}
+              </CustomTypography.Text>
+              <Space size={16}>
+                <CustomTypography.Text type="secondary">
+                  ID: {item.productId}
+                </CustomTypography.Text>
+                <CustomTypography.Text>
+                  <DollarOutlined style={{ marginRight: 4 }} />
+                  <span style={{ fontWeight: 500 }}>
+                    ${(item.price * item.quantity).toFixed(2)}
+                  </span>
+                </CustomTypography.Text>
+              </Space>
+            </Flex>
+            <Text>x{item.quantity}</Text>
+            {/* <Badge
+              count={item.quantity}
+              style={{
+                backgroundColor: token.colorPrimary,
+                fontSize: "12px",
+                fontWeight: "bold",
+                padding: "0 8px",
+              }}
+            /> */}
+          </Flex>
+        ))}
+      </div>
+    );
+  };
+
+  const renderPendingOrders = () => {
+    const pendingOrders = Object.entries(groupedOrders.pending);
+
+    if (pendingOrders.length === 0) {
+      return (
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description="No pending shipments"
+          style={{ margin: "40px 0" }}
+        />
+      );
+    }
+
+    return pendingOrders.map(([orderId, items]: any) => (
+      <CustomCard
+        key={orderId}
+        bordered={false}
+        style={{
+          marginBottom: 24,
+          borderRadius: token.borderRadiusMed,
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+        }}
+      >
+        <Flex justify="space-between" align="center">
+          <CustomTypography.Title level={4} style={{ margin: 0 }}>
+            Order #{orderId}
+          </CustomTypography.Title>
+          <Badge
+            status="warning"
+            text={
+              <CustomTypography.Text
+                style={{ fontSize: 14, color: token.colorWarning }}
+              >
+                Awaiting Shipment
+              </CustomTypography.Text>
+            }
+          />
+        </Flex>
+
+        <Divider style={{ margin: "16px 0" }} />
+
+        {renderOrderItems(items)}
+
+        <Divider style={{ margin: "16px 0" }} />
+
+        <Flex justify="flex-end" gap={12}>
+          <CustomButton
+            icon={<PrinterOutlined />}
+            size="large"
+            onClick={() => printShippingLabel(Number(orderId))}
+          >
+            Print Label
+          </CustomButton>
+          <CustomButton
+            type="primary"
+            icon={<RocketOutlined />}
+            size="large"
+            style={{ background: token.colorPrimary }}
+            onClick={() => shipOrder(orderId)}
+          >
+            Ship Order
+          </CustomButton>
+        </Flex>
+      </CustomCard>
+    ));
+  };
+
+  const renderCompletedOrders = () => {
+    const completedOrders = Object.entries(groupedOrders.completed);
+
+    if (completedOrders.length === 0) {
+      return (
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description="No completed orders"
+          style={{ margin: "40px 0" }}
+        />
+      );
+    }
+
+    return completedOrders.map(([orderId, items]: any) => {
+      const status = getOrderStatus(items);
+
+      return (
+        <CustomCard
+          key={orderId}
+          bordered={false}
+          style={{
+            marginBottom: 24,
+            borderRadius: token.borderRadiusMed,
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+          }}
+        >
+          <Flex justify="space-between" align="center">
+            <CustomTypography.Title level={4} style={{ margin: 0 }}>
+              Order #{orderId}
+            </CustomTypography.Title>
+            <Badge
+              status={status === "DELIVERED" ? "success" : "error"}
+              text={
+                <CustomTypography.Text
+                  style={{
+                    fontSize: 14,
+                    color:
+                      status === "DELIVERED"
+                        ? token.colorSuccess
+                        : token.colorError,
+                  }}
+                >
+                  {status}
+                </CustomTypography.Text>
+              }
+            />
+          </Flex>
+
+          <Divider style={{ margin: "16px 0" }} />
+
+          {renderOrderItems(items)}
+
+          <Divider style={{ margin: "16px 0" }} />
+
+          <Flex justify="flex-end">
+            <CustomButton
+              icon={<PrinterOutlined />}
+              size="large"
+              onClick={() => printShippingLabel(Number(orderId))}
+            >
+              Print Label
+            </CustomButton>
+          </Flex>
+        </CustomCard>
+      );
+    });
+  };
+
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "2rem" }}>
-      <Title level={2} style={{ textAlign: "center", marginBottom: 40 }}>
-        <ShopOutlined style={{ marginRight: 12 }} />
-        Your Orders
-      </Title>
+    <Layout style={{ minHeight: "100vh", background: token.colorBgBase }}>
+      <Content
+        style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}
+      >
+        <CustomCard
+          bordered={false}
+          style={{
+            borderRadius: token.borderRadiusMed,
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+            minWidth: 850,
+          }}
+        >
+          <Typography.Title
+            level={3}
+            style={{
+              marginBottom: 24,
+              color: token.colorTextBase,
+              textAlign: "center",
+            }}
+          >
+            <ShopOutlined style={{ marginRight: 12 }} />
+            Order Fulfillment
+          </Typography.Title>
 
-      {loading ? (
-        <Spin size="large" style={{ display: "block", margin: "2rem auto" }} />
-      ) : (
-        <>
-          <div style={{ marginBottom: "2rem" }}>
-            <Title level={3}>Pending Shipment</Title>
-            {Object.keys(groupedOrders.pending).length > 0 ? (
-              Object.entries(groupedOrders.pending).map(
-                ([orderId, items]: any) => (
-                  <Card
-                    key={orderId}
-                    title={`Order ID - ${orderId}`}
-                    style={{ marginBottom: "1rem" }}
-                    extra={
-                      <>
-                        <Button
-                          type="primary"
-                          onClick={() => shipOrder(orderId)}
-                          style={{ marginRight: "1rem" }}
-                        >
-                          Ship This Order
-                        </Button>
-                        <Button
-                          type="default"
-                          onClick={() => printShippingLabel(orderId)}
-                        >
-                          Print Shipping Label
-                        </Button>
-                      </>
-                    }
-                  >
-                    {items.map((item: any) => (
-                      <div
-                        key={item.id}
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          marginBottom: "1rem",
-                        }}
-                      >
-                        <div>
-                          <Text strong>
-                            Product Name: {getProductName(item.productId)}
-                          </Text>
-                          <p>Product ID: {item.productId}</p>
-                          <p>Quantity: {item.quantity}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </Card>
-                )
-              )
-            ) : (
-              <p>No pending shipments.</p>
-            )}
-          </div>
+          <Divider style={{ marginTop: 0 }} />
 
-          <div>
-            <Title level={3}>Completed / Cancelled Orders</Title>
-            {Object.keys(groupedOrders.completed).length > 0 ? (
-              Object.entries(groupedOrders.completed).map(
-                ([orderId, items]: any) => (
-                  <Card
-                    key={orderId}
-                    title={`Order ID - ${orderId}`}
-                    style={{ marginBottom: "1rem" }}
-                    extra={
-                      <Tag
-                        color={
-                          getOrderStatus(items) === "DELIVERED"
-                            ? "green"
-                            : getOrderStatus(items) === "CANCELLED"
-                            ? "red"
-                            : "orange"
-                        }
-                      >
-                        {getOrderStatus(items)}
-                      </Tag>
-                    }
-                  >
-                    {items.map((item: any) => (
-                      <div
-                        key={item.id}
+          {loading ? (
+            <Flex justify="center" align="center" style={{ padding: "60px 0" }}>
+              <Spin size="large" />
+            </Flex>
+          ) : (
+            <Tabs
+              activeKey={activeTab}
+              onChange={setActiveTab}
+              type="card"
+              style={{ marginTop: 16 }}
+            >
+              <TabPane
+                tab={
+                  <span>
+                    <InboxOutlined style={{ marginRight: 8 }} />
+                    Pending Shipment
+                    {Object.keys(groupedOrders.pending).length > 0 && (
+                      <Badge
+                        count={Object.keys(groupedOrders.pending).length}
                         style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          marginBottom: "1rem",
+                          backgroundColor: token.colorWarning,
+                          marginLeft: 8,
                         }}
-                      >
-                        <div>
-                          <p>Product Name: {getProductName(item.productId)}</p>
-                          <p>Product ID: {item.productId}</p>
-                          <p>Quantity: {item.quantity}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </Card>
-                )
-              )
-            ) : (
-              <p>No completed orders.</p>
-            )}
-          </div>
-        </>
-      )}
-    </div>
+                      />
+                    )}
+                  </span>
+                }
+                key="pending"
+              >
+                {renderPendingOrders()}
+              </TabPane>
+              <TabPane
+                tab={
+                  <span>
+                    <CheckCircleOutlined style={{ marginRight: 8 }} />
+                    Completed Orders
+                  </span>
+                }
+                key="completed"
+              >
+                {renderCompletedOrders()}
+              </TabPane>
+            </Tabs>
+          )}
+        </CustomCard>
+      </Content>
+    </Layout>
   );
 }
-export default OrderFulfilment;
+
+export default OrderFulfillment;

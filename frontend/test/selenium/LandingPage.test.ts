@@ -42,7 +42,7 @@ describe("Landing Page Tests", () => {
       until.elementLocated(By.css('input[placeholder="Username"]')),
       5000
     );
-    await usernameInput.sendKeys("hehhehee");
+    await usernameInput.sendKeys("Coolbuyer123");
 
     // Wait for the Password input to appear
     const passwordInput = await driver.wait(

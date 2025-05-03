@@ -115,7 +115,11 @@ function LandingPage() {
       const user = await onLogin(values);
       if (user) {
         dispatch(login(user));
-        navigate("/home");
+        if (user.role === "ROLE_SELLER") {
+          navigate("/products");
+        } else {
+          navigate("/home");
+        }
       }
     }
   };
