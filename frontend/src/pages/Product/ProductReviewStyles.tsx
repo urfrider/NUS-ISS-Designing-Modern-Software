@@ -4,11 +4,7 @@ import { Content } from "antd/es/layout/layout";
 import styled from "styled-components";
 import CustomTypography from "../../components/custom/CustomTypography/CustomTypography";
 
-const { Title, Text, Paragraph } = CustomTypography;
-
-interface StyledCardProps {
-  borderRadius: string;
-}
+const { Paragraph } = CustomTypography;
 
 // export const StyledCard = styled(Card)<StyledCardProps>`
 //   border-radius: ${(props) => props.borderRadius};

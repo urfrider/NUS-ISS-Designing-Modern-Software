@@ -6,29 +6,20 @@ import { RootState } from "../../redux/store";
 import { Product } from "../../types/Product";
 import { toast } from "react-toastify";
 import {
-  Button,
   Checkbox,
   Col,
   Divider,
   Flex,
   Form,
-  Input,
-  InputNumber,
   Layout,
   Row,
   Select,
   Typography,
   Upload,
   Space,
-  Card,
 } from "antd";
 import { Content } from "antd/es/layout/layout";
-import {
-  UploadOutlined,
-  DollarOutlined,
-  TagOutlined,
-  InboxOutlined,
-} from "@ant-design/icons";
+import { DollarOutlined, TagOutlined, InboxOutlined } from "@ant-design/icons";
 import type { UploadProps, UploadFile } from "antd";
 import { categoryOptions, ProductFormData } from "./AddProduct";
 import { useDesignToken } from "../../DesignToken";

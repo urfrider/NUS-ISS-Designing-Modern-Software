@@ -18,7 +18,6 @@ import com.nus_iss.spring.backend.entities.Review;
 import com.nus_iss.spring.backend.services.ReviewServiceImpl;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/reviews")
 public class ReviewController {
     

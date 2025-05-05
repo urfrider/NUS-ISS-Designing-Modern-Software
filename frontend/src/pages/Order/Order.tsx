@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { RootState } from "../../redux/store";
 import {
   Table,
-  Card,
   Button,
   Space,
   Tag,
   Typography,
-  Badge,
   Row,
   Col,
   Divider,
@@ -21,8 +19,6 @@ import {
 } from "antd";
 import {
   ShoppingOutlined,
-  CalendarOutlined,
-  DollarOutlined,
   InboxOutlined,
   ClockCircleOutlined,
   CheckCircleOutlined,
@@ -50,8 +46,6 @@ function Orders() {
     [key: string]: boolean;
   }>({});
   const token = useDesignToken();
-  const location = useLocation();
-  const { product: initialProduct } = location.state || {};
 
   const config = {
     headers: {
@@ -225,7 +219,7 @@ function Orders() {
                 title: "Product",
                 dataIndex: "productId",
                 key: "product",
-                render: (productId: string, item: any) => {
+                render: (productId: string) => {
                   const product = productDetails[productId];
                   return (
                     <Space>

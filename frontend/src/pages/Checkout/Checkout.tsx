@@ -5,17 +5,14 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { RootState } from "../../redux/store";
 import {
-  Card,
   Radio,
   Input,
-  Button,
   List,
   Space,
   Divider,
   Badge,
   Form,
   Flex,
-  theme,
   Layout,
   Typography,
 } from "antd";

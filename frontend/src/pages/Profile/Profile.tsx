@@ -5,9 +5,6 @@ import { logout } from "../../redux/userSlice";
 import { BUYER } from "../../constants/constants";
 import {
   Avatar,
-  Button,
-  Card,
-  Descriptions,
   Divider,
   Flex,
   Layout,
@@ -18,10 +15,7 @@ import {
   Statistic,
 } from "antd";
 import {
-  BookOutlined,
-  ContactsOutlined,
   DollarOutlined,
-  RobotOutlined,
   LogoutOutlined,
   EditOutlined,
   UserOutlined,
