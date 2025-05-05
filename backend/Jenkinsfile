@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'backend-jenkins'
         DOCKER_TAG = 'latest'
-        EC2_IP = '3.107.208.228'
+        EC2_IP = '13.238.201.11'
         GIT_REPO_URL = 'https://github.com/urfrider/NUS-ISS-Designing-Modern-Software.git'
         GIT_BRANCH = 'main'
     }
