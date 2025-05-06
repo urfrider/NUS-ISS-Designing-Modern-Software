@@ -17,6 +17,7 @@ pipeline {
             }
         }
 
+        // backend
         stage('Build') {
             steps {
                 sh '''
@@ -106,6 +107,67 @@ pipeline {
             }
         }
 
+        // frontend 
+        stage('Build') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo "Building the frontend..."
+                sh '''
+                    ls -la
+                    node --version
+                    npm --version
+                    cd frontend
+                    npm ci
+                    npm run build
+                    ls -la
+                '''
+            }
+        }
+
+        stage('Test') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                    cd frontend
+                    test -f dist/index.html
+                    npm run lint
+                '''
+            }
+        }
+
+        // on netlify
+        stage('Deploy'){
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                withCredentials([
+                    string(credentialsId: 'NETLIFY_SITE_ID', variable: 'NETLIFY_SITE_ID'),
+                    string(credentialsId: 'NETLIFY_AUTH_TOKEN', variable: 'NETLIFY_AUTH_TOKEN'),
+                ])
+                {
+                    sh '''
+                    npm install netlify-cli
+                    node_modules/.bin/netlify --version
+                    npm run build
+                    npx netlify deploy --prod
+                    '''
+                }
+            }
+        }
     }
 
     post {
