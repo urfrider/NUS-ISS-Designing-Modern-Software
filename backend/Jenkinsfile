@@ -16,7 +16,7 @@ pipeline {
                     url: "${GIT_REPO_URL}"
             }
         }
-        // build
+
         stage('Build') {
             steps {
                 sh '''
