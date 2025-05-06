@@ -109,12 +109,6 @@ pipeline {
 
         // frontend 
         stage('Build Frontend') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
             steps {
                 echo "Building the frontend..."
                 sh '''
@@ -130,12 +124,6 @@ pipeline {
         }
 
         stage('Test Frontend') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
             steps {
                 sh '''
                     cd frontend
@@ -147,12 +135,6 @@ pipeline {
 
         // on netlify
         stage('Deploy Frontend'){
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
             steps {
                 withCredentials([
                     string(credentialsId: 'NETLIFY_SITE_ID', variable: 'NETLIFY_SITE_ID'),
