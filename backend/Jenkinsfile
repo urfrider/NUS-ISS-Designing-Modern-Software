@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'backend-jenkins'
         DOCKER_TAG = 'latest'
-        EC2_IP = '13.238.201.11'
+        EC2_IP = '13.211.191.98'
         GIT_REPO_URL = 'https://github.com/urfrider/NUS-ISS-Designing-Modern-Software.git'
         GIT_BRANCH = 'main'
     }
@@ -80,7 +80,7 @@ pipeline {
 
         stage('Dockerize') {
             steps {
-                 script {
+                script {
                     sh  '''
                     docker build -t guokecheng/molymarket:backend-jenkins ./backend
                     docker push guokecheng/molymarket:backend-jenkins
