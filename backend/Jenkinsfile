@@ -1,10 +1,14 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'nodejs'
+    }
+
     environment {
         DOCKER_IMAGE = 'backend-jenkins'
         DOCKER_TAG = 'latest'
-        EC2_IP = '3.107.208.228'
+        EC2_IP = '13.211.191.98'
         GIT_REPO_URL = 'https://github.com/urfrider/NUS-ISS-Designing-Modern-Software.git'
         GIT_BRANCH = 'main'
     }
@@ -17,7 +21,8 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        // backend
+        stage('Build Backend') {
             steps {
                 sh '''
                 cd ./backend
@@ -28,7 +33,7 @@ pipeline {
             }
         }
 
-        stage('Create .env File') {
+        stage('Create backend .env File') {
             steps {
                 withCredentials([
                     string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
@@ -47,7 +52,7 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Test Backend') {
             steps {
                 withCredentials([
                     string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
@@ -78,9 +83,9 @@ pipeline {
             }
         }
 
-        stage('Dockerize') {
+        stage('Dockerize Backend') {
             steps {
-                 script {
+                script {
                     sh  '''
                     docker build -t guokecheng/molymarket:backend-jenkins ./backend
                     docker push guokecheng/molymarket:backend-jenkins
@@ -89,7 +94,7 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy Backend') {
             steps {
                 sshagent(['ec2-ssh-key']) {
                     sh '''
@@ -106,6 +111,52 @@ pipeline {
             }
         }
 
+        stage('Create frontend .env File') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'VITE_API_URL', variable: 'VITE_API_URL'),
+                ]) {
+                    sh '''
+                    mkdir -p frontend
+                    echo "VITE_API_URL=$VITE_API_URL" > frontend/.env
+                    '''
+                }
+            }
+        }
+
+        // frontend 
+        stage('Build Frontend') {
+            steps {
+                echo "Building the frontend..."
+                sh '''
+                    ls -la
+                    node --version
+                    npm --version
+                    cd frontend
+                    npm ci
+                    npm run build
+                    ls -la
+                '''
+            }
+        }
+
+        // on netlify
+        stage('Deploy Frontend'){
+            steps {
+                withCredentials([
+                    string(credentialsId: 'NETLIFY_SITE_ID', variable: 'NETLIFY_SITE_ID'),
+                    string(credentialsId: 'NETLIFY_AUTH_TOKEN', variable: 'NETLIFY_AUTH_TOKEN'),
+                ])
+                {
+                    sh '''
+                    cd frontend
+                    npm ci
+                    node_modules/.bin/netlify --version
+                    npx netlify deploy --prod
+                    '''
+                }
+            }
+        }
     }
 
     post {

@@ -15,8 +15,6 @@ import {
   Space,
   Badge,
   Tabs,
-  Row,
-  Col,
 } from "antd";
 import { Content } from "antd/es/layout/layout";
 import {
@@ -25,17 +23,14 @@ import {
   PrinterOutlined,
   RocketOutlined,
   CheckCircleOutlined,
-  CloseCircleOutlined,
-  TagOutlined,
   DollarOutlined,
-  EnvironmentOutlined,
 } from "@ant-design/icons";
 import { useDesignToken } from "../../DesignToken";
 import CustomCard from "../../components/custom/CustomCard/CustomCard";
 import CustomTypography from "../../components/custom/CustomTypography/CustomTypography";
 import CustomButton from "../../components/custom/CustomButton/CustomButton";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { TabPane } = Tabs;
 
 function OrderFulfillment() {
@@ -293,31 +288,31 @@ function OrderFulfillment() {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "DELIVERED":
-        return token.colorSuccess;
-      case "CANCELLED":
-        return token.colorError;
-      case "PENDING":
-        return token.colorWarning;
-      default:
-        return "cyan";
-    }
-  };
+  // const getStatusColor = (status: string) => {
+  //   switch (status) {
+  //     case "DELIVERED":
+  //       return token.colorSuccess;
+  //     case "CANCELLED":
+  //       return token.colorError;
+  //     case "PENDING":
+  //       return token.colorWarning;
+  //     default:
+  //       return "cyan";
+  //   }
+  // };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "DELIVERED":
-        return <CheckCircleOutlined />;
-      case "CANCELLED":
-        return <CloseCircleOutlined />;
-      case "PENDING":
-        return <InboxOutlined />;
-      default:
-        return <TagOutlined />;
-    }
-  };
+  // const getStatusIcon = (status: string) => {
+  //   switch (status) {
+  //     case "DELIVERED":
+  //       return <CheckCircleOutlined />;
+  //     case "CANCELLED":
+  //       return <CloseCircleOutlined />;
+  //     case "PENDING":
+  //       return <InboxOutlined />;
+  //     default:
+  //       return <TagOutlined />;
+  //   }
+  // };
 
   const renderOrderItems = (items: any[]) => {
     return (

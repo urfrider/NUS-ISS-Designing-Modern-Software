@@ -2,7 +2,6 @@ import { Input, InputProps } from "antd";
 import { useDesignToken } from "../../../DesignToken";
 import { PasswordProps, TextAreaProps } from "antd/es/input";
 
-interface CustomInputProps extends InputProps {}
 const CustomInput: React.FC<InputProps> = (props) => {
   const token = useDesignToken();
   const { style, ...restProps } = props;

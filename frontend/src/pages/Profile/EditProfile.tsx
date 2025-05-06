@@ -93,7 +93,7 @@ function EditProfile() {
           ? `${import.meta.env.VITE_API_URL!}/auth/buyerProfile`
           : `${import.meta.env.VITE_API_URL!}/auth/sellerProfile`;
 
-      const response = await axios.post(endpoint, updateData, config);
+      await axios.post(endpoint, updateData, config);
 
       const updatedUserData =
         user.role === BUYER ? { address: values.address } : { uen: values.uen };

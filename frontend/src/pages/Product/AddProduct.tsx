@@ -1,35 +1,23 @@
 import axios from "axios";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { RootState } from "../../redux/store";
 import {
-  Button,
   Checkbox,
   Col,
   Divider,
   Flex,
   Form,
-  Input,
-  InputNumber,
   Layout,
   Row,
   Select,
   Typography,
   Upload,
-  Card,
   Space,
 } from "antd";
 import { Content } from "antd/es/layout/layout";
-import {
-  UploadOutlined,
-  PlusOutlined,
-  DeleteOutlined,
-  DollarOutlined,
-  TagOutlined,
-  InboxOutlined,
-} from "@ant-design/icons";
+import { DollarOutlined, TagOutlined, InboxOutlined } from "@ant-design/icons";
 import type { UploadProps, UploadFile } from "antd";
 import { useDesignToken } from "../../DesignToken";
 import CustomCard from "../../components/custom/CustomCard/CustomCard";
@@ -37,7 +25,6 @@ import CustomTypography from "../../components/custom/CustomTypography/CustomTyp
 import CustomButton from "../../components/custom/CustomButton/CustomButton";
 import CustomInputNumber from "../../components/custom/CustomInputNumber/CustomInputNumber";
 import CustomInputComponent from "../../components/custom/CustomInput/CustomInput";
-import { CustomSelect } from "../../components/custom/CustomSelect/CustomSelect";
 import { AddProductImagePreview } from "./ProductStyles";
 
 export interface ProductFormData {

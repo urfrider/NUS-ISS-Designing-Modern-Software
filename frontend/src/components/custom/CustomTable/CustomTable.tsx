@@ -6,6 +6,7 @@ interface CustomTableProps<T> extends TableProps<T> {
   headerBackgroundColor?: string;
   rowBackgroundColor?: string;
   outerBorderColor?: string;
+  components?: any;
 }
 
 function CustomTable<T extends object>({
