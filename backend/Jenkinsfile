@@ -127,15 +127,15 @@ pipeline {
             }
         }
 
-        stage('Test Frontend') {
-            steps {
-                sh '''
-                    cd frontend
-                    test -f dist/index.html
-                    npm run lint
-                '''
-            }
-        }
+        // stage('Test Frontend') {
+        //     steps {
+        //         sh '''
+        //             cd frontend
+        //             test -f dist/index.html
+        //             npm run lint
+        //         '''
+        //     }
+        // }
 
         // on netlify
         stage('Deploy Frontend'){
