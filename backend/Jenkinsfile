@@ -17,97 +17,101 @@ pipeline {
             }
         }
 
-        // backend
-        stage('Build Backend') {
-            steps {
-                sh '''
-                cd ./backend
-                chmod +x gradlew
+        // // backend
+        // stage('Build Backend') {
+        //     steps {
+        //         sh '''
+        //         cd ./backend
+        //         chmod +x gradlew
                 
-                ./gradlew clean build
-                '''
-            }
-        }
+        //         ./gradlew clean build
+        //         '''
+        //     }
+        // }
 
-        stage('Create .env File') {
-            steps {
-                withCredentials([
-                    string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
-                    string(credentialsId: 'DB_USERNAME', variable: 'DB_USERNAME'),
-                    string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
-                    string(credentialsId: 'SECRET_KEY', variable: 'SECRET_KEY')
-                ]) {
-                    sh '''
-                    mkdir -p backend
-                    echo "DB_HOST=$DB_HOST" > backend/.env
-                    echo "DB_USERNAME=$DB_USERNAME" >> backend/.env
-                    echo "DB_PASSWORD=$DB_PASSWORD" >> backend/.env
-                    echo "SECRET_KEY=$SECRET_KEY" >> backend/.env
-                    '''
-                }
-            }
-        }
+        // stage('Create .env File') {
+        //     steps {
+        //         withCredentials([
+        //             string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
+        //             string(credentialsId: 'DB_USERNAME', variable: 'DB_USERNAME'),
+        //             string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
+        //             string(credentialsId: 'SECRET_KEY', variable: 'SECRET_KEY')
+        //         ]) {
+        //             sh '''
+        //             mkdir -p backend
+        //             echo "DB_HOST=$DB_HOST" > backend/.env
+        //             echo "DB_USERNAME=$DB_USERNAME" >> backend/.env
+        //             echo "DB_PASSWORD=$DB_PASSWORD" >> backend/.env
+        //             echo "SECRET_KEY=$SECRET_KEY" >> backend/.env
+        //             '''
+        //         }
+        //     }
+        // }
 
-        stage('Test Backend') {
-            steps {
-                withCredentials([
-                    string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
-                    string(credentialsId: 'DB_USERNAME', variable: 'DB_USERNAME'),
-                    string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
-                ]) {
-                    echo "Testing the project..."
-                    sh '''
-                    cd ./backend
-                    chmod +x gradlew
+        // stage('Test Backend') {
+        //     steps {
+        //         withCredentials([
+        //             string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
+        //             string(credentialsId: 'DB_USERNAME', variable: 'DB_USERNAME'),
+        //             string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
+        //         ]) {
+        //             echo "Testing the project..."
+        //             sh '''
+        //             cd ./backend
+        //             chmod +x gradlew
                     
-                    ./gradlew clean test
-                    '''
-                }
-            }
-        }
+        //             ./gradlew clean test
+        //             '''
+        //         }
+        //     }
+        // }
 
-        stage('Log in to Dockerhub') {
-            steps {
-                withCredentials([
-                    string(credentialsId: 'DOCKERHUB_USERNAME', variable: 'DOCKERHUB_USERNAME'),
-                    string(credentialsId: 'DOCKERHUB_PASSWORD', variable: 'DOCKERHUB_PASSWORD')
-                ]) {
-                    sh '''
-                    echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-                    '''
-                }
-            }
-        }
+        // stage('Log in to Dockerhub') {
+        //     steps {
+        //         withCredentials([
+        //             string(credentialsId: 'DOCKERHUB_USERNAME', variable: 'DOCKERHUB_USERNAME'),
+        //             string(credentialsId: 'DOCKERHUB_PASSWORD', variable: 'DOCKERHUB_PASSWORD')
+        //         ]) {
+        //             sh '''
+        //             echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+        //             '''
+        //         }
+        //     }
+        // }
 
-        stage('Dockerize Backend') {
-            steps {
-                script {
-                    sh  '''
-                    docker build -t guokecheng/molymarket:backend-jenkins ./backend
-                    docker push guokecheng/molymarket:backend-jenkins
-                    '''
-                }
-            }
-        }
+        // stage('Dockerize Backend') {
+        //     steps {
+        //         script {
+        //             sh  '''
+        //             docker build -t guokecheng/molymarket:backend-jenkins ./backend
+        //             docker push guokecheng/molymarket:backend-jenkins
+        //             '''
+        //         }
+        //     }
+        // }
 
-        stage('Deploy Backend') {
-            steps {
-                sshagent(['ec2-ssh-key']) {
-                    sh '''
-                    ssh -o StrictHostKeyChecking=no ec2-user@${EC2_IP} '
-                        echo "=== [JENKINS DEPLOY] on $(hostname) at $(date)" > ~/jenkins_deploy_marker.txt &&
-                        docker pull guokecheng/molymarket:backend-jenkins &&
-                        docker stop molymarket-backend || true &&
-                        docker rm molymarket-backend || true &&
-                        docker run -d --name molymarket-backend -p 8080:8080 guokecheng/molymarket:backend-jenkins &&
-                        docker ps > ~/docker_ps_output.txt
-                    '
-                    '''
-                }
-            }
-        }
+        // stage('Deploy Backend') {
+        //     steps {
+        //         sshagent(['ec2-ssh-key']) {
+        //             sh '''
+        //             ssh -o StrictHostKeyChecking=no ec2-user@${EC2_IP} '
+        //                 echo "=== [JENKINS DEPLOY] on $(hostname) at $(date)" > ~/jenkins_deploy_marker.txt &&
+        //                 docker pull guokecheng/molymarket:backend-jenkins &&
+        //                 docker stop molymarket-backend || true &&
+        //                 docker rm molymarket-backend || true &&
+        //                 docker run -d --name molymarket-backend -p 8080:8080 guokecheng/molymarket:backend-jenkins &&
+        //                 docker ps > ~/docker_ps_output.txt
+        //             '
+        //             '''
+        //         }
+        //     }
+        // }
 
         // frontend 
+        tools {
+            nodejs 'nodejs' // must match the name you set in Jenkins
+        }
+        
         stage('Build Frontend') {
             steps {
                 echo "Building the frontend..."
