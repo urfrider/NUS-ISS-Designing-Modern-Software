@@ -146,6 +146,7 @@ pipeline {
                 ])
                 {
                     sh '''
+                    cd frontend
                     npm ci
                     node_modules/.bin/netlify --version
                     npm run build
