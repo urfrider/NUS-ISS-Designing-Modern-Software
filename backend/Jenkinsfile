@@ -18,7 +18,7 @@ pipeline {
         }
 
         // backend
-        stage('Build') {
+        stage('Build Backend') {
             steps {
                 sh '''
                 cd ./backend
@@ -48,7 +48,7 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Test Backend') {
             steps {
                 withCredentials([
                     string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
@@ -79,7 +79,7 @@ pipeline {
             }
         }
 
-        stage('Dockerize') {
+        stage('Dockerize Backend') {
             steps {
                 script {
                     sh  '''
@@ -90,7 +90,7 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy Backend') {
             steps {
                 sshagent(['ec2-ssh-key']) {
                     sh '''
@@ -108,7 +108,7 @@ pipeline {
         }
 
         // frontend 
-        stage('Build') {
+        stage('Build Frontend') {
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -129,7 +129,7 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Test Frontend') {
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -146,7 +146,7 @@ pipeline {
         }
 
         // on netlify
-        stage('Deploy'){
+        stage('Deploy Frontend'){
             agent {
                 docker {
                     image 'node:18-alpine'
