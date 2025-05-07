@@ -96,11 +96,7 @@ pipeline {
 
         stage('Clean up') {
             steps {
-                sh '''
-                docker container stop $(docker ps -aq) || true
-                docker container rm $(docker ps -aq) || true
-                docker rmi -f $(docker images -aq) || true
-                '''
+                sh 'docker system prune -f'
             }
         }
 
