@@ -49,18 +49,8 @@ public class BuyerServiceImpl implements BuyerService {
         
         if (buyerOptional.isPresent()) {
             Buyer buyer = buyerOptional.get();
-            if (buyerDto.getUsername() != null) {
-                buyer.setUsername(buyerDto.getUsername());
-            }
-    
-            if (buyerDto.getAddress() != null) {
-                buyer.setAddress(buyerDto.getAddress());
-            }
-    
-            if (buyerDto.getBalance() != null) {
-                buyer.setBalance(buyerDto.getBalance());
-            }
-            
+            buyer.setUsername(buyerDto.getUsername());
+            buyer.setAddress(buyerDto.getAddress());
             buyerRepository.save(buyer);
             return buyerDto;
         } else {
