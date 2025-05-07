@@ -12,7 +12,7 @@ import com.nus_iss.spring.backend.entities.Cart;
 @Component
 public class CartMapper {
 
-    public CartDto toDto(Cart cart){
+    public static CartDto toDto(Cart cart){
         CartDto cartDto = new CartDto();
         cartDto.setId(cart.getId());
         cartDto.setBuyerId(cart.getBuyer().getId());
