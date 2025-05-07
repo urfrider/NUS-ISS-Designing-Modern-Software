@@ -1,12 +1,13 @@
 package com.nus_iss.spring.backend.mappers;
 
+import org.springframework.stereotype.Component;
+
 import com.nus_iss.spring.backend.dtos.BuyerDto;
 import com.nus_iss.spring.backend.dtos.CartDto;
 import com.nus_iss.spring.backend.entities.Buyer;
 
+@Component
 public class BuyerMapper {
-
-    static CartMapper cartMapper;
 
     public static BuyerDto toDto(Buyer buyer) {
         if (buyer == null) {
@@ -17,9 +18,15 @@ public class BuyerMapper {
         buyerDTO.setId(buyer.getId());
         buyerDTO.setUsername(buyer.getUsername());
         buyerDTO.setAddress(buyer.getAddress());
+        buyerDTO.setBalance(buyer.getBalance());
 
-        CartDto cartDto = cartMapper.toDto(buyer.getCart());
-        buyerDTO.setCart(cartDto);
+        if (buyer.getCart() != null) {
+            CartDto cartDto = CartMapper.toDto(buyer.getCart());
+
+            buyerDTO.setCart(cartDto);
+        } else {
+            buyerDTO.setCart(null);
+        }
 
         return buyerDTO;
     }

@@ -52,7 +52,7 @@ const userSlice = createSlice({
       if (updatedUser.address !== undefined)
         state.address = updatedUser.address;
       if (updatedUser.uen !== undefined) state.uen = updatedUser.uen;
-
+      if (updatedUser.balance !== undefined) state.balance = updatedUser.balance;
       // Update local storage so the changes persist
       localStorage.setItem("user", JSON.stringify(state));
     },
