@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../../redux/store";
-import { logout, updateUser } from "../../redux/userSlice";
+import { logout } from "../../redux/userSlice";
 import { BUYER } from "../../constants/constants";
 import {
   Avatar,
@@ -13,10 +13,6 @@ import {
   Row,
   Col,
   Statistic,
-  Modal,
-  Input,
-  Form,
-  message,
 } from "antd";
 import {
   DollarOutlined,
@@ -25,24 +21,17 @@ import {
   UserOutlined,
   ShoppingOutlined,
   ShopOutlined,
-  WalletOutlined,
 } from "@ant-design/icons";
 import { Content } from "antd/es/layout/layout";
 import { useDesignToken } from "../../DesignToken";
 import CustomButton from "../../components/custom/CustomButton/CustomButton";
 import CustomCard from "../../components/custom/CustomCard/CustomCard";
-import { useState } from "react";
-import axios from "axios";
-import { toast } from "react-toastify";
 
 function Profile() {
   const user = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const token = useDesignToken();
-
-  const [isTopupModalVisible, setTopupModalVisible] = useState(false);
-  const [topupAmount, setTopupAmount] = useState("");
 
   const onLogout = () => {
     dispatch(logout(user));
@@ -62,34 +51,6 @@ function Profile() {
       navigate("/sellerProducts");
     }
   };
-
-  const onTopup = () => {
-    setTopupModalVisible(true);
-  };
-
-  const config = {
-    headers: {
-      Authorization: `Bearer ${user.token}`,
-    },
-  };
-
-  const topUp = async (data : any) => {
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/buyerProfile?buyerId=${user.id}`,
-        data,
-        config
-      );
-
-      await axios.get(
-        `${import.meta.env.VITE_API_URL}/auth/buyerProfile?buyerId=${user.id}`,
-        config
-      );
-      
-    } catch (error) {
-      toast.error("Error fetching product");
-    }
-  }
 
   const { Title, Text, Paragraph } = Typography;
 
@@ -206,15 +167,6 @@ function Profile() {
                       vertical
                       style={{ width: "100%", gap: 12, marginTop: 8 }}
                     >
-                      {user.role == BUYER && (
-                        <CustomButton
-                          icon={<WalletOutlined />}
-                          onClick={onTopup}
-                        >
-                          Top Up
-                        </CustomButton>
-                      )}
-
                       <CustomButton
                         icon={<ShoppingOutlined />}
                         onClick={onViewOrders}
@@ -383,42 +335,6 @@ function Profile() {
           </Col>
         </Row>
       </Content>
-
-      <Modal
-        title="Top Up Balance"
-        open={isTopupModalVisible}
-        onOk={() => {
-          const amount = parseFloat(topupAmount);
-          if (isNaN(amount) || amount <= 0) {
-            message.error("Please enter a valid amount.");
-            return;
-          }
-
-          const newBalance = user.balance + amount;
-          topUp({id:user.id, balance:newBalance});
-
-          toast.success(`Successfully topped up SGD ${amount.toFixed(2)}. `);
-          dispatch(updateUser({balance:newBalance}));
-          setTopupModalVisible(false);
-          setTopupAmount("");
-        }}
-        onCancel={() => {
-          setTopupModalVisible(false);
-          setTopupAmount("");
-        }}
-        okText="Top Up"
-      >
-        <Form layout="vertical">
-          <Form.Item label="Amount (SGD)">
-            <Input
-              type="number"
-              value={topupAmount}
-              onChange={(e) => setTopupAmount(e.target.value)}
-              placeholder="Enter amount"
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
     </Layout>
   );
 }
