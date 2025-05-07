@@ -94,6 +94,12 @@ pipeline {
             }
         }
 
+        stage('Clean up') {
+            steps {
+                sh 'docker system prune -f'
+            }
+        }
+
         stage('Deploy Backend') {
             steps {
                 sshagent(['ec2-ssh-key']) {
