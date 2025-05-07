@@ -167,12 +167,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Clean Jenkins Workspace') {
-            steps {
-                sh 'rm -rf /var/jenkins_home/workspace/*'
-            }
-        }
     }
 
     post {
