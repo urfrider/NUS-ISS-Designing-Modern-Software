@@ -73,7 +73,11 @@ function LandingPage() {
       toast.success(response.data);
       const user = await onLogin(values);
       dispatch(login(user));
-      navigate("/home");
+      if (role === BUYER) {
+        navigate("/home");
+      } else {
+        navigate("/products");
+      }
     } catch (error) {
       if (error instanceof AxiosError && error.response) {
         toast.error(error.response.data);
