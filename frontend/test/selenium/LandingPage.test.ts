@@ -170,9 +170,9 @@ describe("Landing Page Tests", () => {
     );
     await registerButton.click();
 
-    await driver.wait(until.urlContains("/home"), 10000);
+    await driver.wait(until.urlContains("/products"), 10000);
     const currentUrl = await driver.getCurrentUrl();
-    expect(currentUrl).toContain("/home");
+    expect(currentUrl).toContain("/products");
   });
 
   test("User sees validation errors with empty form submission", async () => {
